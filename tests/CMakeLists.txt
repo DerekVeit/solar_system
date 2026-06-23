@@ -1,0 +1,25 @@
+add_executable(solar_system_tests
+    test_kepler.cpp
+    test_json_loader.cpp
+)
+
+target_link_libraries(solar_system_tests
+    PRIVATE
+        solar_core
+        Catch2::Catch2WithMain
+)
+
+add_custom_command(TARGET solar_system_tests POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_SOURCE_DIR}/assets
+        ${CMAKE_BINARY_DIR}/assets
+    COMMENT "Copy assets for unit tests"
+)
+
+list(APPEND CMAKE_MODULE_PATH ${Catch2_SOURCE_DIR}/extras)
+
+include(CTest)
+include(Catch)
+catch_discover_tests(solar_system_tests
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+)

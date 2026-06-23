@@ -1,3 +1,7 @@
 *~
 *.sw?
 x
+
+build/
+.cache/
+compile_commands.json

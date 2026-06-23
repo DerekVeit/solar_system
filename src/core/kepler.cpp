@@ -1,0 +1,105 @@
+#include "core/kepler.hpp"
+
+#include <cmath>
+
+namespace solar::core {
+
+namespace {
+
+double normalize_angle(double radians) {
+    radians = std::fmod(radians, kTwoPi);
+    if (radians < 0.0) {
+        radians += kTwoPi;
+    }
+    return radians;
+}
+
+glm::dmat3 rotation_matrix(const KeplerianElements& elements) {
+    const double cos_i = std::cos(elements.inclination_rad);
+    const double sin_i = std::sin(elements.inclination_rad);
+    const double cos_O = std::cos(elements.longitude_ascending_node_rad);
+    const double sin_O = std::sin(elements.longitude_ascending_node_rad);
+    const double cos_w = std::cos(elements.argument_periapsis_rad);
+    const double sin_w = std::sin(elements.argument_periapsis_rad);
+
+    const glm::dvec3 p{
+        cos_O * cos_w - sin_O * sin_w * cos_i,
+        sin_O * cos_w + cos_O * sin_w * cos_i,
+        sin_w * sin_i,
+    };
+    const glm::dvec3 q{
+        -cos_O * sin_w - sin_O * cos_w * cos_i,
+        -sin_O * sin_w + cos_O * cos_w * cos_i,
+        cos_w * sin_i,
+    };
+
+    return glm::dmat3{p, q, glm::dvec3{0.0, 0.0, 1.0}};
+}
+
+}  // namespace
+
+double solve_kepler(double mean_anomaly_rad, double eccentricity) {
+    mean_anomaly_rad = normalize_angle(mean_anomaly_rad);
+
+    double eccentric_anomaly = mean_anomaly_rad;
+    if (eccentricity > 0.8) {
+        eccentric_anomaly = kPi;
+    }
+
+    for (int iteration = 0; iteration < 30; ++iteration) {
+        const double delta = (eccentric_anomaly - eccentricity * std::sin(eccentric_anomaly) -
+                              mean_anomaly_rad) /
+                             (1.0 - eccentricity * std::cos(eccentric_anomaly));
+        eccentric_anomaly -= delta;
+        if (std::abs(delta) < 1e-12) {
+            break;
+        }
+    }
+
+    return eccentric_anomaly;
+}
+
+Displacement position_in_orbital_plane(const KeplerianElements& elements,
+                                       double eccentric_anomaly) {
+    const double cos_e = std::cos(eccentric_anomaly);
+    const double sin_e = std::sin(eccentric_anomaly);
+    const double x = elements.semi_major_axis_km * (cos_e - elements.eccentricity);
+    const double y = elements.semi_major_axis_km * std::sqrt(1.0 - elements.eccentricity *
+                                                                               elements.eccentricity) *
+                     sin_e;
+    return Displacement{glm::dvec3{x, y, 0.0}};
+}
+
+StateVector state_from_kepler(GravitationalParameter mu, const KeplerianElements& elements,
+                              Epoch epoch) {
+    const Duration elapsed{(epoch.jd - elements.epoch.jd) * kSecondsPerDay};
+
+    const double mean_motion = std::sqrt(mu / (elements.semi_major_axis_km *
+                                              elements.semi_major_axis_km *
+                                              elements.semi_major_axis_km));
+    const double mean_anomaly =
+        normalize_angle(elements.mean_anomaly_at_epoch_rad + mean_motion * elapsed.count());
+
+    const double eccentric_anomaly = solve_kepler(mean_anomaly, elements.eccentricity);
+    const Displacement perifocal = position_in_orbital_plane(elements, eccentric_anomaly);
+
+    const glm::dmat3 rotation = rotation_matrix(elements);
+    const glm::dvec3 position_km = rotation * perifocal.km;
+
+    const double radius = glm::length(perifocal.km);
+    const double factor = std::sqrt(mu * elements.semi_major_axis_km) / radius;
+    const glm::dvec3 perifocal_velocity{
+        -std::sin(eccentric_anomaly) * factor,
+        std::sqrt(1.0 - elements.eccentricity * elements.eccentricity) * std::cos(eccentric_anomaly) *
+            factor,
+        0.0,
+    };
+    const glm::dvec3 velocity_km_s = rotation * perifocal_velocity;
+
+    return StateVector{
+        Displacement{position_km},
+        Velocity{velocity_km_s},
+    };
+}
+
+}  // namespace solar::core

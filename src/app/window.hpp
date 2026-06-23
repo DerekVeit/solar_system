@@ -1,0 +1,36 @@
+#pragma once
+
+#include <string>
+
+struct GLFWwindow;
+
+namespace solar::app {
+
+struct WindowConfig {
+    std::string title{"Solar System"};
+    bool fullscreen{true};
+    int windowed_width{1280};
+    int windowed_height{720};
+};
+
+class Window {
+  public:
+    explicit Window(const WindowConfig& config);
+    ~Window();
+
+    Window(const Window&) = delete;
+    Window& operator=(const Window&) = delete;
+
+    [[nodiscard]] bool should_close() const;
+    void poll_events();
+    void swap_buffers();
+
+    [[nodiscard]] GLFWwindow* handle() const { return window_; }
+    [[nodiscard]] int framebuffer_width() const;
+    [[nodiscard]] int framebuffer_height() const;
+
+  private:
+    GLFWwindow* window_{nullptr};
+};
+
+}  // namespace solar::app

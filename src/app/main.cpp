@@ -1,0 +1,70 @@
+#include <chrono>
+#include <filesystem>
+#include <string>
+
+#include <GL/gl.h>
+#include <GLFW/glfw3.h>
+#include <fmt/core.h>
+
+#include "app/window.hpp"
+#include "core/constants.hpp"
+#include "core/json_loader.hpp"
+#include "core/kepler_ephemeris.hpp"
+#include "sim/clock.hpp"
+#include "sim/solar_system.hpp"
+
+namespace {
+
+std::filesystem::path asset_path(const std::string& relative) {
+    const std::filesystem::path executable =
+        std::filesystem::canonical("/proc/self/exe").parent_path();
+    return executable / "assets" / relative;
+}
+
+void key_callback(GLFWwindow* window, int key, int /*scancode*/, int action, int /*mods*/) {
+    if (action == GLFW_PRESS && key == GLFW_KEY_ESCAPE) {
+        glfwSetWindowShouldClose(window, GLFW_TRUE);
+    }
+}
+
+}  // namespace
+
+int main() {
+    try {
+        const auto bodies = solar::core::load_bodies(asset_path("data/bodies.json"));
+        auto ephemeris =
+            std::make_unique<solar::core::KeplerEphemeris>(bodies);
+
+        solar::sim::SimulationClock clock{solar::core::Epoch{solar::core::kJ2000Jd}};
+        clock.set_time_scale(solar::sim::TimeScale::accelerated);
+        clock.set_acceleration(86400.0);
+
+        solar::sim::SolarSystem simulation{std::move(ephemeris), clock};
+
+        solar::app::Window window{{.title = "Solar System", .fullscreen = true}};
+        glfwSetKeyCallback(window.handle(), key_callback);
+
+        auto previous_time = std::chrono::steady_clock::now();
+
+        while (!window.should_close()) {
+            const auto current_time = std::chrono::steady_clock::now();
+            const double delta_seconds =
+                std::chrono::duration<double>(current_time - previous_time).count();
+            previous_time = current_time;
+
+            simulation.clock().advance(delta_seconds);
+
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            window.swap_buffers();
+            window.poll_events();
+        }
+
+        const auto earth = simulation.state("Earth");
+        fmt::print("Earth position at shutdown: {:.0f} {:.0f} {:.0f} km\n",
+                   earth.position.km.x, earth.position.km.y, earth.position.km.z);
+        return 0;
+    } catch (const std::exception& error) {
+        fmt::print(stderr, "fatal error: {}\n", error.what());
+        return 1;
+    }
+}
