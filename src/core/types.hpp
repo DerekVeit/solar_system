@@ -1,7 +1,6 @@
 #pragma once
 
 #include <chrono>
-#include <cstdint>
 #include <glm/glm.hpp>
 
 namespace solar::core {
