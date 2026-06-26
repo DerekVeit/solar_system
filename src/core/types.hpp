@@ -1,7 +1,11 @@
 #pragma once
 
 #include <chrono>
+#include <ctime>
+#include <fmt/core.h>
+#include <fmt/chrono.h>
 #include <glm/glm.hpp>
+#include <string>
 
 namespace solar::core {
 
@@ -22,6 +26,16 @@ struct Epoch {
     static Epoch from_j2000_offset(Duration offset) {
         constexpr JulianDate kJ2000 = 2451545.0;
         return Epoch{kJ2000 + offset.count() / 86400.0};
+    }
+
+    [[nodiscard]] std::string to_string() const {
+        using namespace std::chrono;
+        const sys_days j2000_date{year{2000}/January/1};
+        const sys_seconds j2000 = j2000_date + 12h;
+        const auto offset = since_j2000();
+        const auto tp = j2000 + duration_cast<seconds>(offset);
+        std::string ts = fmt::format("{:%Y-%m-%d %H:%M:%S} UT (approx)", tp);
+        return ts;
     }
 };
 

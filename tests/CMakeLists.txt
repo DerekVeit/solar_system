@@ -1,6 +1,7 @@
 add_executable(solar_system_tests
     test_kepler.cpp
     test_json_loader.cpp
+    test_types.cpp
 )
 
 target_link_libraries(solar_system_tests
