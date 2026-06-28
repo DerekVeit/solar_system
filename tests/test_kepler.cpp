@@ -13,6 +13,8 @@ using Catch::Approx;
 namespace {
 constexpr double kSunMu = 132712440041.93938;
 
+using solar::core::kPi;
+
 struct KeplerCase {
     std::string label;
     double mean_anomaly;
@@ -23,11 +25,10 @@ struct KeplerCase {
 
 TEST_CASE("solve_kepler recovers expected eccentric anomaly", "[kepler]") {
     const KeplerCase test_case = GENERATE(
-        KeplerCase{"circular orbit", solar::core::kPi / 3.0, 0.0, solar::core::kPi / 3.0},
-        KeplerCase{"M = pi, e = 0.5", solar::core::kPi, 0.5, solar::core::kPi},
-        KeplerCase{"M = 0, e = pi/3", 0.0, solar::core::kPi / 3.0, solar::core::kPi / 6.0},
-        KeplerCase{"M = pi/6, e = pi/3", solar::core::kPi / 6.0, solar::core::kPi / 3.0,
-                   solar::core::kPi / 2.0});
+        KeplerCase{"circular orbit", kPi / 3.0, 0.0, kPi / 3.0},
+        KeplerCase{"M = pi, e = 0.5", kPi, 0.5, kPi},
+        KeplerCase{"M = 0, e = pi/3", 0.0, kPi / 3.0, kPi / 6.0},
+        KeplerCase{"M = pi/6, e = pi/3", kPi / 6.0, kPi / 3.0, kPi / 2.0});
 
     INFO(test_case.label);
 
