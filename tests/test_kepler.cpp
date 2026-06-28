@@ -1,6 +1,9 @@
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/generators/catch_generators.hpp>
+#include <catch2/generators/catch_generators_adapters.hpp>
 #include <cmath>
+#include <string>
 
 #include "core/constants.hpp"
 #include "core/kepler.hpp"
@@ -9,32 +12,30 @@ using Catch::Approx;
 
 namespace {
 constexpr double kSunMu = 132712440041.93938;
-}
 
-TEST_CASE("solve_kepler recovers circular orbit eccentric anomaly", "[kepler]") {
-    const double mean_anomaly = solar::core::kPi / 3.0;
-    const double eccentric_anomaly = solar::core::solve_kepler(mean_anomaly, 0.0);
-    CHECK(eccentric_anomaly == Approx(mean_anomaly).margin(1e-10));
-}
+struct KeplerCase {
+    std::string label;
+    double mean_anomaly;
+    double eccentricity;
+    double expected_eccentric_anomaly;
+};
+}  // namespace
 
-TEST_CASE("solve_kepler at M = π, e = 0.5, E = M", "[kepler]") {
-    const double mean_anomaly = solar::core::kPi;
-    const double eccentric_anomaly = solar::core::solve_kepler(mean_anomaly, 0.5);
-    CHECK(eccentric_anomaly == Approx(mean_anomaly).margin(1e-10));
-}
+TEST_CASE("solve_kepler recovers expected eccentric anomaly", "[kepler]") {
+    const KeplerCase test_case = GENERATE(
+        KeplerCase{"circular orbit", solar::core::kPi / 3.0, 0.0, solar::core::kPi / 3.0},
+        KeplerCase{"M = pi, e = 0.5", solar::core::kPi, 0.5, solar::core::kPi},
+        KeplerCase{"M = 0, e = pi/3", 0.0, solar::core::kPi / 3.0, solar::core::kPi / 6.0},
+        KeplerCase{"M = pi/6, e = pi/3", solar::core::kPi / 6.0, solar::core::kPi / 3.0,
+                   solar::core::kPi / 2.0});
 
-TEST_CASE("solve_kepler at M = 0, e = π/3, E = π/6", "[kepler]") {
-    const double mean_anomaly = 0;
-    const double eccentricity = solar::core::kPi / 3;
-    const double eccentric_anomaly = solar::core::solve_kepler(mean_anomaly, eccentricity);
-    CHECK(eccentric_anomaly == Approx(solar::core::kPi / 6).margin(1e-10));
-}
+    INFO(test_case.label);
 
-TEST_CASE("solve_kepler at M = π/6, e = π/3, E = π/2", "[kepler]") {
-    const double mean_anomaly = solar::core::kPi / 6;
-    const double eccentricity = solar::core::kPi / 3;
-    const double eccentric_anomaly = solar::core::solve_kepler(mean_anomaly, eccentricity);
-    CHECK(eccentric_anomaly == Approx(solar::core::kPi / 2).margin(1e-10));
+    const double eccentric_anomaly =
+        solar::core::solve_kepler(test_case.mean_anomaly, test_case.eccentricity);
+
+    CHECK(eccentric_anomaly ==
+          Approx(test_case.expected_eccentric_anomaly).margin(1e-10));
 }
 
 TEST_CASE("state_from_kepler preserves semi-major axis for circular orbit", "[kepler]") {
