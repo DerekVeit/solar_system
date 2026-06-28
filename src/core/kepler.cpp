@@ -111,12 +111,14 @@ StateVector state_from_kepler(GravitationalParameter mu, const KeplerianElements
 
     const double mean_anomaly = mean_anomaly_at_epoch(mu, elements, epoch);
     const double eccentric_anomaly = solve_kepler(mean_anomaly, elements.eccentricity);
-    const Displacement perifocal = position_in_orbital_plane(elements, eccentric_anomaly);
+    const Displacement perifocal_position = position_in_orbital_plane(elements, eccentric_anomaly);
 
     const glm::dmat3 rotation = rotation_matrix(elements);
-    const glm::dvec3 position_km = rotation * perifocal.km;
+    const glm::dvec3 position_km = rotation * perifocal_position.km;
 
-    const glm::dvec3 perifocal_velocity = perifocal_velocity_at_E(mu, elements, eccentric_anomaly, perifocal);
+    const glm::dvec3 perifocal_velocity = perifocal_velocity_at_E(mu, elements,
+                                                                  eccentric_anomaly,
+                                                                  perifocal_position);
     const glm::dvec3 velocity_km_s = rotation * perifocal_velocity;
 
     return StateVector{
