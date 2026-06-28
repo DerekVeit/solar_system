@@ -11,7 +11,7 @@
 using Catch::Approx;
 
 namespace {
-constexpr double kSunMu = 132712440041.93938;
+constexpr double kSunMu = 132712440041.93938;  // km³/s²
 
 using solar::core::kPi;
 
