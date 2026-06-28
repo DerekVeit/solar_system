@@ -42,6 +42,17 @@ glm::dmat3 rotation_matrix(const KeplerianElements& elements) {
     return glm::dmat3{p, q, w};
 }
 
+double mean_anomaly_at_epoch(GravitationalParameter mu, const KeplerianElements& elements, Epoch epoch) {
+    const Duration elapsed{(epoch.jd - elements.epoch.jd) * kSecondsPerDay};
+
+    const double mean_motion = std::sqrt(mu / (elements.semi_major_axis_km *
+                                               elements.semi_major_axis_km *
+                                               elements.semi_major_axis_km));
+    const double mean_anomaly =
+        normalize_angle(elements.mean_anomaly_at_epoch_rad + mean_motion * elapsed.count());
+    return mean_anomaly;
+}
+
 }  // namespace
 
 double solve_kepler(double mean_anomaly_rad, double eccentricity) {
@@ -83,14 +94,7 @@ StateVector state_from_kepler(GravitationalParameter mu, const KeplerianElements
     // time (epoch) → M → E → (x,y) in orbital plane → rotate to 3D → position
     //                                               → velocity in plane → rotate → velocity
 
-    const Duration elapsed{(epoch.jd - elements.epoch.jd) * kSecondsPerDay};
-
-    const double mean_motion = std::sqrt(mu / (elements.semi_major_axis_km *
-                                               elements.semi_major_axis_km *
-                                               elements.semi_major_axis_km));
-    const double mean_anomaly =
-        normalize_angle(elements.mean_anomaly_at_epoch_rad + mean_motion * elapsed.count());
-
+    const double mean_anomaly = mean_anomaly_at_epoch(mu, elements, epoch);
     const double eccentric_anomaly = solve_kepler(mean_anomaly, elements.eccentricity);
     const Displacement perifocal = position_in_orbital_plane(elements, eccentric_anomaly);
 
