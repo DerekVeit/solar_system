@@ -79,6 +79,10 @@ Displacement position_in_orbital_plane(const KeplerianElements& elements,
 
 StateVector state_from_kepler(GravitationalParameter mu, const KeplerianElements& elements,
                               Epoch epoch) {
+    // Conceptually:
+    // time (epoch) → M → E → (x,y) in orbital plane → rotate to 3D → position
+    //                                               → velocity in plane → rotate → velocity
+
     const Duration elapsed{(epoch.jd - elements.epoch.jd) * kSecondsPerDay};
 
     const double mean_motion = std::sqrt(mu / (elements.semi_major_axis_km *
