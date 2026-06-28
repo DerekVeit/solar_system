@@ -86,8 +86,8 @@ StateVector state_from_kepler(GravitationalParameter mu, const KeplerianElements
     const Duration elapsed{(epoch.jd - elements.epoch.jd) * kSecondsPerDay};
 
     const double mean_motion = std::sqrt(mu / (elements.semi_major_axis_km *
-                                              elements.semi_major_axis_km *
-                                              elements.semi_major_axis_km));
+                                               elements.semi_major_axis_km *
+                                               elements.semi_major_axis_km));
     const double mean_anomaly =
         normalize_angle(elements.mean_anomaly_at_epoch_rad + mean_motion * elapsed.count());
 
