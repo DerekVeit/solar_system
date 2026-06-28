@@ -97,7 +97,7 @@ StateVector state_from_kepler(GravitationalParameter mu, const KeplerianElements
     const glm::dmat3 rotation = rotation_matrix(elements);
     const glm::dvec3 position_km = rotation * perifocal.km;
 
-    const double radius = glm::length(perifocal.km);
+    const double radius = perifocal.length();
     const double factor = std::sqrt(mu * elements.semi_major_axis_km) / radius;
     const glm::dvec3 perifocal_velocity{
         -std::sin(eccentric_anomaly) * factor,
