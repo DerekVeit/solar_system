@@ -17,6 +17,26 @@ TEST_CASE("solve_kepler recovers circular orbit eccentric anomaly", "[kepler]") 
     CHECK(eccentric_anomaly == Approx(mean_anomaly).margin(1e-10));
 }
 
+TEST_CASE("solve_kepler at M = π, e = 0.5, E = M", "[kepler]") {
+    const double mean_anomaly = solar::core::kPi;
+    const double eccentric_anomaly = solar::core::solve_kepler(mean_anomaly, 0.5);
+    CHECK(eccentric_anomaly == Approx(mean_anomaly).margin(1e-10));
+}
+
+TEST_CASE("solve_kepler at M = 0, e = π/3, E = π/6", "[kepler]") {
+    const double mean_anomaly = 0;
+    const double eccentricity = solar::core::kPi / 3;
+    const double eccentric_anomaly = solar::core::solve_kepler(mean_anomaly, eccentricity);
+    CHECK(eccentric_anomaly == Approx(solar::core::kPi / 6).margin(1e-10));
+}
+
+TEST_CASE("solve_kepler at M = π/6, e = π/3, E = π/2", "[kepler]") {
+    const double mean_anomaly = solar::core::kPi / 6;
+    const double eccentricity = solar::core::kPi / 3;
+    const double eccentric_anomaly = solar::core::solve_kepler(mean_anomaly, eccentricity);
+    CHECK(eccentric_anomaly == Approx(solar::core::kPi / 2).margin(1e-10));
+}
+
 TEST_CASE("state_from_kepler preserves semi-major axis for circular orbit", "[kepler]") {
     const solar::core::KeplerianElements elements{
         .semi_major_axis_km = solar::core::kAuKm,
