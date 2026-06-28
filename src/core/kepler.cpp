@@ -32,8 +32,13 @@ glm::dmat3 rotation_matrix(const KeplerianElements& elements) {
         -sin_O * sin_w + cos_O * cos_w * cos_i,
         cos_w * sin_i,
     };
+    const glm::dvec3 w{
+        0.0,
+        0.0,
+        1.0,
+    };
 
-    return glm::dmat3{p, q, glm::dvec3{0.0, 0.0, 1.0}};
+    return glm::dmat3{p, q, w};
 }
 
 }  // namespace
