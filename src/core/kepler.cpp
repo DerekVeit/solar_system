@@ -58,7 +58,7 @@ const glm::dvec3 perifocal_velocity_at_E(GravitationalParameter mu,
                                          const double eccentric_anomaly,
                                          const Displacement perifocal_position) {
     const double radius = perifocal_position.length();
-    const double factor = std::sqrt(mu * elements.semi_major_axis_km) / radius;
+    const double factor = std::sqrt(mu * elements.semi_major_axis_km) / radius;  // km/s
     const glm::dvec3 perifocal_velocity{
         -std::sin(eccentric_anomaly) * factor,
         std::sqrt(1.0 - elements.eccentricity * elements.eccentricity) * std::cos(eccentric_anomaly) *
