@@ -61,12 +61,13 @@ double solve_kepler(double mean_anomaly_rad, double eccentricity) {
 
 Displacement position_in_orbital_plane(const KeplerianElements& elements,
                                        double eccentric_anomaly) {
-    const double cos_e = std::cos(eccentric_anomaly);
-    const double sin_e = std::sin(eccentric_anomaly);
-    const double x = elements.semi_major_axis_km * (cos_e - elements.eccentricity);
-    const double y = elements.semi_major_axis_km * std::sqrt(1.0 - elements.eccentricity *
-                                                                               elements.eccentricity) *
-                     sin_e;
+    const double e = elements.eccentricity;
+    const double a = elements.semi_major_axis_km;
+    const double b = a * std::sqrt(1.0 - e * e);
+
+    const double x = a * (std::cos(eccentric_anomaly) - e);
+    const double y = b * std::sin(eccentric_anomaly);
+
     return Displacement{glm::dvec3{x, y, 0.0}};
 }
 
