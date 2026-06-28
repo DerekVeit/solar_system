@@ -1,3 +1,10 @@
 CompileFlags:
   CompilationDatabase: build/
 
+---
+If:
+  PathMatch: tests/.*\.cpp
+CompileFlags:
+  Add:
+    - -Wno-c2y-extensions
+
