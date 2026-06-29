@@ -4,6 +4,7 @@
 #include <catch2/generators/catch_generators_adapters.hpp>
 #include <cmath>
 #include <string>
+#include <tuple>
 
 #include "core/constants.hpp"
 #include "core/kepler.hpp"
@@ -12,6 +13,7 @@ using Catch::Approx;
 
 namespace {
 constexpr double kSunMu = 132712440041.93938;  // km³/s²
+constexpr double kYearDays = 365.25;
 
 using solar::core::kPi;
 
@@ -84,7 +86,15 @@ TEST_CASE("state_from_kepler completes one revolution per orbital period", "[kep
     CHECK(later.position.km.y == Approx(start.position.km.y).margin(1e3));
 }
 
-TEST_CASE("state_from_kepler advances one quarter orbit in a quarter year", "[kepler]") {
+TEST_CASE("state_from_kepler advances circular orbit to expected positions", "[kepler]") {
+    using Row = std::tuple<double, double, double>;
+
+    const auto [days, expected_x, expected_y] = GENERATE(table<double, double, double>({
+        Row{kYearDays / 4.0, 0.0, solar::core::kAuKm},
+        Row{kYearDays / 2.0, -solar::core::kAuKm, 0.0},
+        Row{3.0 * kYearDays / 4.0, 0.0, -solar::core::kAuKm},
+    }));
+
     const solar::core::KeplerianElements elements{
         .semi_major_axis_km = solar::core::kAuKm,
         .eccentricity = 0.0,
@@ -95,10 +105,10 @@ TEST_CASE("state_from_kepler advances one quarter orbit in a quarter year", "[ke
         .epoch = solar::core::Epoch{solar::core::kJ2000Jd},
     };
 
-    const auto quarter_orbit = solar::core::state_from_kepler(
+    const auto state = solar::core::state_from_kepler(
         kSunMu, elements,
-        solar::core::Epoch{solar::core::kJ2000Jd + 365.25 / 4.0});
+        solar::core::Epoch{solar::core::kJ2000Jd + days});
 
-    CHECK(quarter_orbit.position.km.x == Approx(0.0).margin(2e4));
-    CHECK(quarter_orbit.position.km.y == Approx(solar::core::kAuKm).margin(2e4));
+    CHECK(state.position.km.x == Approx(expected_x).margin(2e4));
+    CHECK(state.position.km.y == Approx(expected_y).margin(2e4));
 }
