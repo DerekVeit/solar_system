@@ -69,13 +69,9 @@ int main() {
             window.poll_events();
         }
 
-        const auto earth = simulation.state("Earth");
-        fmt::print("Earth position at shutdown: {:.0f} {:.0f} {:.0f} km\n",
-                   earth.position.km.x, earth.position.km.y, earth.position.km.z);
-
-        const auto jupiter = simulation.state("Jupiter");
-        fmt::print("Jupiter position at shutdown: {:.0f} {:.0f} {:.0f} km\n",
-                   jupiter.position.km.x, jupiter.position.km.y, jupiter.position.km.z);
+        fmt::print("Earth position at shutdown: {}", planet_report(simulation.state("Earth")));
+        fmt::print("Mars position at shutdown: {}", planet_report(simulation.state("Mars")));
+        fmt::print("Jupiter position at shutdown: {}", planet_report(simulation.state("Jupiter")));
 
         fmt::print("Simulation epoch JD: {:.4f}\n", simulation.clock().epoch().jd);
         fmt::print("Simulation epoch: {}\n", simulation.clock().epoch().to_string());
