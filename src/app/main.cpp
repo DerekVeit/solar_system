@@ -62,6 +62,11 @@ int main() {
         const auto earth = simulation.state("Earth");
         fmt::print("Earth position at shutdown: {:.0f} {:.0f} {:.0f} km\n",
                    earth.position.km.x, earth.position.km.y, earth.position.km.z);
+
+        const auto jupiter = simulation.state("Jupiter");
+        fmt::print("Jupiter position at shutdown: {:.0f} {:.0f} {:.0f} km\n",
+                   jupiter.position.km.x, jupiter.position.km.y, jupiter.position.km.z);
+
         return 0;
     } catch (const std::exception& error) {
         fmt::print(stderr, "fatal error: {}\n", error.what());
