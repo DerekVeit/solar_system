@@ -67,6 +67,9 @@ int main() {
         fmt::print("Jupiter position at shutdown: {:.0f} {:.0f} {:.0f} km\n",
                    jupiter.position.km.x, jupiter.position.km.y, jupiter.position.km.z);
 
+        fmt::print("Simulation epoch JD: {:.4f}\n", simulation.clock().epoch().jd);
+        fmt::print("Simulation epoch: {}\n", simulation.clock().epoch().to_string());
+
         return 0;
     } catch (const std::exception& error) {
         fmt::print(stderr, "fatal error: {}\n", error.what());
