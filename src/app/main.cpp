@@ -10,6 +10,7 @@
 #include "core/constants.hpp"
 #include "core/json_loader.hpp"
 #include "core/kepler_ephemeris.hpp"
+#include "core/types.hpp"
 #include "sim/clock.hpp"
 #include "sim/solar_system.hpp"
 
@@ -28,6 +29,14 @@ void key_callback(GLFWwindow* window, int key, int /*scancode*/, int action, int
 }
 
 }  // namespace
+
+std::string planet_report(solar::core::StateVector planet_state) {
+    auto position = planet_state.position;
+    auto polar = position.polar_xy();
+    return fmt::format("{:.0f} {:.0f} {:.0f} km ({:.0f} km @ {:.0f}°)\n",
+                       position.km.x, position.km.y, position.km.z,
+                       polar.length, polar.angle * solar::core::kRadToDeg);
+}
 
 int main() {
     try {
