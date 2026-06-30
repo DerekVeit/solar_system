@@ -49,6 +49,11 @@ struct Epoch {
     }
 };
 
+struct Polar {
+    double length;
+    double angle;
+};
+
 struct Displacement {
     glm::dvec3 km{};
 
