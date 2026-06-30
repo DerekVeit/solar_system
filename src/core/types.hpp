@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/constants.hpp"
 #include <chrono>
 #include <ctime>
 #include <fmt/core.h>
@@ -58,6 +59,14 @@ struct Displacement {
     glm::dvec3 km{};
 
     [[nodiscard]] double length() const { return glm::length(km); }
+
+    [[nodiscard]] Polar polar_xy() const {
+        double length{std::sqrt(km.x * km.x + km.y * km.y)};
+        double angle{std::atan(km.y / km.x)};
+        if (km.x < 0) angle += kPi;  // Q2,3
+        if (angle < 0) angle += kTwoPi;  // Q4
+        return Polar{length, angle};
+    }
 };
 
 struct Velocity {
