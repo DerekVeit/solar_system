@@ -70,6 +70,7 @@ int main() {
         }
 
         fmt::print("Earth position at shutdown: {}", planet_report(simulation.state("Earth")));
+        fmt::print("Venus position at shutdown: {}", planet_report(simulation.state("Venus")));
         fmt::print("Mars position at shutdown: {}", planet_report(simulation.state("Mars")));
         fmt::print("Jupiter position at shutdown: {}", planet_report(simulation.state("Jupiter")));
 
