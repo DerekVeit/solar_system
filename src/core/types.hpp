@@ -28,6 +28,16 @@ struct Epoch {
         return Epoch{kJ2000 + offset.count() / 86400.0};
     }
 
+    static Epoch now() {
+        using namespace std::chrono;
+        const auto now = std::chrono::system_clock::now();
+        const sys_days j2000_date{year{2000}/January/1};
+        const sys_seconds j2000 = j2000_date + 12h;
+        constexpr JulianDate kJ2000 = 2451545.0;
+        const JulianDate jd_now = kJ2000 + (duration_cast<seconds>(now - j2000).count() / 86400.0);
+        return Epoch{jd_now};
+    }
+
     [[nodiscard]] std::string to_string() const {
         using namespace std::chrono;
         const sys_days j2000_date{year{2000}/January/1};
