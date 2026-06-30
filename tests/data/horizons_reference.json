@@ -1,0 +1,98 @@
+{
+  "source": "NASA/JPL Horizons (DE441/mar099), retrieved 2026-06-30",
+  "query": {
+    "center": "@10",
+    "ref_plane": "ECLIPTIC",
+    "ref_system": "J2000",
+    "table_type": "VECTORS",
+    "output_units": "AU-D"
+  },
+  "cases": [
+    {
+      "label": "J2000.0 (element epoch)",
+      "jd": 2451545.0,
+      "calendar_utc": "2000-01-01 12:00:00 TDB",
+      "bodies": [
+        {
+          "name": "Earth",
+          "horizons_id": "399",
+          "x_au": -0.1771350992727098,
+          "y_au": 0.9672416867665306,
+          "z_au": -4.085281582511366e-06,
+          "tolerance_au": 0.03,
+          "tolerance_lon_deg": 3.0
+        },
+        {
+          "name": "Venus",
+          "horizons_id": "299",
+          "x_au": -0.718302296345389,
+          "y_au": -0.03265430819980606,
+          "z_au": 0.04101418202684621,
+          "tolerance_au": 0.02,
+          "tolerance_lon_deg": 3.0
+        },
+        {
+          "name": "Mars",
+          "horizons_id": "499",
+          "x_au": 1.390715921746351,
+          "y_au": -0.01341631815101244,
+          "z_au": -0.03446766277581799,
+          "tolerance_au": 0.03,
+          "tolerance_lon_deg": 3.0
+        },
+        {
+          "name": "Jupiter",
+          "horizons_id": "5",
+          "x_au": 4.001177161126058,
+          "y_au": 2.938576106966103,
+          "z_au": -0.101785276633744,
+          "tolerance_au": 0.75,
+          "tolerance_lon_deg": 10.0
+        }
+      ]
+    },
+    {
+      "label": "2026-06-29",
+      "jd": 2461220.5,
+      "calendar_utc": "2026-06-29 00:00:00 TDB",
+      "bodies": [
+        {
+          "name": "Earth",
+          "horizons_id": "399",
+          "x_au": 0.1226292418698563,
+          "y_au": -1.009103279148473,
+          "z_au": 6.245863354903853e-05,
+          "tolerance_au": 0.03,
+          "tolerance_lon_deg": 2.0
+        },
+        {
+          "name": "Venus",
+          "horizons_id": "299",
+          "x_au": -0.6577619185012404,
+          "y_au": -0.2953757450147348,
+          "z_au": 0.03389420368387747,
+          "tolerance_au": 0.02,
+          "tolerance_lon_deg": 2.0
+        },
+        {
+          "name": "Mars",
+          "horizons_id": "499",
+          "x_au": 1.186200620337555,
+          "y_au": 0.8160933000207807,
+          "z_au": -0.0119839457613301,
+          "tolerance_au": 0.03,
+          "tolerance_lon_deg": 2.0
+        },
+        {
+          "name": "Jupiter",
+          "horizons_id": "5",
+          "x_au": -2.91836362869334,
+          "y_au": 4.39452145605376,
+          "z_au": 0.04703947533583257,
+          "tolerance_au": 0.65,
+          "tolerance_lon_deg": 8.0
+        }
+      ]
+    }
+  ]
+}
