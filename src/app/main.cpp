@@ -34,24 +34,24 @@ void key_callback(GLFWwindow* window, int key, int /*scancode*/, int action, int
     }
 
     switch (key) {
-    case GLFW_KEY_ESCAPE:
-        fmt::print("escaping\n");
-        glfwSetWindowShouldClose(window, GLFW_TRUE);
-        break;
-    case GLFW_KEY_SPACE:
-        fmt::print("{}  pausing\n", simulation->clock().epoch().to_string());
-        simulation->clock().set_time_scale(solar::sim::TimeScale::paused);
-        break;
-    case GLFW_KEY_R:
-        fmt::print("{}  real\n", simulation->clock().epoch().to_string());
-        simulation->clock().set_time_scale(solar::sim::TimeScale::real_time);
-        break;
-    case GLFW_KEY_A:
-        fmt::print("{}  accelerated\n", simulation->clock().epoch().to_string());
-        simulation->clock().set_time_scale(solar::sim::TimeScale::accelerated);
-        break;
-    default:
-        break;
+        case GLFW_KEY_ESCAPE:
+            fmt::print("escaping\n");
+            glfwSetWindowShouldClose(window, GLFW_TRUE);
+            break;
+        case GLFW_KEY_SPACE:
+            fmt::print("{}  pausing\n", simulation->clock().epoch().to_string());
+            simulation->clock().set_time_scale(solar::sim::TimeScale::paused);
+            break;
+        case GLFW_KEY_R:
+            fmt::print("{}  real\n", simulation->clock().epoch().to_string());
+            simulation->clock().set_time_scale(solar::sim::TimeScale::real_time);
+            break;
+        case GLFW_KEY_A:
+            fmt::print("{}  accelerated\n", simulation->clock().epoch().to_string());
+            simulation->clock().set_time_scale(solar::sim::TimeScale::accelerated);
+            break;
+        default:
+            break;
     }
 }
 
