@@ -23,8 +23,35 @@ std::filesystem::path asset_path(const std::string& relative) {
 }
 
 void key_callback(GLFWwindow* window, int key, int /*scancode*/, int action, int /*mods*/) {
-    if (action == GLFW_PRESS && key == GLFW_KEY_ESCAPE) {
+    if (action != GLFW_PRESS) {
+        return;
+    }
+
+    auto *simulation = static_cast<solar::sim::SolarSystem *>(
+        glfwGetWindowUserPointer(window));
+    if (simulation == nullptr) {
+        return;
+    }
+
+    switch (key) {
+    case GLFW_KEY_ESCAPE:
+        fmt::print("escaping\n");
         glfwSetWindowShouldClose(window, GLFW_TRUE);
+        break;
+    case GLFW_KEY_SPACE:
+        fmt::print("pausing\n");
+        simulation->clock().set_time_scale(solar::sim::TimeScale::paused);
+        break;
+    case GLFW_KEY_R:
+        fmt::print("real\n");
+        simulation->clock().set_time_scale(solar::sim::TimeScale::real_time);
+        break;
+    case GLFW_KEY_A:
+        fmt::print("accelerated\n");
+        simulation->clock().set_time_scale(solar::sim::TimeScale::accelerated);
+        break;
+    default:
+        break;
     }
 }
 
@@ -52,6 +79,7 @@ int main() {
         solar::sim::SolarSystem simulation{std::move(ephemeris), clock};
 
         solar::app::Window window{{.title = "Solar System", .fullscreen = true}};
+        glfwSetWindowUserPointer(window.handle(), &simulation);
         glfwSetKeyCallback(window.handle(), key_callback);
 
         auto previous_time = std::chrono::steady_clock::now();
