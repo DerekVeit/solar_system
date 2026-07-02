@@ -50,6 +50,26 @@ void key_callback(GLFWwindow* window, int key, int /*scancode*/, int action, int
             fmt::print("{}  accelerated\n", simulation->clock().epoch().to_string());
             simulation->clock().set_time_scale(solar::sim::TimeScale::accelerated);
             break;
+        case GLFW_KEY_KP_SUBTRACT: {
+            double accel = simulation->clock().acceleration();
+            accel *= 0.5;
+            fmt::print("{}  slower: {}\n", simulation->clock().epoch().to_string(), accel);
+            simulation->clock().set_acceleration(accel);
+            if (simulation->clock().time_scale() != solar::sim::TimeScale::accelerated) {
+                fmt::print("(not currently in the accelerated time scale)\n");
+            }
+            break;
+        }
+        case GLFW_KEY_KP_ADD: {
+            double accel = simulation->clock().acceleration();
+            accel *= 2.0;
+            fmt::print("{}  faster: {}\n", simulation->clock().epoch().to_string(), accel);
+            simulation->clock().set_acceleration(accel);
+            if (simulation->clock().time_scale() != solar::sim::TimeScale::accelerated) {
+                fmt::print("(not currently in the accelerated time scale)\n");
+            }
+            break;
+        }
         default:
             break;
     }
