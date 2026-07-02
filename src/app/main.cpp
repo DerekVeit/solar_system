@@ -22,18 +22,28 @@ std::filesystem::path asset_path(const std::string& relative) {
     return executable / "assets" / relative;
 }
 
-void key_callback(GLFWwindow* window, int key, int /*scancode*/, int action, int /*mods*/) {
+void change_acceleration(solar::sim::SimulationClock& clock, double multiplier) {
+    const double accel = clock.acceleration() * multiplier;
+    const char* direction = multiplier < 1.0 ? "slower" : "faster";
+    fmt::print("{}  {}: {}\n", clock.epoch().to_string(), direction, accel);
+    clock.set_acceleration(accel);
+    if (clock.time_scale() != solar::sim::TimeScale::accelerated) {
+        fmt::print("(not currently in the accelerated time scale)\n");
+    }
+}
+
+void key_callback(GLFWwindow* window, int key, int /*scancode*/, int action, int mods) {
     if (action != GLFW_PRESS) {
         return;
     }
 
-    auto *simulation = static_cast<solar::sim::SolarSystem *>(
+    auto* simulation = static_cast<solar::sim::SolarSystem*>(
         glfwGetWindowUserPointer(window));
     if (simulation == nullptr) {
         return;
     }
 
-    auto clock = simulation->clock();
+    solar::sim::SimulationClock& clock = simulation->clock();
 
     switch (key) {
         case GLFW_KEY_ESCAPE:
@@ -52,26 +62,18 @@ void key_callback(GLFWwindow* window, int key, int /*scancode*/, int action, int
             fmt::print("{}  accelerated\n", clock.epoch().to_string());
             clock.set_time_scale(solar::sim::TimeScale::accelerated);
             break;
-        case GLFW_KEY_KP_SUBTRACT: {
-            double accel = clock.acceleration();
-            accel *= 0.5;
-            fmt::print("{}  slower: {}\n", clock.epoch().to_string(), accel);
-            clock.set_acceleration(accel);
-            if (clock.time_scale() != solar::sim::TimeScale::accelerated) {
-                fmt::print("(not currently in the accelerated time scale)\n");
+        case GLFW_KEY_MINUS:
+        case GLFW_KEY_KP_SUBTRACT:
+            change_acceleration(clock, 0.5);
+            break;
+        case GLFW_KEY_EQUAL:
+            if ((mods & GLFW_MOD_SHIFT) != 0) {
+                change_acceleration(clock, 2.0);
             }
             break;
-        }
-        case GLFW_KEY_KP_ADD: {
-            double accel = clock.acceleration();
-            accel *= 2.0;
-            fmt::print("{}  faster: {}\n", clock.epoch().to_string(), accel);
-            clock.set_acceleration(accel);
-            if (clock.time_scale() != solar::sim::TimeScale::accelerated) {
-                fmt::print("(not currently in the accelerated time scale)\n");
-            }
+        case GLFW_KEY_KP_ADD:
+            change_acceleration(clock, 2.0);
             break;
-        }
         default:
             break;
     }
