@@ -67,7 +67,7 @@ void key_callback(GLFWwindow* window, int key, int /*scancode*/, int action, int
             change_acceleration(clock, 0.5);
             break;
         case GLFW_KEY_EQUAL:
-            if ((mods & GLFW_MOD_SHIFT) != 0) {
+            if (mods == GLFW_MOD_SHIFT) {
                 change_acceleration(clock, 2.0);
             }
             break;
