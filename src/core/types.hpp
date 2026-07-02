@@ -61,9 +61,9 @@ struct Displacement {
     [[nodiscard]] double length() const { return glm::length(km); }
 
     [[nodiscard]] Polar polar_xy() const {
-        double length{std::sqrt(km.x * km.x + km.y * km.y)};
-        double angle{std::atan2(km.y, km.x)};
-        if (angle < 0) angle += kTwoPi;  // atan2 returns negative for Q3 or Q4
+        const double length{std::sqrt(km.x * km.x + km.y * km.y)};
+        const double raw_angle{std::atan2(km.y, km.x)};
+        const double angle{raw_angle < 0.0 ? raw_angle + kTwoPi : raw_angle};
         return Polar{length, angle};
     }
 };
