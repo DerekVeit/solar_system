@@ -9,8 +9,8 @@ namespace solar::app {
 struct WindowConfig {
     std::string title{"Solar System"};
     bool fullscreen{true};
-    int windowed_width{1280};
-    int windowed_height{720};
+    int windowed_width{1920};
+    int windowed_height{1200};
 };
 
 class Window {
