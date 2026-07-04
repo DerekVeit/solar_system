@@ -1,5 +1,6 @@
 #pragma once
 
+#include <GL/gl.h>
 #include <string>
 
 struct GLFWwindow;
@@ -28,6 +29,8 @@ class Window {
     [[nodiscard]] GLFWwindow* handle() const { return window_; }
     [[nodiscard]] int framebuffer_width() const;
     [[nodiscard]] int framebuffer_height() const;
+
+    void set_clear_color(float r, float g, float b, float a);
 
   private:
     GLFWwindow* window_{nullptr};
