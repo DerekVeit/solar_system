@@ -6,6 +6,7 @@
 #include <GLFW/glfw3.h>
 #include <fmt/core.h>
 
+#include "app/logging.hpp"
 #include "app/window.hpp"
 #include "core/constants.hpp"
 #include "core/json_loader.hpp"
@@ -25,10 +26,10 @@ std::filesystem::path asset_path(const std::string& relative) {
 void change_acceleration(solar::sim::SimulationClock& clock, double multiplier) {
     const double accel = clock.acceleration() * multiplier;
     const char* direction = multiplier < 1.0 ? "slower" : "faster";
-    fmt::print("{}  {}: {}\n", clock.epoch().to_string(), direction, accel);
+    solar::app::log("{}  {}: {}", clock.epoch().to_string(), direction, accel);
     clock.set_acceleration(accel);
     if (clock.time_scale() != solar::sim::TimeScale::accelerated) {
-        fmt::print("(not currently in the accelerated time scale)\n");
+        solar::app::log("(not currently in the accelerated time scale)");
     }
 }
 
@@ -47,19 +48,19 @@ void key_callback(GLFWwindow* window, int key, int /*scancode*/, int action, int
 
     switch (key) {
         case GLFW_KEY_ESCAPE:
-            fmt::print("escaping\n");
+            solar::app::log("escaping");
             glfwSetWindowShouldClose(window, GLFW_TRUE);
             break;
         case GLFW_KEY_SPACE:
-            fmt::print("{}  pausing\n", clock.epoch().to_string());
+            solar::app::log("{}  pausing", clock.epoch().to_string());
             clock.set_time_scale(solar::sim::TimeScale::paused);
             break;
         case GLFW_KEY_R:
-            fmt::print("{}  real\n", clock.epoch().to_string());
+            solar::app::log("{}  real", clock.epoch().to_string());
             clock.set_time_scale(solar::sim::TimeScale::real_time);
             break;
         case GLFW_KEY_A:
-            fmt::print("{}  accelerated\n", clock.epoch().to_string());
+            solar::app::log("{}  accelerated", clock.epoch().to_string());
             clock.set_time_scale(solar::sim::TimeScale::accelerated);
             break;
         case GLFW_KEY_MINUS:
@@ -84,7 +85,7 @@ void key_callback(GLFWwindow* window, int key, int /*scancode*/, int action, int
 std::string planet_report(solar::core::StateVector planet_state) {
     const auto position = planet_state.position;
     const auto polar = position.polar_xy();
-    return fmt::format("{:.0f} {:.0f} {:.0f} km ({:.0f} km @ {:.0f}°)\n",
+    return fmt::format("{:.0f} {:.0f} {:.0f} km ({:.0f} km @ {:.0f}°)",
                        position.km.x, position.km.y, position.km.z,
                        polar.length, polar.angle * solar::core::kRadToDeg);
 }
@@ -121,13 +122,13 @@ int main() {
             window.poll_events();
         }
 
-        fmt::print("Earth position at shutdown: {}", planet_report(simulation.state("Earth")));
-        fmt::print("Venus position at shutdown: {}", planet_report(simulation.state("Venus")));
-        fmt::print("Mars position at shutdown: {}", planet_report(simulation.state("Mars")));
-        fmt::print("Jupiter position at shutdown: {}", planet_report(simulation.state("Jupiter")));
+        solar::app::log("Earth position at shutdown: {}", planet_report(simulation.state("Earth")));
+        solar::app::log("Venus position at shutdown: {}", planet_report(simulation.state("Venus")));
+        solar::app::log("Mars position at shutdown: {}", planet_report(simulation.state("Mars")));
+        solar::app::log("Jupiter position at shutdown: {}", planet_report(simulation.state("Jupiter")));
 
-        fmt::print("Simulation epoch JD: {:.4f}\n", simulation.clock().epoch().jd);
-        fmt::print("Simulation epoch: {}\n", simulation.clock().epoch().to_string());
+        solar::app::log("Simulation epoch JD: {:.4f}", simulation.clock().epoch().jd);
+        solar::app::log("Simulation epoch: {}", simulation.clock().epoch().to_string());
 
         return 0;
     } catch (const std::exception& error) {
