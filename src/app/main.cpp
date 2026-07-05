@@ -116,8 +116,6 @@ int main() {
 
         auto previous_time = std::chrono::steady_clock::now();
 
-        float blue = 0.06f;
-
         while (!window.should_close()) {
             const auto current_time = std::chrono::steady_clock::now();
             const double delta_seconds =
@@ -127,8 +125,15 @@ int main() {
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            float seconds_into_epoch(simulation.clock().epoch().since_j2000().count());
-            blue = std::min(seconds_into_epoch / (86400.0f * 365.25f * 1000.0f), 1.0f);
+            const double earth_angle = simulation.state("Earth").position.polar_xy().angle;
+
+            float red(0.0f), green(0.0f), blue(0.0f);
+            if (std::cos(earth_angle) < 0) {
+                green = -std::cos(earth_angle);
+            } else {
+                red = std::cos(earth_angle);
+            }
+            blue = ((-std::sin(earth_angle) + 1.0f) / 2.0f) * 0.8f + 0.2f;
 
             int previous_second = steady_second(previous_time);
             int current_second = steady_second(current_time);
@@ -136,11 +141,13 @@ int main() {
             if ((current_second != previous_second) && ! paused) {
                 log("previous_second: {}", previous_second);
                 log("current_second: {}", current_second);
-                log("seconds_into_epoch: {}", seconds_into_epoch);
-                log("blue: {}", blue);
+                log("RGB: ({:.02f} {:.02f} {:.02f}) for {:.01f}° at {}",
+                    red, green, blue,
+                    earth_angle * solar::core::kRadToDeg,
+                    simulation.clock().epoch().to_string());
             }
 
-            window.set_clear_color(0.02f, 0.02f, blue, 1.0f);
+            window.set_clear_color(red, green, blue, 1.0f);
             window.swap_buffers();
             window.poll_events();
             previous_time = current_time;
