@@ -17,6 +17,8 @@
 
 namespace {
 
+using solar::app::log;
+
 std::filesystem::path asset_path(const std::string& relative) {
     const std::filesystem::path executable =
         std::filesystem::canonical("/proc/self/exe").parent_path();
@@ -26,10 +28,10 @@ std::filesystem::path asset_path(const std::string& relative) {
 void change_acceleration(solar::sim::SimulationClock& clock, double multiplier) {
     const double accel = clock.acceleration() * multiplier;
     const char* direction = multiplier < 1.0 ? "slower" : "faster";
-    solar::app::log("{}  {}: {}", clock.epoch().to_string(), direction, accel);
+    log("{}  {}: {}", clock.epoch().to_string(), direction, accel);
     clock.set_acceleration(accel);
     if (clock.time_scale() != solar::sim::TimeScale::accelerated) {
-        solar::app::log("(not currently in the accelerated time scale)");
+        log("(not currently in the accelerated time scale)");
     }
 }
 
@@ -48,19 +50,19 @@ void key_callback(GLFWwindow* window, int key, int /*scancode*/, int action, int
 
     switch (key) {
         case GLFW_KEY_ESCAPE:
-            solar::app::log("escaping");
+            log("escaping");
             glfwSetWindowShouldClose(window, GLFW_TRUE);
             break;
         case GLFW_KEY_SPACE:
-            solar::app::log("{}  pausing", clock.epoch().to_string());
+            log("{}  pausing", clock.epoch().to_string());
             clock.set_time_scale(solar::sim::TimeScale::paused);
             break;
         case GLFW_KEY_R:
-            solar::app::log("{}  real", clock.epoch().to_string());
+            log("{}  real", clock.epoch().to_string());
             clock.set_time_scale(solar::sim::TimeScale::real_time);
             break;
         case GLFW_KEY_A:
-            solar::app::log("{}  accelerated", clock.epoch().to_string());
+            log("{}  accelerated", clock.epoch().to_string());
             clock.set_time_scale(solar::sim::TimeScale::accelerated);
             break;
         case GLFW_KEY_MINUS:
@@ -122,13 +124,13 @@ int main() {
             window.poll_events();
         }
 
-        solar::app::log("Earth position at shutdown: {}", planet_report(simulation.state("Earth")));
-        solar::app::log("Venus position at shutdown: {}", planet_report(simulation.state("Venus")));
-        solar::app::log("Mars position at shutdown: {}", planet_report(simulation.state("Mars")));
-        solar::app::log("Jupiter position at shutdown: {}", planet_report(simulation.state("Jupiter")));
+        log("Earth position at shutdown: {}", planet_report(simulation.state("Earth")));
+        log("Venus position at shutdown: {}", planet_report(simulation.state("Venus")));
+        log("Mars position at shutdown: {}", planet_report(simulation.state("Mars")));
+        log("Jupiter position at shutdown: {}", planet_report(simulation.state("Jupiter")));
 
-        solar::app::log("Simulation epoch JD: {:.4f}", simulation.clock().epoch().jd);
-        solar::app::log("Simulation epoch: {}", simulation.clock().epoch().to_string());
+        log("Simulation epoch JD: {:.4f}", simulation.clock().epoch().jd);
+        log("Simulation epoch: {}", simulation.clock().epoch().to_string());
 
         return 0;
     } catch (const std::exception& error) {
