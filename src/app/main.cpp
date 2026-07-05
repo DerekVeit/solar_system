@@ -124,7 +124,6 @@ int main() {
             const int current_second = steady_second();
             const double delta_seconds =
                 std::chrono::duration<double>(current_time - previous_time).count();
-            previous_time = current_time;
 
             simulation.clock().advance(delta_seconds);
 
@@ -142,6 +141,7 @@ int main() {
             window.set_clear_color(0.02f, 0.02f, blue, 1.0f);
             window.swap_buffers();
             window.poll_events();
+            previous_time = current_time;
         }
 
         log("Earth position at shutdown: {}", planet_report(simulation.state("Earth")));
