@@ -19,8 +19,8 @@ namespace {
 
 using solar::app::log;
 
-int steady_second() {
-    return std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
+int steady_second(std::chrono::time_point<std::chrono::steady_clock> time) {
+    return std::chrono::floor<std::chrono::seconds>(time.time_since_epoch()).count();
 }
 
 std::filesystem::path asset_path(const std::string& relative) {
@@ -115,13 +115,10 @@ int main() {
 
         auto previous_time = std::chrono::steady_clock::now();
 
-        const int start_second = steady_second();
-        int previous_second = start_second;
         float blue = 0.06f;
 
         while (!window.should_close()) {
             const auto current_time = std::chrono::steady_clock::now();
-            const int current_second = steady_second();
             const double delta_seconds =
                 std::chrono::duration<double>(current_time - previous_time).count();
 
@@ -131,12 +128,15 @@ int main() {
 
             float seconds_into_epoch(simulation.clock().epoch().since_j2000().count());
             blue = std::min(seconds_into_epoch / (86400.0f * 365.25f * 1000.0f), 1.0f);
+
+            int previous_second = steady_second(previous_time);
+            int current_second = steady_second(current_time);
             if (current_second != previous_second) {
+                log("previous_second: {}", previous_second);
                 log("current_second: {}", current_second);
                 log("seconds_into_epoch: {}", seconds_into_epoch);
                 log("blue: {}", blue);
             }
-            previous_second = current_second;
 
             window.set_clear_color(0.02f, 0.02f, blue, 1.0f);
             window.swap_buffers();
