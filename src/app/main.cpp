@@ -132,7 +132,8 @@ int main() {
 
             int previous_second = steady_second(previous_time);
             int current_second = steady_second(current_time);
-            if (current_second != previous_second) {
+            bool paused = simulation.clock().time_scale() == solar::sim::TimeScale::paused;
+            if ((current_second != previous_second) && ! paused) {
                 log("previous_second: {}", previous_second);
                 log("current_second: {}", current_second);
                 log("seconds_into_epoch: {}", seconds_into_epoch);
