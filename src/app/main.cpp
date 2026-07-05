@@ -19,10 +19,6 @@ namespace {
 
 using solar::app::log;
 
-int steady_second(std::chrono::time_point<std::chrono::steady_clock> time) {
-    return std::chrono::floor<std::chrono::seconds>(time.time_since_epoch()).count();
-}
-
 std::filesystem::path asset_path(const std::string& relative) {
     const std::filesystem::path executable =
         std::filesystem::canonical("/proc/self/exe").parent_path();
@@ -116,6 +112,8 @@ int main() {
 
         auto previous_time = std::chrono::steady_clock::now();
 
+        double log_timer = 1.0;
+
         while (!window.should_close()) {
             const auto current_time = std::chrono::steady_clock::now();
             const double delta_seconds =
@@ -135,16 +133,16 @@ int main() {
             }
             blue = ((-std::sin(earth_angle) + 1.0f) / 2.0f) * 0.8f + 0.2f;
 
-            int previous_second = steady_second(previous_time);
-            int current_second = steady_second(current_time);
             bool paused = simulation.clock().time_scale() == solar::sim::TimeScale::paused;
-            if ((current_second != previous_second) && ! paused) {
-                log("previous_second: {}", previous_second);
-                log("current_second: {}", current_second);
-                log("RGB: ({:.02f} {:.02f} {:.02f}) for {:.01f}° at {}",
-                    red, green, blue,
-                    earth_angle * solar::core::kRadToDeg,
-                    simulation.clock().epoch().to_string());
+            if (!paused) {
+                log_timer += delta_seconds;
+                if (log_timer >= 1.0) {
+                    log("RGB: ({:.02f} {:.02f} {:.02f}) for {:.01f}° at {}",
+                        red, green, blue,
+                        earth_angle * solar::core::kRadToDeg,
+                        simulation.clock().epoch().to_string());
+                    log_timer -= 1.0;
+                }
             }
 
             window.set_clear_color(red, green, blue, 1.0f);
