@@ -97,6 +97,7 @@ std::string planet_report(solar::core::StateVector planet_state) {
 }
 
 int main() {
+    log("----------------------------------------");
     try {
         const auto bodies = solar::core::load_bodies(asset_path("data/bodies.json"));
         auto ephemeris =
