@@ -82,8 +82,6 @@ void key_callback(GLFWwindow* window, int key, int /*scancode*/, int action, int
     }
 }
 
-}  // namespace
-
 std::string planet_report(solar::core::StateVector planet_state) {
     const auto position = planet_state.position;
     const auto polar = position.polar_xy();
@@ -91,6 +89,8 @@ std::string planet_report(solar::core::StateVector planet_state) {
                        position.km.x, position.km.y, position.km.z,
                        polar.length, polar.angle * solar::core::kRadToDeg);
 }
+
+}  // namespace
 
 int main() {
     log("----------------------------------------");
