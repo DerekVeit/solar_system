@@ -111,7 +111,8 @@ int main() {
 
         auto previous_time = std::chrono::steady_clock::now();
 
-        double log_timer = 1.0;
+        const double log_interval = 1.0;
+        double log_timer = log_interval;  // initially due for logging
 
         while (!window.should_close()) {
             const auto current_time = std::chrono::steady_clock::now();
@@ -135,12 +136,12 @@ int main() {
             bool paused = simulation.clock().time_scale() == solar::sim::TimeScale::paused;
             if (!paused) {
                 log_timer += delta_seconds;
-                if (log_timer >= 1.0) {
+                if (log_timer >= log_interval) {
                     log("RGB: ({:.02f} {:.02f} {:.02f}) for {:.01f}° at {}",
                         red, green, blue,
                         earth_angle * solar::core::kRadToDeg,
                         simulation.clock().epoch().to_string());
-                    log_timer -= 1.0;
+                    log_timer -= log_interval;
                 }
             }
 
