@@ -15,7 +15,7 @@ core::StateVector SolarSystem::state(const std::string& body_name) const {
     return ephemeris_->state(body_name, clock_.epoch());
 }
 
-void SolarSystem::SolarSystem::change_acceleration(double multiplier) {
+void SolarSystem::change_acceleration(double multiplier) {
     const double accel = clock_.acceleration() * multiplier;
     const char* direction = multiplier < 1.0 ? "slower" : "faster";
     log("{}  {}: {}", clock_.epoch().to_string(), direction, accel);
