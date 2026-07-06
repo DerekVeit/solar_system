@@ -20,12 +20,12 @@ struct Epoch {
 
     [[nodiscard]] Duration since_j2000() const {
         constexpr JulianDate kJ2000 = 2451545.0;
-        return Duration{(jd - kJ2000) * 86400.0};
+        return Duration{(jd - kJ2000) * kSecondsPerDay};
     }
 
     static Epoch from_j2000_offset(Duration offset) {
         constexpr JulianDate kJ2000 = 2451545.0;
-        return Epoch{kJ2000 + offset.count() / 86400.0};
+        return Epoch{kJ2000 + offset.count() / kSecondsPerDay};
     }
 
     static Epoch now() {
@@ -34,7 +34,7 @@ struct Epoch {
         const sys_days j2000_date{year{2000}/January/1};
         const sys_seconds j2000 = j2000_date + 12h;
         constexpr JulianDate kJ2000 = 2451545.0;
-        const JulianDate jd_now = kJ2000 + (duration_cast<seconds>(now - j2000).count() / 86400.0);
+        const JulianDate jd_now = kJ2000 + (duration_cast<seconds>(now - j2000).count() / kSecondsPerDay);
         return Epoch{jd_now};
     }
 
