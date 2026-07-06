@@ -1,8 +1,9 @@
 #include "sim/solar_system.hpp"
+#include "core/ephemeris.hpp"
 
 namespace solar::sim {
 
-SolarSystem::SolarSystem(std::unique_ptr<core::EphemerisProvider> ephemeris, SimulationClock clock)
+SolarSystem::SolarSystem(core::EphemerisProviderPtr ephemeris, SimulationClock clock)
     : ephemeris_(std::move(ephemeris)), clock_(clock) {}
 
 core::StateVector SolarSystem::state(const std::string& body_name) const {

@@ -11,7 +11,7 @@ namespace solar::sim {
 
 class SolarSystem {
   public:
-    SolarSystem(std::unique_ptr<core::EphemerisProvider> ephemeris, SimulationClock clock);
+    SolarSystem(core::EphemerisProviderPtr ephemeris, SimulationClock clock);
 
     [[nodiscard]] const SimulationClock& clock() const { return clock_; }
     [[nodiscard]] SimulationClock& clock() { return clock_; }
@@ -20,7 +20,7 @@ class SolarSystem {
     [[nodiscard]] const core::EphemerisProvider& ephemeris() const { return *ephemeris_; }
 
   private:
-    std::unique_ptr<core::EphemerisProvider> ephemeris_;
+    core::EphemerisProviderPtr ephemeris_;
     SimulationClock clock_;
 };
 
