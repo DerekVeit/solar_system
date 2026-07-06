@@ -2,7 +2,6 @@
 
 #include "core/constants.hpp"
 #include <chrono>
-#include <ctime>
 #include <fmt/core.h>
 #include <fmt/chrono.h>
 #include <glm/glm.hpp>
