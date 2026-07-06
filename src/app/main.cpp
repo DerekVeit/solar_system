@@ -26,16 +26,6 @@ std::filesystem::path asset_path(const std::string& relative) {
     return executable / "assets" / relative;
 }
 
-void change_acceleration(solar::sim::SimulationClock& clock, double multiplier) {
-    const double accel = clock.acceleration() * multiplier;
-    const char* direction = multiplier < 1.0 ? "slower" : "faster";
-    log("{}  {}: {}", clock.epoch().to_string(), direction, accel);
-    clock.set_acceleration(accel);
-    if (clock.time_scale() != solar::sim::TimeScale::accelerated) {
-        log("(not currently in the accelerated time scale)");
-    }
-}
-
 void key_callback(GLFWwindow* window, int key, int /*scancode*/, int action, int mods) {
     if (action != GLFW_PRESS) {
         return;
@@ -68,15 +58,15 @@ void key_callback(GLFWwindow* window, int key, int /*scancode*/, int action, int
             break;
         case GLFW_KEY_MINUS:
         case GLFW_KEY_KP_SUBTRACT:
-            change_acceleration(clock, 0.5);
+            app_context->simulation->change_acceleration(0.5);
             break;
         case GLFW_KEY_EQUAL:
             if (mods == GLFW_MOD_SHIFT) {
-                change_acceleration(clock, 2.0);
+                app_context->simulation->change_acceleration(2.0);
             }
             break;
         case GLFW_KEY_KP_ADD:
-            change_acceleration(clock, 2.0);
+            app_context->simulation->change_acceleration(2.0);
             break;
         default:
             break;
