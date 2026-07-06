@@ -99,7 +99,6 @@ int main() {
         auto ephemeris =
             std::make_unique<solar::core::KeplerEphemeris>(bodies);
 
-        //solar::sim::SimulationClock clock{solar::core::Epoch{solar::core::kJ2000Jd}};
         solar::sim::SimulationClock clock{solar::core::Epoch{}.now()};
         clock.set_time_scale(solar::sim::TimeScale::real_time);
         clock.set_acceleration(solar::core::kSecondsPerDay);
