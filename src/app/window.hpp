@@ -27,7 +27,6 @@ class Window {
     void poll_events();
     void swap_buffers();
 
-    [[nodiscard]] GLFWwindow* handle() const { return window_; }
     [[nodiscard]] int framebuffer_width() const;
     [[nodiscard]] int framebuffer_height() const;
 
