@@ -6,6 +6,7 @@
 #include <GLFW/glfw3.h>
 #include <fmt/core.h>
 
+#include "app/context.hpp"
 #include "app/logging.hpp"
 #include "app/window.hpp"
 #include "core/constants.hpp"
@@ -40,13 +41,13 @@ void key_callback(GLFWwindow* window, int key, int /*scancode*/, int action, int
         return;
     }
 
-    auto* simulation = static_cast<solar::sim::SolarSystem*>(
+    auto* app_context = static_cast<solar::app::AppContext*>(
         glfwGetWindowUserPointer(window));
-    if (simulation == nullptr) {
+    if (app_context == nullptr) {
         return;
     }
 
-    solar::sim::SimulationClock& clock = simulation->clock();
+    solar::sim::SimulationClock& clock = app_context->simulation->clock();
 
     switch (key) {
         case GLFW_KEY_ESCAPE:
@@ -106,7 +107,8 @@ int main() {
         solar::sim::SolarSystem simulation{std::move(ephemeris), clock};
 
         solar::app::Window window{{.title = "Solar System", .fullscreen = true}};
-        glfwSetWindowUserPointer(window.handle(), &simulation);
+        solar::app::AppContext app_context{&window, &simulation};
+        glfwSetWindowUserPointer(window.handle(), &app_context);
         glfwSetKeyCallback(window.handle(), key_callback);
 
         auto previous_time = std::chrono::steady_clock::now();
