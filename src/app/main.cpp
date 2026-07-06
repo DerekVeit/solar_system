@@ -108,7 +108,7 @@ int main() {
 
         solar::app::Window window{{.title = "Solar System", .fullscreen = true}};
         solar::app::AppContext app_context{&window, &simulation};
-        glfwSetWindowUserPointer(window.handle(), &app_context);
+        window.set_user_pointer(&app_context);
         glfwSetKeyCallback(window.handle(), key_callback);
 
         auto previous_time = std::chrono::steady_clock::now();
