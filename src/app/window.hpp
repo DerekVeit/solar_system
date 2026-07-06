@@ -39,6 +39,8 @@ class Window {
 
     void clear_frame(GLbitfield mask);
 
+    void request_close();
+
   private:
     GLFWwindow* window_{nullptr};
 };

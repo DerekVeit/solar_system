@@ -52,7 +52,7 @@ void key_callback(GLFWwindow* window, int key, int /*scancode*/, int action, int
     switch (key) {
         case GLFW_KEY_ESCAPE:
             log("escaping");
-            glfwSetWindowShouldClose(window, GLFW_TRUE);
+            app_context->window->request_close();
             break;
         case GLFW_KEY_SPACE:
             log("{}  pausing", clock.epoch().to_string());

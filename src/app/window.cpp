@@ -99,4 +99,8 @@ void Window::clear_frame(GLbitfield mask) {
     glClear(mask);
 }
 
+void Window::request_close() {
+    glfwSetWindowShouldClose(window_, GLFW_TRUE);
+}
+
 }  // namespace solar::app
