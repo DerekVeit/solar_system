@@ -102,7 +102,7 @@ int main() {
         //solar::sim::SimulationClock clock{solar::core::Epoch{solar::core::kJ2000Jd}};
         solar::sim::SimulationClock clock{solar::core::Epoch{}.now()};
         clock.set_time_scale(solar::sim::TimeScale::real_time);
-        clock.set_acceleration(86400.0);
+        clock.set_acceleration(solar::core::kSecondsPerDay);
 
         solar::sim::SolarSystem simulation{std::move(ephemeris), clock};
 
