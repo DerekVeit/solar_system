@@ -37,6 +37,8 @@ class Window {
 
     void set_key_callback(GLFWkeyfun callback);
 
+    void clear_frame(GLbitfield mask);
+
   private:
     GLFWwindow* window_{nullptr};
 };

@@ -95,4 +95,8 @@ void Window::set_key_callback(GLFWkeyfun callback) {
     glfwSetKeyCallback(window_, callback);
 }
 
+void Window::clear_frame(GLbitfield mask) {
+    glClear(mask);
+}
+
 }  // namespace solar::app

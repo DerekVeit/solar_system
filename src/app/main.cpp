@@ -123,7 +123,7 @@ int main() {
 
             simulation.clock().advance(delta_seconds);
 
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            window.clear_frame(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             const double earth_angle = simulation.state("Earth").position.polar_xy().angle;
 
