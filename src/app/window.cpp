@@ -91,4 +91,8 @@ void Window::set_user_pointer(void* data) {
     glfwSetWindowUserPointer(window_, data);
 }
 
+void Window::set_key_callback(GLFWkeyfun callback) {
+    glfwSetKeyCallback(window_, callback);
+}
+
 }  // namespace solar::app
