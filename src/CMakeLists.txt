@@ -19,6 +19,7 @@ target_link_libraries(solar_core
 )
 
 add_executable(solar_system
+    app/input.cpp
     app/logging.cpp
     app/main.cpp
     app/window.cpp

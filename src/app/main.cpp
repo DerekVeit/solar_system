@@ -7,6 +7,7 @@
 #include <fmt/core.h>
 
 #include "app/context.hpp"
+#include "app/input.hpp"
 #include "app/logging.hpp"
 #include "app/window.hpp"
 #include "core/constants.hpp"
@@ -24,53 +25,6 @@ std::filesystem::path asset_path(const std::string& relative) {
     const std::filesystem::path executable =
         std::filesystem::canonical("/proc/self/exe").parent_path();
     return executable / "assets" / relative;
-}
-
-void key_callback(GLFWwindow* window, int key, int /*scancode*/, int action, int mods) {
-    if (action != GLFW_PRESS) {
-        return;
-    }
-
-    auto* app_context = static_cast<solar::app::AppContext*>(
-        glfwGetWindowUserPointer(window));
-    if (app_context == nullptr) {
-        return;
-    }
-
-    solar::sim::SimulationClock& clock = app_context->simulation->clock();
-
-    switch (key) {
-        case GLFW_KEY_ESCAPE:
-            log("escaping");
-            app_context->window->request_close();
-            break;
-        case GLFW_KEY_SPACE:
-            log("{}  pausing", clock.epoch().to_string());
-            clock.set_time_scale(solar::sim::TimeScale::paused);
-            break;
-        case GLFW_KEY_R:
-            log("{}  real", clock.epoch().to_string());
-            clock.set_time_scale(solar::sim::TimeScale::real_time);
-            break;
-        case GLFW_KEY_A:
-            log("{}  accelerated", clock.epoch().to_string());
-            clock.set_time_scale(solar::sim::TimeScale::accelerated);
-            break;
-        case GLFW_KEY_MINUS:
-        case GLFW_KEY_KP_SUBTRACT:
-            app_context->simulation->change_acceleration(0.5);
-            break;
-        case GLFW_KEY_EQUAL:
-            if (mods == GLFW_MOD_SHIFT) {
-                app_context->simulation->change_acceleration(2.0);
-            }
-            break;
-        case GLFW_KEY_KP_ADD:
-            app_context->simulation->change_acceleration(2.0);
-            break;
-        default:
-            break;
-    }
 }
 
 std::string planet_report(solar::core::StateVector planet_state) {
@@ -98,8 +52,7 @@ int main() {
 
         solar::app::Window window{{.title = "Solar System", .fullscreen = true}};
         solar::app::AppContext app_context{&window, &simulation};
-        window.set_user_pointer(&app_context);
-        window.set_key_callback(key_callback);
+        solar::app::register_key_handlers(app_context);
 
         auto previous_time = std::chrono::steady_clock::now();
 
