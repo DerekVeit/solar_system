@@ -28,4 +28,4 @@ class SimulationClock {
     double acceleration_{1.0};
 };
 
-}  // namespace solar::sim
+} // namespace solar::sim

@@ -44,4 +44,4 @@ class Window {
     GLFWwindow* window_{nullptr};
 };
 
-}  // namespace solar::app
+} // namespace solar::app

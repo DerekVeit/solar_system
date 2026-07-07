@@ -25,4 +25,4 @@ class EphemerisProvider {
 
 using EphemerisProviderPtr = std::unique_ptr<EphemerisProvider>;
 
-}  // namespace solar::core
+} // namespace solar::core

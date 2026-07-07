@@ -6,8 +6,8 @@
 namespace solar::app {
 
 struct AppContext {
-    Window *window;
-    sim::SolarSystem *simulation;
+    Window* window;
+    sim::SolarSystem* simulation;
 };
 
 } // namespace solar::app

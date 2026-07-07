@@ -10,4 +10,4 @@ inline constexpr double kJ2000Jd = 2451545.0;
 inline constexpr double kSecondsPerDay = 86400.0;
 inline constexpr double kAuKm = 149597870.7;
 
-}  // namespace solar::core
+} // namespace solar::core

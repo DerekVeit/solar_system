@@ -9,17 +9,16 @@ namespace {
 constexpr const char* kLogFilePath = "/tmp/solar_system.log";
 
 fmt::ostream& log_stream() {
-    static fmt::ostream stream = fmt::output_file(
-        kLogFilePath,
-        fmt::file::WRONLY | fmt::file::CREATE | fmt::file::APPEND);
+    static fmt::ostream stream =
+        fmt::output_file(kLogFilePath, fmt::file::WRONLY | fmt::file::CREATE | fmt::file::APPEND);
     return stream;
 }
 
-}  // namespace
+} // namespace
 
 void log_line(std::string line) {
     log_stream().print("{}", line);
     log_stream().flush();
 }
 
-}  // namespace solar::app::detail
+} // namespace solar::app::detail

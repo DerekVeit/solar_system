@@ -9,4 +9,4 @@ namespace solar::core {
 
 [[nodiscard]] std::vector<BodyDefinition> load_bodies(const std::filesystem::path& path);
 
-}  // namespace solar::core
+} // namespace solar::core

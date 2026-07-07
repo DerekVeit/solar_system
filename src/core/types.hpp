@@ -2,8 +2,8 @@
 
 #include "core/constants.hpp"
 #include <chrono>
-#include <fmt/core.h>
 #include <fmt/chrono.h>
+#include <fmt/core.h>
 #include <glm/glm.hpp>
 #include <string>
 
@@ -31,16 +31,17 @@ struct Epoch {
     static Epoch now() {
         using namespace std::chrono;
         const auto now = std::chrono::system_clock::now();
-        const sys_days j2000_date{year{2000}/January/1};
+        const sys_days j2000_date{year{2000} / January / 1};
         const sys_seconds j2000 = j2000_date + 12h;
         constexpr JulianDate kJ2000 = 2451545.0;
-        const JulianDate jd_now = kJ2000 + (duration_cast<seconds>(now - j2000).count() / kSecondsPerDay);
+        const JulianDate jd_now =
+            kJ2000 + (duration_cast<seconds>(now - j2000).count() / kSecondsPerDay);
         return Epoch{jd_now};
     }
 
     [[nodiscard]] std::string to_string() const {
         using namespace std::chrono;
-        const sys_days j2000_date{year{2000}/January/1};
+        const sys_days j2000_date{year{2000} / January / 1};
         const sys_seconds j2000 = j2000_date + 12h;
         const auto offset = since_j2000();
         const auto tp = j2000 + duration_cast<seconds>(offset);
@@ -86,4 +87,4 @@ struct KeplerianElements {
     Epoch epoch{};
 };
 
-}  // namespace solar::core
+} // namespace solar::core

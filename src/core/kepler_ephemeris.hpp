@@ -15,4 +15,4 @@ class KeplerEphemeris final : public EphemerisProvider {
     std::vector<BodyDefinition> bodies_;
 };
 
-}  // namespace solar::core
+} // namespace solar::core

@@ -4,7 +4,8 @@
 
 namespace solar::sim {
 
-SimulationClock::SimulationClock(core::Epoch start_epoch) : epoch_(start_epoch) {}
+SimulationClock::SimulationClock(core::Epoch start_epoch)
+    : epoch_(start_epoch) {}
 
 void SimulationClock::advance(double delta_seconds) {
     if (time_scale_ == TimeScale::paused) {
@@ -19,4 +20,4 @@ void SimulationClock::advance(double delta_seconds) {
     epoch_.jd += effective_delta / core::kSecondsPerDay;
 }
 
-}  // namespace solar::sim
+} // namespace solar::sim

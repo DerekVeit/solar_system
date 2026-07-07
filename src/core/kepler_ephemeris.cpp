@@ -19,7 +19,8 @@ StateVector KeplerEphemeris::state(const std::string& body_name, Epoch epoch) co
         }
     }
     if (central_mu <= 0.0) {
-        throw std::runtime_error("KeplerEphemeris requires a Sun entry with gravitational parameter");
+        throw std::runtime_error(
+            "KeplerEphemeris requires a Sun entry with gravitational parameter");
     }
 
     for (const BodyDefinition& body : bodies_) {
@@ -33,4 +34,4 @@ StateVector KeplerEphemeris::state(const std::string& body_name, Epoch epoch) co
     throw std::invalid_argument("unknown body: " + body_name);
 }
 
-}  // namespace solar::core
+} // namespace solar::core

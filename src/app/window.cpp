@@ -13,7 +13,7 @@ void framebuffer_size_callback(GLFWwindow* /*window*/, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
-}  // namespace
+} // namespace
 
 Window::Window(const WindowConfig& config) {
     if (!glfwInit()) {
@@ -83,24 +83,14 @@ int Window::framebuffer_height() const {
     return height;
 }
 
-void Window::set_clear_color(float r, float g, float b, float a) {
-    glClearColor(r, g, b, a);
-}
+void Window::set_clear_color(float r, float g, float b, float a) { glClearColor(r, g, b, a); }
 
-void Window::set_user_pointer(void* data) {
-    glfwSetWindowUserPointer(window_, data);
-}
+void Window::set_user_pointer(void* data) { glfwSetWindowUserPointer(window_, data); }
 
-void Window::set_key_callback(GLFWkeyfun callback) {
-    glfwSetKeyCallback(window_, callback);
-}
+void Window::set_key_callback(GLFWkeyfun callback) { glfwSetKeyCallback(window_, callback); }
 
-void Window::clear_frame(GLbitfield mask) {
-    glClear(mask);
-}
+void Window::clear_frame(GLbitfield mask) { glClear(mask); }
 
-void Window::request_close() {
-    glfwSetWindowShouldClose(window_, GLFW_TRUE);
-}
+void Window::request_close() { glfwSetWindowShouldClose(window_, GLFW_TRUE); }
 
-}  // namespace solar::app
+} // namespace solar::app

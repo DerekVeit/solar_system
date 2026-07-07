@@ -12,7 +12,7 @@
 using Catch::Approx;
 
 namespace {
-constexpr double kSunMu = 132712440041.93938;  // km³/s²
+constexpr double kSunMu = 132712440041.93938; // km³/s²
 constexpr double kYearDays = 365.25;
 
 using solar::core::kPi;
@@ -23,22 +23,21 @@ struct KeplerCase {
     double eccentricity;
     double expected_eccentric_anomaly;
 };
-}  // namespace
+} // namespace
 
 TEST_CASE("solve_kepler recovers expected eccentric anomaly", "[kepler]") {
-    const KeplerCase test_case = GENERATE(
-        KeplerCase{"circular orbit", kPi / 3.0, 0.0, kPi / 3.0},
-        KeplerCase{"M = pi, e = 0.5", kPi, 0.5, kPi},
-        KeplerCase{"M = 0, e = pi/3", 0.0, kPi / 3.0, kPi / 6.0},
-        KeplerCase{"M = pi/6, e = pi/3", kPi / 6.0, kPi / 3.0, kPi / 2.0});
+    const KeplerCase test_case =
+        GENERATE(KeplerCase{"circular orbit", kPi / 3.0, 0.0, kPi / 3.0},
+                 KeplerCase{"M = pi, e = 0.5", kPi, 0.5, kPi},
+                 KeplerCase{"M = 0, e = pi/3", 0.0, kPi / 3.0, kPi / 6.0},
+                 KeplerCase{"M = pi/6, e = pi/3", kPi / 6.0, kPi / 3.0, kPi / 2.0});
 
     INFO(test_case.label);
 
     const double eccentric_anomaly =
         solar::core::solve_kepler(test_case.mean_anomaly, test_case.eccentricity);
 
-    CHECK(eccentric_anomaly ==
-          Approx(test_case.expected_eccentric_anomaly).margin(1e-10));
+    CHECK(eccentric_anomaly == Approx(test_case.expected_eccentric_anomaly).margin(1e-10));
 }
 
 TEST_CASE("state_from_kepler preserves semi-major axis for circular orbit", "[kepler]") {
@@ -52,8 +51,8 @@ TEST_CASE("state_from_kepler preserves semi-major axis for circular orbit", "[ke
         .epoch = solar::core::Epoch{solar::core::kJ2000Jd},
     };
 
-    const auto state = solar::core::state_from_kepler(kSunMu, elements,
-                                                      solar::core::Epoch{solar::core::kJ2000Jd});
+    const auto state =
+        solar::core::state_from_kepler(kSunMu, elements, solar::core::Epoch{solar::core::kJ2000Jd});
 
     CHECK(state.position.length() == Approx(solar::core::kAuKm).margin(1.0));
     CHECK(state.velocity.km_per_s.x == Approx(0.0).margin(1e-6));
@@ -71,16 +70,15 @@ TEST_CASE("state_from_kepler completes one revolution per orbital period", "[kep
         .epoch = solar::core::Epoch{solar::core::kJ2000Jd},
     };
 
-    const auto start = solar::core::state_from_kepler(kSunMu, elements,
-                                                     solar::core::Epoch{solar::core::kJ2000Jd});
+    const auto start =
+        solar::core::state_from_kepler(kSunMu, elements, solar::core::Epoch{solar::core::kJ2000Jd});
     const double mean_motion =
         std::sqrt(kSunMu / (solar::core::kAuKm * solar::core::kAuKm * solar::core::kAuKm));
     const double orbital_period_days =
         solar::core::kTwoPi / mean_motion / solar::core::kSecondsPerDay;
 
     const auto later = solar::core::state_from_kepler(
-        kSunMu, elements,
-        solar::core::Epoch{solar::core::kJ2000Jd + orbital_period_days});
+        kSunMu, elements, solar::core::Epoch{solar::core::kJ2000Jd + orbital_period_days});
 
     CHECK(later.position.km.x == Approx(start.position.km.x).margin(1e3));
     CHECK(later.position.km.y == Approx(start.position.km.y).margin(1e3));
@@ -106,8 +104,7 @@ TEST_CASE("state_from_kepler advances circular orbit to expected positions", "[k
     };
 
     const auto state = solar::core::state_from_kepler(
-        kSunMu, elements,
-        solar::core::Epoch{solar::core::kJ2000Jd + days});
+        kSunMu, elements, solar::core::Epoch{solar::core::kJ2000Jd + days});
 
     CHECK(state.position.km.x == Approx(expected_x).margin(2e4));
     CHECK(state.position.km.y == Approx(expected_y).margin(2e4));

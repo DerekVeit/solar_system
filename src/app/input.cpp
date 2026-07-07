@@ -7,19 +7,18 @@
 
 namespace solar::app {
 
-void key_callback(GLFWwindow *glfw_window, int key, int /*scancode*/, int action, int mods) {
+void key_callback(GLFWwindow* glfw_window, int key, int /*scancode*/, int action, int mods) {
     if (action != GLFW_PRESS) {
         return;
     }
 
-    auto *app_context =
-        static_cast<solar::app::AppContext *>(glfwGetWindowUserPointer(glfw_window));
+    auto* app_context = static_cast<solar::app::AppContext*>(glfwGetWindowUserPointer(glfw_window));
     if (app_context == nullptr) {
         return;
     }
 
-    Window *window = app_context->window;
-    solar::sim::SolarSystem *simulation = app_context->simulation;
+    Window* window = app_context->window;
+    solar::sim::SolarSystem* simulation = app_context->simulation;
     if (window == nullptr) {
         fmt::print(stderr, "app_context->window is nullptr");
         return;
@@ -28,7 +27,7 @@ void key_callback(GLFWwindow *glfw_window, int key, int /*scancode*/, int action
         fmt::print(stderr, "app_context->simulation is nullptr");
         return;
     }
-    solar::sim::SimulationClock &clock = simulation->clock();
+    solar::sim::SimulationClock& clock = simulation->clock();
 
     switch (key) {
         case GLFW_KEY_ESCAPE:
@@ -64,7 +63,7 @@ void key_callback(GLFWwindow *glfw_window, int key, int /*scancode*/, int action
     }
 }
 
-void register_key_handlers(AppContext &app_context) {
+void register_key_handlers(AppContext& app_context) {
     app_context.window->set_user_pointer(&app_context);
     app_context.window->set_key_callback(key_callback);
 }

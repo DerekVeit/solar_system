@@ -13,11 +13,10 @@ using GravitationalParameter = double;
 
 /// Position in the orbital plane (perifocal frame), km.
 [[nodiscard]] Displacement position_in_orbital_plane(const KeplerianElements& elements,
-                                                       double eccentric_anomaly);
+                                                     double eccentric_anomaly);
 
 /// Heliocentric state from osculating Keplerian elements at the given epoch.
 [[nodiscard]] StateVector state_from_kepler(GravitationalParameter mu,
-                                            const KeplerianElements& elements,
-                                            Epoch epoch);
+                                            const KeplerianElements& elements, Epoch epoch);
 
-}  // namespace solar::core
+} // namespace solar::core

@@ -45,7 +45,8 @@ double angular_difference_deg(double a_deg, double b_deg) {
     return delta - 180.0;
 }
 
-double position_error_au(const solar::core::Displacement& position, const HorizonsBodyReference& reference) {
+double position_error_au(const solar::core::Displacement& position,
+                         const HorizonsBodyReference& reference) {
     const double dx = position.km.x / solar::core::kAuKm - reference.x_au;
     const double dy = position.km.y / solar::core::kAuKm - reference.y_au;
     const double dz = position.km.z / solar::core::kAuKm - reference.z_au;
@@ -83,7 +84,7 @@ std::vector<HorizonsEpochReference> load_horizons_reference(const std::filesyste
     return cases;
 }
 
-}  // namespace
+} // namespace
 
 TEST_CASE("KeplerEphemeris agrees with JPL Horizons reference ephemeris", "[horizons][kepler]") {
     const auto reference_cases = load_horizons_reference("tests/data/horizons_reference.json");
@@ -103,8 +104,7 @@ TEST_CASE("KeplerEphemeris agrees with JPL Horizons reference ephemeris", "[hori
             const double reference_lon =
                 heliocentric_longitude_deg(body_reference.x_au, body_reference.y_au);
             const double simulated_lon = heliocentric_longitude_deg(
-                state.position.km.x / solar::core::kAuKm,
-                state.position.km.y / solar::core::kAuKm);
+                state.position.km.x / solar::core::kAuKm, state.position.km.y / solar::core::kAuKm);
             const double lon_error_deg =
                 std::abs(angular_difference_deg(simulated_lon, reference_lon));
 

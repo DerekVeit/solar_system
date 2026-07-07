@@ -25,4 +25,4 @@ class SolarSystem {
     SimulationClock clock_;
 };
 
-}  // namespace solar::sim
+} // namespace solar::sim

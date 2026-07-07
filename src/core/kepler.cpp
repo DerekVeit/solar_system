@@ -34,20 +34,21 @@ glm::dmat3 rotation_matrix(const KeplerianElements& elements) {
     };
     const glm::dvec3 w{
         // The perifocal z is always 0.
-        0.0,  // sin_O * sin_i,
-        0.0,  // -cos_O * sin_i,
-        1.0,  // cos_i,
+        0.0, // sin_O * sin_i,
+        0.0, // -cos_O * sin_i,
+        1.0, // cos_i,
     };
 
     return glm::dmat3{p, q, w};
 }
 
-double mean_anomaly_at_epoch(GravitationalParameter mu, const KeplerianElements& elements, Epoch epoch) {
+double mean_anomaly_at_epoch(GravitationalParameter mu, const KeplerianElements& elements,
+                             Epoch epoch) {
     const Duration elapsed{(epoch.jd - elements.epoch.jd) * kSecondsPerDay};
 
-    const double mean_motion = std::sqrt(mu / (elements.semi_major_axis_km *
-                                               elements.semi_major_axis_km *
-                                               elements.semi_major_axis_km));
+    const double mean_motion =
+        std::sqrt(mu / (elements.semi_major_axis_km * elements.semi_major_axis_km *
+                        elements.semi_major_axis_km));
     const double mean_anomaly =
         normalize_angle(elements.mean_anomaly_at_epoch_rad + mean_motion * elapsed.count());
     return mean_anomaly;
@@ -58,17 +59,17 @@ const glm::dvec3 perifocal_velocity_at_E(GravitationalParameter mu,
                                          const double eccentric_anomaly,
                                          const Displacement perifocal_position) {
     const double radius = perifocal_position.length();
-    const double factor = std::sqrt(mu * elements.semi_major_axis_km) / radius;  // km/s
+    const double factor = std::sqrt(mu * elements.semi_major_axis_km) / radius; // km/s
     const glm::dvec3 perifocal_velocity{
         -std::sin(eccentric_anomaly) * factor,
-        std::sqrt(1.0 - elements.eccentricity * elements.eccentricity) * std::cos(eccentric_anomaly) *
-            factor,
+        std::sqrt(1.0 - elements.eccentricity * elements.eccentricity) *
+            std::cos(eccentric_anomaly) * factor,
         0.0,
     };
     return perifocal_velocity;
 }
 
-}  // namespace
+} // namespace
 
 double solve_kepler(double mean_anomaly_rad, double eccentricity) {
     mean_anomaly_rad = normalize_angle(mean_anomaly_rad);
@@ -79,9 +80,9 @@ double solve_kepler(double mean_anomaly_rad, double eccentricity) {
     }
 
     for (int iteration = 0; iteration < 30; ++iteration) {
-        const double delta = (eccentric_anomaly - eccentricity * std::sin(eccentric_anomaly) -
-                              mean_anomaly_rad) /
-                             (1.0 - eccentricity * std::cos(eccentric_anomaly));
+        const double delta =
+            (eccentric_anomaly - eccentricity * std::sin(eccentric_anomaly) - mean_anomaly_rad) /
+            (1.0 - eccentricity * std::cos(eccentric_anomaly));
         eccentric_anomaly -= delta;
         if (std::abs(delta) < 1e-12) {
             break;
@@ -116,9 +117,8 @@ StateVector state_from_kepler(GravitationalParameter mu, const KeplerianElements
     const glm::dmat3 rotation = rotation_matrix(elements);
     const glm::dvec3 position_km = rotation * perifocal_position.km;
 
-    const glm::dvec3 perifocal_velocity = perifocal_velocity_at_E(mu, elements,
-                                                                  eccentric_anomaly,
-                                                                  perifocal_position);
+    const glm::dvec3 perifocal_velocity =
+        perifocal_velocity_at_E(mu, elements, eccentric_anomaly, perifocal_position);
     const glm::dvec3 velocity_km_s = rotation * perifocal_velocity;
 
     return StateVector{
@@ -127,4 +127,4 @@ StateVector state_from_kepler(GravitationalParameter mu, const KeplerianElements
     };
 }
 
-}  // namespace solar::core
+} // namespace solar::core

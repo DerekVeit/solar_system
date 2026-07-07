@@ -26,7 +26,7 @@ KeplerianElements parse_elements(const nlohmann::json& json) {
     };
 }
 
-}  // namespace
+} // namespace
 
 std::vector<BodyDefinition> load_bodies(const std::filesystem::path& path) {
     std::ifstream input{path};
@@ -50,4 +50,4 @@ std::vector<BodyDefinition> load_bodies(const std::filesystem::path& path) {
     return bodies;
 }
 
-}  // namespace solar::core
+} // namespace solar::core

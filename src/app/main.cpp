@@ -30,19 +30,18 @@ std::filesystem::path asset_path(const std::string& relative) {
 std::string planet_report(solar::core::StateVector planet_state) {
     const auto position = planet_state.position;
     const auto polar = position.polar_xy();
-    return fmt::format("{:.0f} {:.0f} {:.0f} km ({:.0f} km @ {:.0f}°)",
-                       position.km.x, position.km.y, position.km.z,
-                       polar.length, polar.angle * solar::core::kRadToDeg);
+    return fmt::format("{:.0f} {:.0f} {:.0f} km ({:.0f} km @ {:.0f}°)", position.km.x,
+                       position.km.y, position.km.z, polar.length,
+                       polar.angle * solar::core::kRadToDeg);
 }
 
-}  // namespace
+} // namespace
 
 int main() {
     log("----------------------------------------");
     try {
         const auto bodies = solar::core::load_bodies(asset_path("data/bodies.json"));
-        auto ephemeris =
-            std::make_unique<solar::core::KeplerEphemeris>(bodies);
+        auto ephemeris = std::make_unique<solar::core::KeplerEphemeris>(bodies);
 
         solar::sim::SimulationClock clock{solar::core::Epoch{}.now()};
         clock.set_time_scale(solar::sim::TimeScale::real_time);
@@ -57,7 +56,7 @@ int main() {
         auto previous_time = std::chrono::steady_clock::now();
 
         const double log_interval = 1.0;
-        double log_timer = log_interval;  // initially due for logging
+        double log_timer = log_interval; // initially due for logging
 
         while (!window.should_close()) {
             const auto current_time = std::chrono::steady_clock::now();
@@ -82,8 +81,7 @@ int main() {
             if (!paused) {
                 log_timer += delta_seconds;
                 if (log_timer >= log_interval) {
-                    log("RGB: ({:.02f} {:.02f} {:.02f}) for {:.01f}° at {}",
-                        red, green, blue,
+                    log("RGB: ({:.02f} {:.02f} {:.02f}) for {:.01f}° at {}", red, green, blue,
                         earth_angle * solar::core::kRadToDeg,
                         simulation.clock().epoch().to_string());
                     log_timer -= log_interval;

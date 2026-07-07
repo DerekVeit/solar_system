@@ -1,5 +1,5 @@
-#include "app/logging.hpp"
 #include "sim/solar_system.hpp"
+#include "app/logging.hpp"
 #include "core/ephemeris.hpp"
 
 namespace {
@@ -9,7 +9,8 @@ using solar::app::log;
 namespace solar::sim {
 
 SolarSystem::SolarSystem(core::EphemerisProviderPtr ephemeris, SimulationClock clock)
-    : ephemeris_(std::move(ephemeris)), clock_(clock) {}
+    : ephemeris_(std::move(ephemeris))
+    , clock_(clock) {}
 
 core::StateVector SolarSystem::state(const std::string& body_name) const {
     return ephemeris_->state(body_name, clock_.epoch());
@@ -25,4 +26,4 @@ void SolarSystem::change_acceleration(double multiplier) {
     }
 }
 
-}  // namespace solar::sim
+} // namespace solar::sim

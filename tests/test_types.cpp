@@ -24,8 +24,7 @@ struct PolarCase {
 
 constexpr double kEps = 1e-12;
 
-}  // namespace
-
+} // namespace
 
 TEST_CASE("Epoch.to_string returns ISO-like timestamp string for J2000", "[types]") {
     const solar::core::Epoch epoch{solar::core::kJ2000Jd};
@@ -49,12 +48,13 @@ TEST_CASE("Epoch.to_string for a fractional day later", "[types]") {
 TEST_CASE("Displacement.polar_xy converts quadrants to [0, 2pi) angles", "[types]") {
     using Row = std::tuple<std::string, double, double, double, double>;
 
-    const auto [label, x, y, expected_length, expected_angle] = GENERATE(table<std::string, double, double, double, double>({
-        Row{"Q1: +x +y", 3.0, 4.0, 5.0, std::atan2(4.0, 3.0)},
-        Row{"Q2: -x +y", -3.0, 4.0, 5.0, std::atan2(4.0, -3.0)},
-        Row{"Q3: -x -y", -3.0, -4.0, 5.0, std::atan2(-4.0, -3.0) + solar::core::kTwoPi},
-        Row{"Q4: +x -y", 3.0, -4.0, 5.0, std::atan2(-4.0, 3.0) + solar::core::kTwoPi},
-    }));
+    const auto [label, x, y, expected_length, expected_angle] =
+        GENERATE(table<std::string, double, double, double, double>({
+            Row{"Q1: +x +y", 3.0, 4.0, 5.0, std::atan2(4.0, 3.0)},
+            Row{"Q2: -x +y", -3.0, 4.0, 5.0, std::atan2(4.0, -3.0)},
+            Row{"Q3: -x -y", -3.0, -4.0, 5.0, std::atan2(-4.0, -3.0) + solar::core::kTwoPi},
+            Row{"Q4: +x -y", 3.0, -4.0, 5.0, std::atan2(-4.0, 3.0) + solar::core::kTwoPi},
+        }));
 
     INFO(label);
 
@@ -70,12 +70,13 @@ TEST_CASE("Displacement.polar_xy converts quadrants to [0, 2pi) angles", "[types
 TEST_CASE("Displacement.polar_xy handles atan2 edge cases on axes", "[types]") {
     using Row = std::tuple<std::string, double, double, double, double>;
 
-    const auto [label, x, y, expected_length, expected_angle] = GENERATE(table<std::string, double, double, double, double>({
-        Row{"+x axis", 2.0, 0.0, 2.0, 0.0},
-        Row{"-x axis (atan2 = pi)", -2.0, 0.0, 2.0, solar::core::kPi},
-        Row{"+y axis (atan2 = pi/2)", 0.0, 3.0, 3.0, solar::core::kPi / 2.0},
-        Row{"-y axis (atan2 = -pi/2 -> 3pi/2)", 0.0, -3.0, 3.0, 3.0 * solar::core::kPi / 2.0},
-    }));
+    const auto [label, x, y, expected_length, expected_angle] =
+        GENERATE(table<std::string, double, double, double, double>({
+            Row{"+x axis", 2.0, 0.0, 2.0, 0.0},
+            Row{"-x axis (atan2 = pi)", -2.0, 0.0, 2.0, solar::core::kPi},
+            Row{"+y axis (atan2 = pi/2)", 0.0, 3.0, 3.0, solar::core::kPi / 2.0},
+            Row{"-y axis (atan2 = -pi/2 -> 3pi/2)", 0.0, -3.0, 3.0, 3.0 * solar::core::kPi / 2.0},
+        }));
 
     INFO(label);
 
@@ -106,4 +107,3 @@ TEST_CASE("Displacement.polar_xy at origin has zero length", "[types]") {
     CHECK(polar.length == Approx(0.0).margin(kEps));
     CHECK(std::isfinite(polar.angle));
 }
-
