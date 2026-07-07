@@ -1,3 +1,5 @@
+#pragma once
+
 #include "app/context.hpp"
 #include <GLFW/glfw3.h>
 
