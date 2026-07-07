@@ -1,7 +1,6 @@
 #include "app/logging.hpp"
 
 #include <fmt/os.h>
-#include <utility>
 
 namespace solar::app::detail {
 
