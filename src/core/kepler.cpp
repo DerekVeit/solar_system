@@ -42,13 +42,13 @@ glm::dmat3 rotation_matrix(const KeplerianElements& elements) {
     return glm::dmat3{p, q, w};
 }
 
+double cube(double num) { return num * num * num; }
+
 double mean_anomaly_at_epoch(GravitationalParameter mu, const KeplerianElements& elements,
                              Epoch epoch) {
     const Duration elapsed{(epoch.jd - elements.epoch.jd) * kSecondsPerDay};
 
-    const double mean_motion =
-        std::sqrt(mu / (elements.semi_major_axis_km * elements.semi_major_axis_km *
-                        elements.semi_major_axis_km));
+    const double mean_motion = std::sqrt(mu / cube(elements.semi_major_axis_km));
     const double mean_anomaly =
         normalize_angle(elements.mean_anomaly_at_epoch_rad + mean_motion * elapsed.count());
     return mean_anomaly;
