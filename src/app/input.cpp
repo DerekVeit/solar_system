@@ -7,13 +7,13 @@
 
 namespace solar::app {
 
-void key_callback(GLFWwindow* glfw_window, int key, int /*scancode*/, int action, int mods) {
+void key_callback(GLFWwindow *glfw_window, int key, int /*scancode*/, int action, int mods) {
     if (action != GLFW_PRESS) {
         return;
     }
 
-    auto* app_context = static_cast<solar::app::AppContext*>(
-        glfwGetWindowUserPointer(glfw_window));
+    auto *app_context =
+        static_cast<solar::app::AppContext *>(glfwGetWindowUserPointer(glfw_window));
     if (app_context == nullptr) {
         return;
     }
@@ -64,10 +64,9 @@ void key_callback(GLFWwindow* glfw_window, int key, int /*scancode*/, int action
     }
 }
 
-void register_key_handlers(AppContext& app_context) {
+void register_key_handlers(AppContext &app_context) {
     app_context.window->set_user_pointer(&app_context);
     app_context.window->set_key_callback(key_callback);
 }
 
-}
-
+} // namespace solar::app
