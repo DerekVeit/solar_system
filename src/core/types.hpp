@@ -15,6 +15,8 @@ using JulianDate = double;
 /// Seconds since J2000.0 TT (approximated as UTC for this simulation).
 using Duration = std::chrono::duration<double>;
 
+using TimePoint = std::chrono::time_point<std::chrono::system_clock,std::chrono::seconds>;
+
 struct Epoch {
     JulianDate jd{};
 
@@ -39,7 +41,7 @@ struct Epoch {
         return Epoch{jd_now};
     }
 
-    [[nodiscard]] std::chrono::time_point<std::chrono::system_clock,std::chrono::seconds> now() const {
+    [[nodiscard]] TimePoint now() const {
         using namespace std::chrono;
         const sys_days j2000_date{year{2000} / January / 1};
         const sys_seconds j2000 = j2000_date + 12h;
