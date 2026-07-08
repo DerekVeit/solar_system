@@ -15,6 +15,7 @@ class SimulationClock {
     explicit SimulationClock(core::Epoch start_epoch);
 
     [[nodiscard]] core::Epoch epoch() const { return epoch_; }
+    [[nodiscard]] core::TimePoint now() const { return epoch_.now(); }
     [[nodiscard]] TimeScale time_scale() const { return time_scale_; }
     [[nodiscard]] double acceleration() const { return acceleration_; }
 
