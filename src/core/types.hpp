@@ -39,7 +39,7 @@ struct Epoch {
         return Epoch{jd_now};
     }
 
-    [[nodiscard]] std::chrono::time_point<std::chrono::system_clock,std::chrono::seconds> time() const {
+    [[nodiscard]] std::chrono::time_point<std::chrono::system_clock,std::chrono::seconds> now() const {
         using namespace std::chrono;
         const sys_days j2000_date{year{2000} / January / 1};
         const sys_seconds j2000 = j2000_date + 12h;
@@ -49,7 +49,7 @@ struct Epoch {
     }
 
     [[nodiscard]] std::string to_string() const {
-        const auto tp = time();
+        const auto tp = now();
         std::string ts = fmt::format("{:%Y-%m-%d %H:%M:%S} UT (approx)", tp);
         return ts;
     }
