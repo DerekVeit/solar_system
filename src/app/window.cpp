@@ -89,7 +89,7 @@ void Window::set_user_pointer(void* data) { glfwSetWindowUserPointer(window_, da
 
 void Window::set_key_callback(GLFWkeyfun callback) { glfwSetKeyCallback(window_, callback); }
 
-void Window::clear_frame(GLbitfield mask) { glClear(mask); }
+void Window::clear_frame() { glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); }
 
 void Window::request_close() { glfwSetWindowShouldClose(window_, GLFW_TRUE); }
 

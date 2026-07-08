@@ -36,7 +36,7 @@ class Window {
 
     void set_key_callback(GLFWkeyfun callback);
 
-    void clear_frame(GLbitfield mask);
+    void clear_frame();
 
     void request_close();
 
