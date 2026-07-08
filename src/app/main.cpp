@@ -86,7 +86,7 @@ int main() {
                 }
             }
 
-            window.set_clear_color(red, green, blue, 1.0f);
+            window.set_clear_color({red, green, blue, 1.0f});
             window.swap_buffers();
             window.poll_events();
             previous_time = current_time;

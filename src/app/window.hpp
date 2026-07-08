@@ -1,5 +1,6 @@
 #pragma once
 
+#include "app/color.hpp"
 #include <GL/gl.h>
 #include <GLFW/glfw3.h>
 #include <string>
@@ -30,7 +31,7 @@ class Window {
     [[nodiscard]] int framebuffer_width() const;
     [[nodiscard]] int framebuffer_height() const;
 
-    void set_clear_color(float r, float g, float b, float a);
+    void set_clear_color(solar::app::Color c);
 
     void set_user_pointer(void* data);
 
