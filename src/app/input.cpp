@@ -4,6 +4,7 @@
 #include "sim/solar_system.hpp"
 
 #include "app/input.hpp"
+#include <fmt/core.h>
 
 namespace solar::app {
 
