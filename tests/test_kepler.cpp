@@ -1,3 +1,6 @@
+#include "core/constants.hpp"
+#include "core/kepler.hpp"
+
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
@@ -5,9 +8,6 @@
 #include <cmath>
 #include <string>
 #include <tuple>
-
-#include "core/constants.hpp"
-#include "core/kepler.hpp"
 
 using Catch::Approx;
 

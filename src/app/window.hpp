@@ -1,8 +1,10 @@
 #pragma once
 
 #include "app/color.hpp"
+
 #include <GL/gl.h>
 #include <GLFW/glfw3.h>
+
 #include <string>
 
 struct GLFWwindow;

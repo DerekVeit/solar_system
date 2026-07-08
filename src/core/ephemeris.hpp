@@ -1,10 +1,10 @@
 #pragma once
 
+#include "core/types.hpp"
+
 #include <memory>
 #include <string>
 #include <vector>
-
-#include "core/types.hpp"
 
 namespace solar::core {
 

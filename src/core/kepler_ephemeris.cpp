@@ -1,9 +1,9 @@
 #include "core/kepler_ephemeris.hpp"
 
+#include "core/kepler.hpp"
+
 #include <stdexcept>
 #include <string>
-
-#include "core/kepler.hpp"
 
 namespace solar::core {
 

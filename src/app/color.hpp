@@ -1,7 +1,9 @@
 #pragma once
 
 #include "fmt/format.h"
+
 #include <string>
+
 namespace solar::app {
 
 struct Color {

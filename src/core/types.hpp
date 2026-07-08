@@ -1,10 +1,12 @@
 #pragma once
 
 #include "core/constants.hpp"
-#include <chrono>
+
 #include <fmt/chrono.h>
 #include <fmt/core.h>
 #include <glm/glm.hpp>
+
+#include <chrono>
 #include <string>
 
 namespace solar::core {

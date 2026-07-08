@@ -1,3 +1,8 @@
+#include "core/constants.hpp"
+#include "core/json_loader.hpp"
+#include "core/kepler_ephemeris.hpp"
+#include "core/types.hpp"
+
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <cmath>
@@ -8,11 +13,6 @@
 #include <vector>
 
 #include <nlohmann/json.hpp>
-
-#include "core/constants.hpp"
-#include "core/json_loader.hpp"
-#include "core/kepler_ephemeris.hpp"
-#include "core/types.hpp"
 
 using Catch::Approx;
 

@@ -1,9 +1,9 @@
 #pragma once
 
+#include "core/ephemeris.hpp"
+
 #include <filesystem>
 #include <vector>
-
-#include "core/ephemeris.hpp"
 
 namespace solar::core {
 

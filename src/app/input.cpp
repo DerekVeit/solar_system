@@ -1,9 +1,10 @@
+#include "app/input.hpp"
+
 #include "app/logging.hpp"
 #include "app/window.hpp"
 #include "sim/clock.hpp"
 #include "sim/solar_system.hpp"
 
-#include "app/input.hpp"
 #include <fmt/core.h>
 
 namespace solar::app {

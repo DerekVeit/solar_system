@@ -1,11 +1,11 @@
 #include "core/json_loader.hpp"
 
-#include <fstream>
-#include <stdexcept>
+#include "core/constants.hpp"
 
 #include <nlohmann/json.hpp>
 
-#include "core/constants.hpp"
+#include <fstream>
+#include <stdexcept>
 
 namespace solar::core {
 

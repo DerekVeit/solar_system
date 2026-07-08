@@ -1,10 +1,11 @@
-#include "app/color.hpp"
 #include "app/window.hpp"
 
-#include <stdexcept>
+#include "app/color.hpp"
 
 #include <GL/gl.h>
 #include <GLFW/glfw3.h>
+
+#include <stdexcept>
 
 namespace solar::app {
 

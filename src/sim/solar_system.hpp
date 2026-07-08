@@ -1,10 +1,10 @@
 #pragma once
 
-#include <string>
-
 #include "core/ephemeris.hpp"
 #include "core/types.hpp"
 #include "sim/clock.hpp"
+
+#include <string>
 
 namespace solar::sim {
 

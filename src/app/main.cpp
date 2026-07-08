@@ -1,8 +1,3 @@
-#include <chrono>
-#include <string>
-
-#include <fmt/core.h>
-
 #include "app/color.hpp"
 #include "app/context.hpp"
 #include "app/files.hpp"
@@ -15,6 +10,11 @@
 #include "core/types.hpp"
 #include "sim/clock.hpp"
 #include "sim/solar_system.hpp"
+
+#include <fmt/core.h>
+
+#include <chrono>
+#include <string>
 
 namespace {
 

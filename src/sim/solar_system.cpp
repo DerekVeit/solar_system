@@ -1,4 +1,5 @@
 #include "sim/solar_system.hpp"
+
 #include "app/logging.hpp"
 #include "core/ephemeris.hpp"
 

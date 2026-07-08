@@ -1,4 +1,5 @@
 #include "app/color.hpp"
+
 #include <cmath>
 
 namespace solar::app {

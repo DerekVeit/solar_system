@@ -1,6 +1,5 @@
 #pragma once
 
-#include "core/constants.hpp"
 #include "core/types.hpp"
 
 namespace solar::core {

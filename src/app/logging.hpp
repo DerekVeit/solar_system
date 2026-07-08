@@ -1,11 +1,11 @@
 #pragma once
 
+#include <fmt/chrono.h>
+#include <fmt/format.h>
+
 #include <chrono>
 #include <string>
 #include <utility>
-
-#include <fmt/chrono.h>
-#include <fmt/format.h>
 
 namespace solar::app {
 

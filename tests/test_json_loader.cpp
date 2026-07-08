@@ -1,6 +1,6 @@
-#include <catch2/catch_test_macros.hpp>
-
 #include "core/json_loader.hpp"
+
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("load_bodies reads bundled planet data", "[json]") {
     const auto bodies = solar::core::load_bodies("assets/data/bodies.json");
