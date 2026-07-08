@@ -1,11 +1,11 @@
 #include <chrono>
-#include <filesystem>
 #include <string>
 
 #include <fmt/core.h>
 
 #include "app/color.hpp"
 #include "app/context.hpp"
+#include "app/files.hpp"
 #include "app/input.hpp"
 #include "app/logging.hpp"
 #include "app/window.hpp"
@@ -20,12 +20,6 @@ namespace {
 
 using solar::app::log;
 
-std::filesystem::path asset_path(const std::string& relative) {
-    const std::filesystem::path executable =
-        std::filesystem::canonical("/proc/self/exe").parent_path();
-    return executable / "assets" / relative;
-}
-
 std::string planet_report(solar::core::StateVector planet_state) {
     const auto position = planet_state.position;
     const auto polar = position.polar_xy();
@@ -39,7 +33,7 @@ std::string planet_report(solar::core::StateVector planet_state) {
 int main() {
     log("----------------------------------------");
     try {
-        const auto bodies = solar::core::load_bodies(asset_path("data/bodies.json"));
+        const auto bodies = solar::core::load_bodies(solar::app::asset_path("data/bodies.json"));
         auto ephemeris = std::make_unique<solar::core::KeplerEphemeris>(bodies);
 
         solar::sim::SimulationClock clock{solar::core::Epoch{}.now()};
