@@ -74,8 +74,7 @@ int main() {
             if (!paused) {
                 log_timer += delta_seconds;
                 if (log_timer >= log_interval) {
-                    log("RGB: ({:.02f} {:.02f} {:.02f}) for {:.01f}° at {}",
-                        clear_color.r, clear_color.g, clear_color.b,
+                    log("RGB: ({}) for {:.01f}° at {}", clear_color.to_string(),
                         earth_angle * solar::core::kRadToDeg,
                         simulation.clock().epoch().to_string());
                     log_timer -= log_interval;
