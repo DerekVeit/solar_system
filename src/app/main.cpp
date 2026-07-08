@@ -4,6 +4,7 @@
 
 #include <fmt/core.h>
 
+#include "app/color.hpp"
 #include "app/context.hpp"
 #include "app/input.hpp"
 #include "app/logging.hpp"
@@ -67,26 +68,21 @@ int main() {
 
             const double earth_angle = simulation.state("Earth").position.polar_xy().angle;
 
-            float red(0.0f), green(0.0f), blue(0.0f);
-            if (std::cos(earth_angle) < 0) {
-                green = -std::cos(earth_angle);
-            } else {
-                red = std::cos(earth_angle);
-            }
-            blue = ((-std::sin(earth_angle) + 1.0f) / 2.0f) * 0.8f + 0.2f;
+            solar::app::Color clear_color = solar::app::color_from_angle(earth_angle);
 
             bool paused = simulation.clock().time_scale() == solar::sim::TimeScale::paused;
             if (!paused) {
                 log_timer += delta_seconds;
                 if (log_timer >= log_interval) {
-                    log("RGB: ({:.02f} {:.02f} {:.02f}) for {:.01f}° at {}", red, green, blue,
+                    log("RGB: ({:.02f} {:.02f} {:.02f}) for {:.01f}° at {}",
+                        clear_color.r, clear_color.g, clear_color.b,
                         earth_angle * solar::core::kRadToDeg,
                         simulation.clock().epoch().to_string());
                     log_timer -= log_interval;
                 }
             }
 
-            window.set_clear_color({red, green, blue, 1.0f});
+            window.set_clear_color(clear_color);
             window.swap_buffers();
             window.poll_events();
             previous_time = current_time;

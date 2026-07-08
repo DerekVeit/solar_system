@@ -9,4 +9,6 @@ struct Color {
     float a;
 };
 
+Color color_from_angle(double angle);
+
 } // namespace solar::app
