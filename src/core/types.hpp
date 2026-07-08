@@ -75,6 +75,13 @@ struct Velocity {
 struct StateVector {
     Displacement position{};
     Velocity velocity{};
+
+    std::string to_string() {
+        const auto polar = position.polar_xy();
+        return fmt::format("{:.0f} {:.0f} {:.0f} km ({:.0f} km @ {:.0f}°)", position.km.x,
+                           position.km.y, position.km.z, polar.length,
+                           polar.angle * solar::core::kRadToDeg);
+    }
 };
 
 struct KeplerianElements {

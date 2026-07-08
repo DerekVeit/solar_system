@@ -20,14 +20,6 @@ namespace {
 
 using solar::app::log;
 
-std::string planet_report(solar::core::StateVector planet_state) {
-    const auto position = planet_state.position;
-    const auto polar = position.polar_xy();
-    return fmt::format("{:.0f} {:.0f} {:.0f} km ({:.0f} km @ {:.0f}°)", position.km.x,
-                       position.km.y, position.km.z, polar.length,
-                       polar.angle * solar::core::kRadToDeg);
-}
-
 } // namespace
 
 int main() {
@@ -81,10 +73,10 @@ int main() {
             previous_time = current_time;
         }
 
-        log("Earth position at shutdown: {}", planet_report(simulation.state("Earth")));
-        log("Venus position at shutdown: {}", planet_report(simulation.state("Venus")));
-        log("Mars position at shutdown: {}", planet_report(simulation.state("Mars")));
-        log("Jupiter position at shutdown: {}", planet_report(simulation.state("Jupiter")));
+        log("Earth position at shutdown: {}", simulation.state("Earth").to_string());
+        log("Venus position at shutdown: {}", simulation.state("Venus").to_string());
+        log("Mars position at shutdown: {}", simulation.state("Mars").to_string());
+        log("Jupiter position at shutdown: {}", simulation.state("Jupiter").to_string());
 
         log("Simulation epoch JD: {:.4f}", simulation.clock().epoch().jd);
         log("Simulation epoch: {}", simulation.clock().epoch().to_string());
