@@ -28,7 +28,7 @@ struct Epoch {
         return Epoch{kJ2000 + offset.count() / kSecondsPerDay};
     }
 
-    static Epoch now() {
+    static Epoch at_now() {
         using namespace std::chrono;
         const auto now = std::chrono::system_clock::now();
         const sys_days j2000_date{year{2000} / January / 1};
