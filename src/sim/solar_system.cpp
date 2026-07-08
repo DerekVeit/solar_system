@@ -22,7 +22,7 @@ void SolarSystem::change_acceleration(double multiplier) {
     const char* direction = multiplier < 1.0 ? "slower" : "faster";
     log("{}  {}: {}", clock_.epoch().to_string(), direction, accel);
     clock_.set_acceleration(accel);
-    if (clock_.time_scale() != solar::sim::TimeScale::accelerated) {
+    if (clock_.time_scale() != TimeScale::accelerated) {
         log("(not currently in the accelerated time scale)");
     }
 }

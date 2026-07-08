@@ -85,7 +85,7 @@ int Window::framebuffer_height() const {
     return height;
 }
 
-void Window::set_clear_color(solar::app::Color c) { glClearColor(c.r, c.g, c.b, c.a); }
+void Window::set_clear_color(Color c) { glClearColor(c.r, c.g, c.b, c.a); }
 
 void Window::set_user_pointer(void* data) { glfwSetWindowUserPointer(window_, data); }
 

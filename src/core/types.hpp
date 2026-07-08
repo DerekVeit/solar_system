@@ -17,7 +17,7 @@ using JulianDate = double;
 /// Seconds since J2000.0 TT (approximated as UTC for this simulation).
 using Duration = std::chrono::duration<double>;
 
-using TimePoint = std::chrono::time_point<std::chrono::system_clock,std::chrono::seconds>;
+using TimePoint = std::chrono::time_point<std::chrono::system_clock, std::chrono::seconds>;
 
 struct Epoch {
     JulianDate jd{};
@@ -88,8 +88,7 @@ struct StateVector {
     std::string to_string() {
         const auto polar = position.polar_xy();
         return fmt::format("{:.0f} {:.0f} {:.0f} km ({:.0f} km @ {:.0f}°)", position.km.x,
-                           position.km.y, position.km.z, polar.length,
-                           polar.angle * solar::core::kRadToDeg);
+                           position.km.y, position.km.z, polar.length, polar.angle * kRadToDeg);
     }
 };
 

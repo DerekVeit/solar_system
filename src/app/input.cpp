@@ -14,13 +14,13 @@ void key_callback(GLFWwindow* glfw_window, int key, int /*scancode*/, int action
         return;
     }
 
-    auto* app_context = static_cast<solar::app::AppContext*>(glfwGetWindowUserPointer(glfw_window));
+    auto* app_context = static_cast<AppContext*>(glfwGetWindowUserPointer(glfw_window));
     if (app_context == nullptr) {
         return;
     }
 
     Window* window = app_context->window;
-    solar::sim::SolarSystem* simulation = app_context->simulation;
+    sim::SolarSystem* simulation = app_context->simulation;
     if (window == nullptr) {
         fmt::print(stderr, "app_context->window is nullptr");
         return;
@@ -29,7 +29,7 @@ void key_callback(GLFWwindow* glfw_window, int key, int /*scancode*/, int action
         fmt::print(stderr, "app_context->simulation is nullptr");
         return;
     }
-    solar::sim::SimulationClock& clock = simulation->clock();
+    sim::SimulationClock& clock = simulation->clock();
 
     switch (key) {
         case GLFW_KEY_ESCAPE:
@@ -38,15 +38,15 @@ void key_callback(GLFWwindow* glfw_window, int key, int /*scancode*/, int action
             break;
         case GLFW_KEY_SPACE:
             log("{}  pausing", clock.epoch().to_string());
-            clock.set_time_scale(solar::sim::TimeScale::paused);
+            clock.set_time_scale(sim::TimeScale::paused);
             break;
         case GLFW_KEY_R:
             log("{}  real", clock.epoch().to_string());
-            clock.set_time_scale(solar::sim::TimeScale::real_time);
+            clock.set_time_scale(sim::TimeScale::real_time);
             break;
         case GLFW_KEY_A:
             log("{}  accelerated", clock.epoch().to_string());
-            clock.set_time_scale(solar::sim::TimeScale::accelerated);
+            clock.set_time_scale(sim::TimeScale::accelerated);
             break;
         case GLFW_KEY_MINUS:
         case GLFW_KEY_KP_SUBTRACT:
