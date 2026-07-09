@@ -1,4 +1,3 @@
-#include "app/color.hpp"
 #include "app/context.hpp"
 #include "app/files.hpp"
 #include "app/input.hpp"
@@ -14,14 +13,11 @@
 
 #include <fmt/core.h>
 
-#include <chrono>
 #include <string>
 
 namespace {
 
 using solar::app::log;
-
-constexpr double log_interval = 1.0;
 
 } // namespace
 
@@ -41,40 +37,7 @@ int main() {
         solar::app::AppContext ctx{&window, &simulation};
         solar::app::register_key_handlers(ctx);
 
-        auto previous_time = std::chrono::steady_clock::now();
-
-        double log_timer = log_interval; // initially due for logging
-
-        while (!window.should_close()) {
-            const auto current_time = std::chrono::steady_clock::now();
-            const double delta_seconds =
-                std::chrono::duration<double>(current_time - previous_time).count();
-
-            simulation.clock().advance(delta_seconds);
-
-            window.clear_frame();
-
-            const double earth_angle = simulation.state("Earth").position.polar_xy().angle;
-
-            solar::app::Color clear_color = solar::app::color_from_angle(earth_angle);
-
-            bool paused = simulation.clock().time_scale() == solar::sim::TimeScale::paused;
-            if (!paused) {
-                log_timer += delta_seconds;
-                if (log_timer >= log_interval) {
-                    log("RGB: ({}) for {:.01f}° at {}", clear_color.to_string(),
-                        earth_angle * solar::core::kRadToDeg,
-                        simulation.clock().epoch().to_string());
-                    log_timer -= log_interval;
-                }
-            }
-
-            window.set_clear_color(clear_color);
-            window.swap_buffers();
-            window.poll_events();
-            previous_time = current_time;
-        }
-
+        solar::app::run_loop(ctx);
         solar::app::log_shutdown_report(simulation);
 
         return 0;

@@ -1,8 +1,56 @@
 #include "app/run.hpp"
 
+#include "app/color.hpp"
 #include "app/logging.hpp"
 
+#include <chrono>
+
+namespace {
+
+constexpr double log_interval = 1.0;
+
+} // namespace
+
 namespace solar::app {
+
+void run_loop(AppContext& ctx) {
+    // auto& [window, simulation] = ctx;
+    auto& window = *ctx.window;
+    auto& simulation = *ctx.simulation;
+
+    auto previous_time = std::chrono::steady_clock::now();
+
+    double log_timer = log_interval; // initially due for logging
+
+    while (!window.should_close()) {
+        const auto current_time = std::chrono::steady_clock::now();
+        const double delta_seconds =
+            std::chrono::duration<double>(current_time - previous_time).count();
+
+        simulation.clock().advance(delta_seconds);
+
+        window.clear_frame();
+
+        const double earth_angle = simulation.state("Earth").position.polar_xy().angle;
+
+        Color clear_color = color_from_angle(earth_angle);
+
+        bool paused = simulation.clock().time_scale() == sim::TimeScale::paused;
+        if (!paused) {
+            log_timer += delta_seconds;
+            if (log_timer >= log_interval) {
+                log("RGB: ({}) for {:.01f}° at {}", clear_color.to_string(),
+                    earth_angle * core::kRadToDeg, simulation.clock().epoch().to_string());
+                log_timer -= log_interval;
+            }
+        }
+
+        window.set_clear_color(clear_color);
+        window.swap_buffers();
+        window.poll_events();
+        previous_time = current_time;
+    }
+}
 
 void log_shutdown_report(const sim::SolarSystem& simulation) {
     log("Earth position at shutdown: {}", simulation.state("Earth").to_string());
