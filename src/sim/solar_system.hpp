@@ -19,8 +19,6 @@ class SolarSystem {
     [[nodiscard]] core::StateVector state(const std::string& body_name) const;
     [[nodiscard]] const core::EphemerisProvider& ephemeris() const { return *ephemeris_; }
 
-    void change_acceleration(double multiplier);
-
   private:
     core::EphemerisProviderPtr ephemeris_;
     SimulationClock clock_;

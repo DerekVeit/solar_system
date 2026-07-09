@@ -7,6 +7,22 @@
 
 #include <fmt/core.h>
 
+namespace {
+
+using solar::app::log;
+
+void change_acceleration(solar::sim::SimulationClock& clock, double multiplier) {
+    const double accel = clock.acceleration() * multiplier;
+    const char* direction = multiplier < 1.0 ? "slower" : "faster";
+    log("{}  {}: {}", clock.epoch().to_string(), direction, accel);
+    clock.set_acceleration(accel);
+    if (clock.time_scale() != solar::sim::TimeScale::accelerated) {
+        log("(not currently in the accelerated time scale)");
+    }
+}
+
+} // namespace
+
 namespace solar::app {
 
 void key_callback(GLFWwindow* glfw_window, int key, int /*scancode*/, int action, int mods) {
@@ -50,15 +66,15 @@ void key_callback(GLFWwindow* glfw_window, int key, int /*scancode*/, int action
             break;
         case GLFW_KEY_MINUS:
         case GLFW_KEY_KP_SUBTRACT:
-            simulation->change_acceleration(0.5);
+            change_acceleration(clock, 0.5);
             break;
         case GLFW_KEY_EQUAL:
             if (mods == GLFW_MOD_SHIFT) {
-                simulation->change_acceleration(2.0);
+                change_acceleration(clock, 2.0);
             }
             break;
         case GLFW_KEY_KP_ADD:
-            simulation->change_acceleration(2.0);
+            change_acceleration(clock, 2.0);
             break;
         default:
             break;
