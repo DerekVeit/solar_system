@@ -38,8 +38,8 @@ int main() {
         solar::sim::SolarSystem simulation{std::move(ephemeris), clock};
 
         solar::app::Window window{{.title = "Solar System", .fullscreen = true}};
-        solar::app::AppContext app_context{&window, &simulation};
-        solar::app::register_key_handlers(app_context);
+        solar::app::AppContext ctx{&window, &simulation};
+        solar::app::register_key_handlers(ctx);
 
         auto previous_time = std::chrono::steady_clock::now();
 
