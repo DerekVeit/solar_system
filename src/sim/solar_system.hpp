@@ -13,7 +13,6 @@ class SolarSystem {
     SolarSystem(core::EphemerisProviderPtr ephemeris, SimulationClock clock);
 
     [[nodiscard]] const SimulationClock& clock() const { return clock_; }
-    [[nodiscard]] core::TimePoint now() const { return clock_.now(); }
     [[nodiscard]] SimulationClock& clock() { return clock_; }
 
     [[nodiscard]] core::StateVector state(const std::string& body_name) const;
