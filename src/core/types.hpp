@@ -56,11 +56,7 @@ struct Epoch {
         return tp;
     }
 
-    [[nodiscard]] std::string to_string() const {
-        const auto tp = now();
-        std::string ts = fmt::format("{:%Y-%m-%d %H:%M:%S} UT (approx)", tp);
-        return ts;
-    }
+    [[nodiscard]] std::string to_string() const { return time_string(now()) + " (approx)"; }
 };
 
 struct Polar {
