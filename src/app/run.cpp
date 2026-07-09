@@ -44,10 +44,9 @@ AppObjects make_app() {
     return app;
 }
 
-void run_loop(AppContext& ctx) {
-    // auto& [window, simulation] = ctx;
-    auto& window = *ctx.window;
-    auto& simulation = *ctx.simulation;
+void AppObjects::run_loop() {
+    auto& window = *context.window;
+    auto& simulation = *context.simulation;
 
     auto previous_time = std::chrono::steady_clock::now();
 
@@ -83,7 +82,7 @@ void run_loop(AppContext& ctx) {
     }
 }
 
-void log_shutdown_report(const sim::SolarSystem& simulation) {
+void AppObjects::log_shutdown_report() const {
     log("Earth position at shutdown: {}", simulation.state("Earth").to_string());
     log("Venus position at shutdown: {}", simulation.state("Venus").to_string());
     log("Mars position at shutdown: {}", simulation.state("Mars").to_string());

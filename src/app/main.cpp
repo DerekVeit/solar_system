@@ -7,8 +7,8 @@ int main() {
     solar::app::log("----------------------------------------");
     try {
         solar::app::AppObjects app = solar::app::make_app();
-        solar::app::run_loop(app.context);
-        solar::app::log_shutdown_report(app.simulation);
+        app.run_loop();
+        app.log_shutdown_report();
         return 0;
     } catch (const std::exception& error) {
         fmt::print(stderr, "fatal error: {}\n", error.what());

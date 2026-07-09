@@ -7,12 +7,11 @@ struct AppObjects {
     Window window;
     sim::SolarSystem simulation;
     AppContext context;
+
+    void run_loop();
+    void log_shutdown_report() const;
 };
 
 AppObjects make_app();
-
-void run_loop(AppContext& ctx);
-
-void log_shutdown_report(const sim::SolarSystem& simulation);
 
 } // namespace solar::app
