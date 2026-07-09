@@ -20,6 +20,8 @@ namespace {
 
 using solar::app::log;
 
+constexpr double log_interval = 1.0;
+
 } // namespace
 
 int main() {
@@ -40,7 +42,6 @@ int main() {
 
         auto previous_time = std::chrono::steady_clock::now();
 
-        const double log_interval = 1.0;
         double log_timer = log_interval; // initially due for logging
 
         while (!window.should_close()) {
