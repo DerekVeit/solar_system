@@ -12,7 +12,7 @@ struct Color {
     float b;
     float a;
 
-    [[nodiscard]] std::string to_string() const {
+    [[nodiscard]] inline std::string to_string() const {
         return fmt::format("{:.02f} {:.02f} {:.02f} {:.02f}", r, g, b, a);
     }
 };
