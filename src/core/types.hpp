@@ -19,6 +19,10 @@ using Duration = std::chrono::duration<double>;
 
 using TimePoint = std::chrono::time_point<std::chrono::system_clock, std::chrono::seconds>;
 
+[[nodiscard]] inline std::string time_string(TimePoint tp) {
+    return fmt::format("{:%Y-%m-%d %H:%M:%S} UT", tp);
+}
+
 struct Epoch {
     JulianDate jd{};
 
