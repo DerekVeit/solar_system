@@ -3,6 +3,14 @@
 
 namespace solar::app {
 
+struct AppObjects {
+    Window window;
+    sim::SolarSystem simulation;
+    AppContext context;
+};
+
+AppObjects make_app();
+
 void run_loop(AppContext& ctx);
 
 void log_shutdown_report(const sim::SolarSystem& simulation);

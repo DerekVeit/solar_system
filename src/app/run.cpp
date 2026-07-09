@@ -1,9 +1,20 @@
 #include "app/run.hpp"
 
 #include "app/color.hpp"
+#include "app/context.hpp"
+#include "app/files.hpp"
+#include "app/input.hpp"
 #include "app/logging.hpp"
+#include "app/window.hpp"
+#include "core/constants.hpp"
+#include "core/json_loader.hpp"
+#include "core/kepler_ephemeris.hpp"
+#include "core/types.hpp"
+#include "sim/clock.hpp"
+#include "sim/solar_system.hpp"
 
 #include <chrono>
+#include <string>
 
 namespace {
 
@@ -12,6 +23,26 @@ constexpr double log_interval = 1.0;
 } // namespace
 
 namespace solar::app {
+
+AppObjects make_app() {
+    const auto bodies = core::load_bodies(asset_path("data/bodies.json"));
+    auto ephemeris = std::make_unique<core::KeplerEphemeris>(bodies);
+
+    sim::SimulationClock clock{core::Epoch::at_now()};
+    clock.set_time_scale(sim::TimeScale::real_time);
+    clock.set_acceleration(core::kSecondsPerDay);
+
+    AppObjects app{
+        Window{{.title = "Solar System", .fullscreen = true}},
+        sim::SolarSystem{std::move(ephemeris), clock},
+        {},
+    };
+    app.context = AppContext{&app.window, &app.simulation};
+
+    solar::app::register_key_handlers(app.context);
+
+    return app;
+}
 
 void run_loop(AppContext& ctx) {
     // auto& [window, simulation] = ctx;
