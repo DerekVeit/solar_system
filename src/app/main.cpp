@@ -28,7 +28,7 @@ int main() {
         const auto bodies = solar::core::load_bodies(solar::app::asset_path("data/bodies.json"));
         auto ephemeris = std::make_unique<solar::core::KeplerEphemeris>(bodies);
 
-        solar::sim::SimulationClock clock{solar::core::Epoch{}.at_now()};
+        solar::sim::SimulationClock clock{solar::core::Epoch::at_now()};
         clock.set_time_scale(solar::sim::TimeScale::real_time);
         clock.set_acceleration(solar::core::kSecondsPerDay);
 
