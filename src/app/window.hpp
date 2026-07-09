@@ -25,6 +25,20 @@ class Window {
 
     Window(const Window&) = delete;
     Window& operator=(const Window&) = delete;
+    Window(Window&& other) noexcept
+        : window_(other.window_) {
+        other.window_ = nullptr;
+    }
+    Window& operator=(Window&& other) noexcept {
+        if (this != &other) {
+            if (window_ != nullptr) {
+                glfwDestroyWindow(window_);
+            }
+            window_ = other.window_;
+            other.window_ = nullptr;
+        }
+        return *this;
+    }
 
     [[nodiscard]] bool should_close() const;
     void poll_events();
