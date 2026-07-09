@@ -24,6 +24,7 @@ add_executable(solar_system
     app/input.cpp
     app/logging.cpp
     app/main.cpp
+    app/run.cpp
     app/window.cpp
 )
 

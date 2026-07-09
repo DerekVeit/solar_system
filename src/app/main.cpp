@@ -3,6 +3,7 @@
 #include "app/files.hpp"
 #include "app/input.hpp"
 #include "app/logging.hpp"
+#include "app/run.hpp"
 #include "app/window.hpp"
 #include "core/constants.hpp"
 #include "core/json_loader.hpp"
@@ -74,13 +75,7 @@ int main() {
             previous_time = current_time;
         }
 
-        log("Earth position at shutdown: {}", simulation.state("Earth").to_string());
-        log("Venus position at shutdown: {}", simulation.state("Venus").to_string());
-        log("Mars position at shutdown: {}", simulation.state("Mars").to_string());
-        log("Jupiter position at shutdown: {}", simulation.state("Jupiter").to_string());
-
-        log("Simulation epoch JD: {:.4f}", simulation.clock().epoch().jd);
-        log("Simulation epoch: {}", simulation.clock().epoch().to_string());
+        solar::app::log_shutdown_report(simulation);
 
         return 0;
     } catch (const std::exception& error) {
