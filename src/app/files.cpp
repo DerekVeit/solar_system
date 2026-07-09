@@ -1,5 +1,8 @@
 #include "app/files.hpp"
 
+#include <filesystem>
+#include <string>
+
 namespace solar::app {
 
 std::filesystem::path asset_path(const std::string& relative) {
