@@ -38,11 +38,11 @@ void key_callback(GLFWwindow* glfw_window, int key, int /*scancode*/, int action
     Window* window = app_context->window;
     sim::SolarSystem* simulation = app_context->simulation;
     if (window == nullptr) {
-        fmt::print(stderr, "app_context->window is nullptr");
+        fmt::print(stderr, "app_context->window is nullptr\n");
         return;
     }
     if (simulation == nullptr) {
-        fmt::print(stderr, "app_context->simulation is nullptr");
+        fmt::print(stderr, "app_context->simulation is nullptr\n");
         return;
     }
     sim::SimulationClock& clock = simulation->clock();
