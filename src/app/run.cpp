@@ -45,9 +45,6 @@ AppObjects make_app() {
 }
 
 void AppObjects::run_loop() {
-    auto& window = *context.window;
-    auto& simulation = *context.simulation;
-
     auto previous_time = std::chrono::steady_clock::now();
 
     double log_timer = log_interval; // initially due for logging
