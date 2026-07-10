@@ -1,4 +1,5 @@
 #include "app/context.hpp"
+#include "app/window.hpp"
 #include "sim/solar_system.hpp"
 
 namespace solar::app {
