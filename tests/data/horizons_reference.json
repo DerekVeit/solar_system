@@ -93,6 +93,22 @@
           "tolerance_lon_deg": 8.0
         }
       ]
+    },
+    {
+      "label": "2026-07-10",
+      "jd": 2461232.0,
+      "calendar_utc": "2026-07-10 12:00:00 TDB",
+      "bodies": [
+        {
+          "name": "Earth",
+          "horizons_id": "399",
+          "x_au": 3.123328891134394e-01,
+          "y_au": -9.674418171319650e-01,
+          "z_au": 5.355660874595493e-05,
+          "tolerance_au": 0.03,
+          "tolerance_lon_deg": 2.0
+        }
+      ]
     }
   ]
 }
