@@ -12,3 +12,4 @@ BreakConstructorInitializers: BeforeComma
 ConstructorInitializerIndentWidth: 4
 PackConstructorInitializers: Never
 BreakBeforeBraces: Attach
+AlwaysBreakTemplateDeclarations: Yes
