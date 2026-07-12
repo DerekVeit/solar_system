@@ -27,13 +27,11 @@ struct Epoch {
     JulianDate jd{};
 
     [[nodiscard]] Duration since_j2000() const {
-        constexpr JulianDate kJ2000 = 2451545.0;
-        return Duration{(jd - kJ2000) * kSecondsPerDay};
+        return Duration{(jd - kJ2000Jd) * kSecondsPerDay};
     }
 
     static Epoch from_j2000_offset(Duration offset) {
-        constexpr JulianDate kJ2000 = 2451545.0;
-        return Epoch{kJ2000 + offset.count() / kSecondsPerDay};
+        return Epoch{kJ2000Jd + offset.count() / kSecondsPerDay};
     }
 
     static Epoch at_now() {
@@ -41,9 +39,8 @@ struct Epoch {
         const auto now = std::chrono::system_clock::now();
         const sys_days j2000_date{year{2000} / January / 1};
         const sys_seconds j2000 = j2000_date + 12h;
-        constexpr JulianDate kJ2000 = 2451545.0;
         const JulianDate jd_now =
-            kJ2000 + (duration_cast<seconds>(now - j2000).count() / kSecondsPerDay);
+            kJ2000Jd + (duration_cast<seconds>(now - j2000).count() / kSecondsPerDay);
         return Epoch{jd_now};
     }
 
