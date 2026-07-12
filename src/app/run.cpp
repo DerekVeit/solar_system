@@ -56,8 +56,6 @@ void AppObjects::run_loop() {
 
         simulation.clock().advance(delta_seconds);
 
-        window.clear_frame();
-
         const double earth_angle = simulation.state("Earth").position.polar_xy().angle;
 
         Color clear_color = color_from_angle(earth_angle);
@@ -73,6 +71,8 @@ void AppObjects::run_loop() {
         }
 
         window.set_clear_color(clear_color);
+        window.clear_frame();
+
         window.swap_buffers();
         window.poll_events();
         previous_time = current_time;
