@@ -49,6 +49,7 @@ void AppObjects::run_loop() {
 
     double log_timer = log_interval; // initially due for logging
 
+    int loop_counter = 0;
     while (!window.should_close()) {
         const auto current_time = std::chrono::steady_clock::now();
         const double delta_seconds =
@@ -64,9 +65,11 @@ void AppObjects::run_loop() {
         if (!paused) {
             log_timer += delta_seconds;
             if (log_timer >= log_interval) {
-                log("RGB: ({}) for {:.01f}° at {}", clear_color.to_string(),
-                    earth_angle * core::kRadToDeg, simulation.clock().epoch().to_string());
+                log("RGB: ({}) for {:.01f}° at {} FPS: {}", clear_color.to_string(),
+                    earth_angle * core::kRadToDeg, simulation.clock().epoch().to_string(),
+                    loop_counter);
                 log_timer -= log_interval;
+                loop_counter = 0;
             }
         }
 
@@ -76,6 +79,7 @@ void AppObjects::run_loop() {
         window.swap_buffers();
         window.poll_events();
         previous_time = current_time;
+        loop_counter++;
     }
 }
 
