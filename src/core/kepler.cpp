@@ -1,4 +1,5 @@
 #include "core/kepler.hpp"
+#include "core/types.hpp"
 
 #include <cmath>
 
@@ -54,10 +55,9 @@ double mean_anomaly_at_epoch(GravitationalParameter mu, const KeplerianElements&
     return mean_anomaly;
 }
 
-const glm::dvec3 velocity_in_orbital_plane(GravitationalParameter mu,
-                                           const KeplerianElements& elements,
-                                           const double eccentric_anomaly,
-                                           const Displacement perifocal_position) {
+Velocity velocity_in_orbital_plane(GravitationalParameter mu, const KeplerianElements& elements,
+                                   const double eccentric_anomaly,
+                                   const Displacement perifocal_position) {
     const double radius = perifocal_position.length();
     const double factor = std::sqrt(mu * elements.semi_major_axis_km) / radius; // km/s
     const glm::dvec3 perifocal_velocity{
@@ -66,7 +66,7 @@ const glm::dvec3 velocity_in_orbital_plane(GravitationalParameter mu,
             std::cos(eccentric_anomaly) * factor,
         0.0,
     };
-    return perifocal_velocity;
+    return Velocity{perifocal_velocity};
 }
 
 } // namespace
@@ -117,9 +117,9 @@ StateVector state_from_kepler(GravitationalParameter mu, const KeplerianElements
     const glm::dmat3 rotation = rotation_matrix(elements);
     const glm::dvec3 position_km = rotation * perifocal_position.km;
 
-    const glm::dvec3 perifocal_velocity =
+    const Velocity perifocal_velocity =
         velocity_in_orbital_plane(mu, elements, eccentric_anomaly, perifocal_position);
-    const glm::dvec3 velocity_km_s = rotation * perifocal_velocity;
+    const glm::dvec3 velocity_km_s = rotation * perifocal_velocity.km_per_s;
 
     return StateVector{
         Displacement{position_km},
