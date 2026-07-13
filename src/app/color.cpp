@@ -19,6 +19,10 @@ static bool equal(float f1, float f2) { return (std::fabs(f1 - f2) <= solar::app
 
 namespace solar::app {
 
+bool Color::operator==(const Color& other) const {
+    return equal(r, other.r) && equal(g, other.g) && equal(b, other.b) && equal(a, other.a);
+}
+
 ColorHSV Color::as_hsv() const {
     ColorHSV hsv;
 

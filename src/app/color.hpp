@@ -28,6 +28,8 @@ struct Color {
         return fmt::format("{:.02f} {:.02f} {:.02f} {:.02f}", r, g, b, a);
     }
 
+    [[nodiscard]] bool operator==(const Color& other) const;
+
     [[nodiscard]] ColorHSV as_hsv() const; // alpha is ignored
 };
 
