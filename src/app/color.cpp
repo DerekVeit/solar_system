@@ -100,6 +100,11 @@ Color color_from_angle(double angle) {
     }
     blue = ((-std::sin(angle) + 1.0f) / 2.0f) * 0.8f + 0.2f;
 
+    float factor = 0.12;
+    red *= factor;
+    green *= factor;
+    blue *= factor;
+
     return Color{red, green, blue, 1.0f};
 }
 
