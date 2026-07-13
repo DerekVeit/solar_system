@@ -4,13 +4,17 @@
 #include <cmath>
 #include <limits>
 
+namespace solar::app {
+
+inline constexpr float kColorEpsilon = 1e-5f;
+
+};
+
 namespace {
 
-static bool zero(float f1) { return f1 < std::numeric_limits<float>::epsilon(); }
+static bool zero(float f1) { return f1 < solar::app::kColorEpsilon; }
 
-static bool equal(float f1, float f2) {
-    return (std::fabs(f1 - f2) <= std::numeric_limits<float>::epsilon());
-}
+static bool equal(float f1, float f2) { return (std::fabs(f1 - f2) <= solar::app::kColorEpsilon); }
 
 }; // namespace
 
