@@ -19,7 +19,7 @@ struct ColorToHSVCase {
 
 } // namespace
 
-TEST_CASE("Color.as_hsv provdes correct HSV values", "[color]") {
+TEST_CASE("Color.as_hsv provides correct HSV values", "[color]") {
     const ColorToHSVCase test_case = GENERATE(
         ColorToHSVCase{"pure red", Color{1.0f, 0.0f, 0.0f, 0.0f}, ColorHSV{0.0f, 1.0f, 1.0f}},
         ColorToHSVCase{"pink", Color{1.0f, 0.5f, 0.5f, 0.0f}, ColorHSV{0.0f, 0.5f, 1.0f}},
