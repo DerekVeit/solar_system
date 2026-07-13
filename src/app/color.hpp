@@ -15,7 +15,7 @@ struct ColorHSV {
         return fmt::format("{:.02f} {:.02f} {:.02f}", h, s, v);
     }
 
-    bool operator==(const ColorHSV& other) const;
+    [[nodiscard]] bool operator==(const ColorHSV& other) const;
 };
 
 struct Color {
@@ -28,7 +28,7 @@ struct Color {
         return fmt::format("{:.02f} {:.02f} {:.02f} {:.02f}", r, g, b, a);
     }
 
-    [[nodiscard]] ColorHSV as_hsv() const;
+    [[nodiscard]] ColorHSV as_hsv() const; // alpha is ignored
 };
 
 Color color_from_angle(double angle);
