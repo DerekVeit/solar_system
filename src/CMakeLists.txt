@@ -26,6 +26,7 @@ target_link_libraries(glad PUBLIC ${CMAKE_DL_LIBS})
 
 add_executable(solar_system
     app/color.cpp
+    app/earth_renderer.cpp
     app/files.cpp
     app/input.cpp
     app/logging.cpp

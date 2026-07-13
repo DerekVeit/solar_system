@@ -1,4 +1,5 @@
 #include "app/context.hpp"
+#include "app/earth_renderer.hpp"
 #include "app/window.hpp"
 #include "sim/solar_system.hpp"
 
@@ -8,6 +9,7 @@ struct AppObjects {
     Window window;
     sim::SolarSystem simulation;
     AppContext context;
+    EarthRenderer earth_renderer;
 
     void run_loop();
     void log_shutdown_report() const;

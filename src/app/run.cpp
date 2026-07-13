@@ -36,10 +36,15 @@ AppObjects make_app() {
         Window{{.title = "Solar System", .fullscreen = true}},
         sim::SolarSystem{std::move(ephemeris), clock},
         {},
+        {},
     };
     app.context = AppContext{&app.window, &app.simulation};
 
     solar::app::register_key_handlers(app.context);
+
+    if (!app.earth_renderer.init()) {
+        throw std::runtime_error("failed to initialize Earth renderer");
+    }
 
     return app;
 }
@@ -75,6 +80,8 @@ void AppObjects::run_loop() {
 
         window.set_clear_color(clear_color);
         window.clear_frame();
+
+        earth_renderer.draw(simulation.state("Earth").position);
 
         window.swap_buffers();
         window.poll_events();
