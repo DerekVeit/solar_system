@@ -18,6 +18,12 @@ target_link_libraries(solar_core
         nlohmann_json::nlohmann_json
 )
 
+add_library(glad STATIC
+    ${CMAKE_SOURCE_DIR}/third_party/glad/src/gl.c
+)
+target_include_directories(glad PUBLIC ${CMAKE_SOURCE_DIR}/third_party/glad/include)
+target_link_libraries(glad PUBLIC ${CMAKE_DL_LIBS})
+
 add_executable(solar_system
     app/color.cpp
     app/files.cpp

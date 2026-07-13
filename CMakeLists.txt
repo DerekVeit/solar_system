@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.22)
 project(solar_system
     VERSION 0.1.0
     DESCRIPTION "Solar system geometry and motion simulation"
-    LANGUAGES CXX
+    LANGUAGES CXX C
 )
 
 set(CMAKE_CXX_STANDARD 20)
