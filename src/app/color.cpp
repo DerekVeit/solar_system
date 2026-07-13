@@ -2,7 +2,6 @@
 #include "core/constants.hpp"
 
 #include <cmath>
-#include <limits>
 
 namespace solar::app {
 
