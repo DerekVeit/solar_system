@@ -45,7 +45,7 @@ TEST_CASE("Epoch.to_string for a fractional day later", "[types]") {
     CHECK_THAT(ts, ContainsSubstring("2000-01-02 00:00:00"));
 }
 
-TEST_CASE("Displacement.polar_xy converts quadrants to [0, 2pi) angles", "[types]") {
+TEST_CASE("Displacement.polar_xy converts quadrants to 0..2pi angles", "[types]") {
     using Row = std::tuple<std::string, double, double, double, double>;
 
     const auto [label, x, y, expected_length, expected_angle] =
