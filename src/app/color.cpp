@@ -5,7 +5,7 @@
 
 namespace solar::app {
 
-inline constexpr float kColorEpsilon = 1e-5f;
+inline constexpr float kColorEpsilon = 1e-7f;
 
 };
 
