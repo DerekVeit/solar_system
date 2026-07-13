@@ -23,6 +23,33 @@ bool Color::operator==(const Color& other) const {
     return equal(r, other.r) && equal(g, other.g) && equal(b, other.b) && equal(a, other.a);
 }
 
+Color Color::from_hsv(ColorHSV hsv) {
+
+    float chroma = hsv.s * hsv.v;
+    float sector = hsv.h * 3 / core::kPi;
+    float second = chroma * (1 - std::fabs(std::fmod(sector, 2.0f) - 1.0f));
+    float m = hsv.v - chroma;
+
+    float c = chroma + m;
+    float x = second + m;
+    switch (static_cast<int>(std::floor(sector))) {
+        case 0:
+            return Color{c, x, m, 1.0f};
+        case 1:
+            return Color{x, c, m, 1.0f};
+        case 2:
+            return Color{m, c, x, 1.0f};
+        case 3:
+            return Color{m, x, c, 1.0f};
+        case 4:
+            return Color{x, m, c, 1.0f};
+        case 5:
+            return Color{c, m, x, 1.0f};
+        default:
+            return Color{0.0f, 0.0f, 0.0f, 0.0f};
+    }
+}
+
 ColorHSV Color::as_hsv() const {
     ColorHSV hsv;
 

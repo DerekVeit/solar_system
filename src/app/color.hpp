@@ -30,6 +30,8 @@ struct Color {
 
     [[nodiscard]] bool operator==(const Color& other) const;
 
+    static Color from_hsv(ColorHSV hsv);
+
     [[nodiscard]] ColorHSV as_hsv() const; // alpha is ignored
 };
 
