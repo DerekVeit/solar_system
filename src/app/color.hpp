@@ -7,7 +7,7 @@
 namespace solar::app {
 
 struct ColorHSV {
-    float h = 0.0f;
+    float h = 0.0f; // radians, [0, 2π)
     float s = 0.0f;
     float v = 0.0f;
 
