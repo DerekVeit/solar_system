@@ -6,3 +6,4 @@ build/
 build-gcc/
 .cache/
 compile_commands.json
+.checkpatch-camelcase.git.
