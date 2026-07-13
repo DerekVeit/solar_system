@@ -23,6 +23,11 @@ struct ColorFromHSVCase {
     Color expected_color;
 };
 
+struct ColorRoundTripCase {
+    std::string label;
+    Color color;
+};
+
 } // namespace
 
 TEST_CASE("Color.as_hsv provides correct HSV values", "[color]") {
@@ -61,4 +66,26 @@ TEST_CASE("Color::from_hsv provides correct RGB values", "[color]") {
     INFO(color.to_string());
 
     CHECK(color == test_case.expected_color);
+}
+
+TEST_CASE("round trip RGB->HSV->RGB", "[color]") {
+    const ColorRoundTripCase test_case = GENERATE(
+        ColorRoundTripCase{"butterscotch", Color{0.7568627f, 0.4901960f, 0.0666666f, 1.0f}},
+        ColorRoundTripCase{"subtle gray", Color{0.5333333f, 0.5411765f, 0.5215686f, 1.0f}},
+        ColorRoundTripCase{"pure gray", Color{0.5f, 0.5f, 0.5f, 1.0f}},
+        ColorRoundTripCase{"black", Color{0.0f, 0.0f, 0.0f, 1.0f}},
+        ColorRoundTripCase{"white", Color{1.0f, 1.0f, 1.0f, 1.0f}},
+        ColorRoundTripCase{"chartreuse", Color{0.7882353f, 0.9607843f, 0.5215686f, 1.0f}},
+        ColorRoundTripCase{"dark brown", Color{0.2235294f, 0.2039216f, 0.1333333f, 1.0f}},
+        ColorRoundTripCase{"soft blue", Color{0.2039216f, 0.3960784f, 0.6431373f, 1.0f}});
+
+    INFO(test_case.label);
+
+    ColorHSV hsv = test_case.color.as_hsv();
+    auto returned_color = Color::from_hsv(hsv);
+
+    INFO(test_case.color.to_string());
+    INFO(returned_color.to_string());
+
+    CHECK(returned_color == test_case.color);
 }
