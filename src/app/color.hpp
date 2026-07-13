@@ -19,10 +19,10 @@ struct ColorHSV {
 };
 
 struct Color {
-    float r;
-    float g;
-    float b;
-    float a;
+    float r = 0.0f;
+    float g = 0.0f;
+    float b = 0.0f;
+    float a = 1.0f;
 
     [[nodiscard]] inline std::string to_string() const {
         return fmt::format("{:.02f} {:.02f} {:.02f} {:.02f}", r, g, b, a);

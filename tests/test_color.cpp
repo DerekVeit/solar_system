@@ -17,15 +17,21 @@ struct ColorToHSVCase {
     ColorHSV expected_hsv;
 };
 
+struct ColorFromHSVCase {
+    std::string label;
+    ColorHSV hsv;
+    Color expected_color;
+};
+
 } // namespace
 
 TEST_CASE("Color.as_hsv provides correct HSV values", "[color]") {
     const ColorToHSVCase test_case = GENERATE(
-        ColorToHSVCase{"pure red", Color{1.0f, 0.0f, 0.0f, 0.0f}, ColorHSV{0.0f, 1.0f, 1.0f}},
-        ColorToHSVCase{"pink", Color{1.0f, 0.5f, 0.5f, 0.0f}, ColorHSV{0.0f, 0.5f, 1.0f}},
-        ColorToHSVCase{"cyan", Color{0.0f, 1.0f, 1.0f, 0.0f},
+        ColorToHSVCase{"pure red", Color{1.0f, 0.0f, 0.0f, 1.0f}, ColorHSV{0.0f, 1.0f, 1.0f}},
+        ColorToHSVCase{"pink", Color{1.0f, 0.5f, 0.5f, 1.0f}, ColorHSV{0.0f, 0.5f, 1.0f}},
+        ColorToHSVCase{"cyan", Color{0.0f, 1.0f, 1.0f, 1.0f},
                        ColorHSV{solar::core::kPi, 1.0f, 1.0f}},
-        ColorToHSVCase{"medium green", Color{0.0f, 0.5f, 0.0f, 0.0f},
+        ColorToHSVCase{"medium green", Color{0.0f, 0.5f, 0.0f, 1.0f},
                        ColorHSV{solar::core::kPi * 2 / 3, 1.0f, 0.5f}});
 
     INFO(test_case.label);
