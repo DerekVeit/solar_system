@@ -14,6 +14,8 @@ struct ColorHSV {
     [[nodiscard]] inline std::string to_string() const {
         return fmt::format("{:.02f} {:.02f} {:.02f}", h, s, v);
     }
+
+    bool operator==(const ColorHSV& other) const;
 };
 
 struct Color {

@@ -50,6 +50,10 @@ ColorHSV Color::as_hsv() const {
     return hsv;
 }
 
+bool ColorHSV::operator==(const ColorHSV& other) const {
+    return equal(h, other.h) && equal(s, other.s) && equal(v, other.v);
+}
+
 Color color_from_angle(double angle) {
     float red(0.0f);
     float green(0.0f);
