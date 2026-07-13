@@ -25,7 +25,5 @@ TEST_CASE("Color.as_hsv provdes correct HSV values", "[color]") {
     INFO(test_case.label);
 
     ColorHSV hsv = test_case.color.as_hsv();
-    CHECK(hsv.h == test_case.expected_hsv.h);
-    CHECK(hsv.s == test_case.expected_hsv.s);
-    CHECK(hsv.v == test_case.expected_hsv.v);
+    CHECK(hsv == test_case.expected_hsv);
 }
