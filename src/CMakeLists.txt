@@ -39,7 +39,7 @@ find_package(OpenGL REQUIRED)
 target_link_libraries(solar_system
     PRIVATE
         solar_core
-        OpenGL::GL
+        glad
         ${GLFW3_LIBRARIES}
 )
 

@@ -2,7 +2,7 @@
 
 #include "app/color.hpp"
 
-#include <GL/gl.h>
+#include <glad/gl.h>
 #include <GLFW/glfw3.h>
 
 #include <stdexcept>
@@ -48,6 +48,12 @@ Window::Window(const WindowConfig& config) {
     }
 
     glfwMakeContextCurrent(window_);
+
+    if (gladLoadGL(glfwGetProcAddress) == 0) {
+        glfwTerminate();
+        throw std::runtime_error("failed to load OpenGL via GLAD");
+    }
+
     glfwSwapInterval(1);
     glfwSetFramebufferSizeCallback(window_, framebuffer_size_callback);
 

@@ -13,3 +13,13 @@ ConstructorInitializerIndentWidth: 4
 PackConstructorInitializers: Never
 BreakBeforeBraces: Attach
 AlwaysBreakTemplateDeclarations: Yes
+SortIncludes: CaseSensitive
+IncludeCategories:
+  - Regex: '^"[^"]*"'
+    Priority: 1
+  - Regex: '^<glad/'
+    Priority: 2
+  - Regex: '^<GLFW/'
+    Priority: 3
+  - Regex: '^<.*'
+    Priority: 4
