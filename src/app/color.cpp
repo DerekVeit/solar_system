@@ -3,17 +3,13 @@
 
 #include <cmath>
 
-namespace solar::app {
+namespace {
 
 inline constexpr float kColorEpsilon = 1e-7f;
 
-};
+static bool zero(float f1) { return f1 < kColorEpsilon; }
 
-namespace {
-
-static bool zero(float f1) { return f1 < solar::app::kColorEpsilon; }
-
-static bool equal(float f1, float f2) { return (std::fabs(f1 - f2) <= solar::app::kColorEpsilon); }
+static bool equal(float f1, float f2) { return (std::fabs(f1 - f2) <= kColorEpsilon); }
 
 }; // namespace
 
