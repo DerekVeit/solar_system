@@ -72,7 +72,6 @@ bool EarthRenderer::init() {
         u_pos_location_ = glGetUniformLocation(program_, "u_pos");
 
         glGenVertexArrays(1, &vao_);
-        glBindVertexArray(vao_);
 
         glEnable(GL_PROGRAM_POINT_SIZE);
         return true;
