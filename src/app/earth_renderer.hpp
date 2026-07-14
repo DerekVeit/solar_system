@@ -14,6 +14,7 @@ class EarthRenderer {
     unsigned int program_{0};
     unsigned int vao_{0};
     int u_pos_location_{-1};
+    int u_color_location_{-1};
 };
 
 } // namespace solar::app

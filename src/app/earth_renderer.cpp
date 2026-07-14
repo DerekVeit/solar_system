@@ -54,8 +54,9 @@ void main() {
 
 constexpr std::string_view kFragmentShader = R"(#version 460 core
 out vec4 frag_color;
+uniform vec4 u_color;
 void main() {
-    frag_color = vec4(0.45, 0.75, 1.0, 1.0);
+    frag_color = u_color;
 }
 )";
 
@@ -70,6 +71,7 @@ bool EarthRenderer::init() {
         glDeleteShader(fragment_shader);
 
         u_pos_location_ = glGetUniformLocation(program_, "u_pos");
+        u_color_location_ = glGetUniformLocation(program_, "u_color");
 
         glGenVertexArrays(1, &vao_);
 
@@ -81,7 +83,7 @@ bool EarthRenderer::init() {
 }
 
 void EarthRenderer::draw(const core::Displacement& earth_position) const {
-    if (program_ == 0 || u_pos_location_ < 0) {
+    if (program_ == 0 || u_pos_location_ < 0 || u_color_location_ < 0) {
         return;
     }
 
@@ -92,6 +94,7 @@ void EarthRenderer::draw(const core::Displacement& earth_position) const {
     glUseProgram(program_);
     glBindVertexArray(vao_);
     glUniform2f(u_pos_location_, x_ndc, y_ndc);
+    glUniform4f(u_color_location_, 0.45f, 0.75f, 1.0f, 1.0f);
     glDrawArrays(GL_POINTS, 0, 1);
 }
 
