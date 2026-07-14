@@ -46,9 +46,10 @@ unsigned int link_program(unsigned int vertex_shader, unsigned int fragment_shad
 
 constexpr std::string_view kVertexShader = R"(#version 460 core
 uniform vec2 u_pos;
+uniform float u_size;
 void main() {
     gl_Position = vec4(u_pos, 0.0, 1.0);
-    gl_PointSize = 14.0;
+    gl_PointSize = u_size;
 }
 )";
 
@@ -71,6 +72,7 @@ bool EarthRenderer::init() {
         glDeleteShader(fragment_shader);
 
         u_pos_location_ = glGetUniformLocation(program_, "u_pos");
+        u_size_location_ = glGetUniformLocation(program_, "u_size");
         u_color_location_ = glGetUniformLocation(program_, "u_color");
 
         glGenVertexArrays(1, &vao_);
@@ -83,7 +85,7 @@ bool EarthRenderer::init() {
 }
 
 void EarthRenderer::draw(const core::Displacement& earth_position) const {
-    if (program_ == 0 || u_pos_location_ < 0 || u_color_location_ < 0) {
+    if (program_ == 0 || u_pos_location_ < 0 || u_color_location_ < 0 || u_size_location_ < 0) {
         return;
     }
 
@@ -95,6 +97,7 @@ void EarthRenderer::draw(const core::Displacement& earth_position) const {
     glBindVertexArray(vao_);
     glUniform2f(u_pos_location_, x_ndc, y_ndc);
     glUniform4f(u_color_location_, 0.45f, 0.75f, 1.0f, 1.0f);
+    glUniform1f(u_size_location_, 14.0f);
     glDrawArrays(GL_POINTS, 0, 1);
 }
 
