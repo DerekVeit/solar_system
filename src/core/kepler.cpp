@@ -60,13 +60,10 @@ Velocity velocity_in_orbital_plane(GravitationalParameter mu, const KeplerianEle
                                    const Displacement perifocal_position) {
     const double radius = perifocal_position.length();
     const double factor = std::sqrt(mu * elements.semi_major_axis_km) / radius; // km/s
-    const glm::dvec3 perifocal_velocity{
-        -std::sin(eccentric_anomaly) * factor,
-        std::sqrt(1.0 - elements.eccentricity * elements.eccentricity) *
-            std::cos(eccentric_anomaly) * factor,
-        0.0,
-    };
-    return Velocity{perifocal_velocity};
+    return Velocity{glm::dvec3{-std::sin(eccentric_anomaly) * factor,
+                               std::sqrt(1.0 - elements.eccentricity * elements.eccentricity) *
+                                   std::cos(eccentric_anomaly) * factor,
+                               0.0}};
 }
 
 } // namespace
