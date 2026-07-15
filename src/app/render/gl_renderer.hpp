@@ -12,9 +12,7 @@ class GlRenderer final : public IRenderer {
   private:
     unsigned int program_{0};
     unsigned int vao_{0};
-    int u_pos_location_{-1};
-    int u_color_location_{-1};
-    int u_point_size_location_{-1};
+    unsigned int vbo_{0};
     std::size_t max_points_{0};
 };
 

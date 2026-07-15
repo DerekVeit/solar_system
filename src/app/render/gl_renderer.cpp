@@ -1,9 +1,11 @@
 #include "app/render/gl_renderer.hpp"
 
 #include "app/render/gl_shader.hpp"
+#include "app/render/types.hpp"
 
 #include <glad/gl.h>
 
+#include <cstddef>
 #include <string_view>
 
 namespace solar::app {
@@ -11,19 +13,24 @@ namespace solar::app {
 namespace {
 
 constexpr std::string_view kVertexShader = R"(#version 460 core
-uniform vec2 u_pos;
-uniform float u_point_size;
+layout(location = 0) in vec2 a_pos;
+layout(location = 1) in vec4 a_color;
+layout(location = 2) in float a_point_size;
+
+out vec4 v_color;
+
 void main() {
-    gl_Position = vec4(u_pos, 0.0, 1.0);
-    gl_PointSize = u_point_size;
+    gl_Position = vec4(a_pos, 0.0, 1.0);
+    gl_PointSize = a_point_size;
+    v_color = a_color;
 }
 )";
 
 constexpr std::string_view kFragmentShader = R"(#version 460 core
-uniform vec4 u_color;
+in vec4 v_color;
 out vec4 frag_color;
 void main() {
-    frag_color = u_color;
+    frag_color = v_color;
 }
 )";
 
@@ -41,15 +48,28 @@ bool GlRenderer::init(std::size_t max_points) {
         glDeleteShader(vertex_shader);
         glDeleteShader(fragment_shader);
 
-        u_pos_location_ = glGetUniformLocation(program_, "u_pos");
-        u_color_location_ = glGetUniformLocation(program_, "u_color");
-        u_point_size_location_ = glGetUniformLocation(program_, "u_point_size");
-
-        if (u_pos_location_ < 0 || u_color_location_ < 0 || u_point_size_location_ < 0) {
-            return false;
-        }
-
         glGenVertexArrays(1, &vao_);
+        glGenBuffers(1, &vbo_);
+
+        glBindVertexArray(vao_);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo_);
+        glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(max_points * sizeof(PointInstance)),
+                     nullptr, GL_DYNAMIC_DRAW);
+
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(PointInstance),
+                              reinterpret_cast<void*>(offsetof(PointInstance, x_ndc)));
+
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(PointInstance),
+                              reinterpret_cast<void*>(offsetof(PointInstance, color)));
+
+        glEnableVertexAttribArray(2);
+        glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(PointInstance),
+                              reinterpret_cast<void*>(offsetof(PointInstance, point_size)));
+
+        glBindVertexArray(0);
+
         glEnable(GL_PROGRAM_POINT_SIZE);
 
         max_points_ = max_points;
@@ -60,21 +80,21 @@ bool GlRenderer::init(std::size_t max_points) {
 }
 
 void GlRenderer::draw_points(std::span<const PointInstance> points) {
-    if (program_ == 0 || vao_ == 0) {
+    if (program_ == 0 || vao_ == 0 || vbo_ == 0) {
+        return;
+    }
+
+    const std::size_t count = points.size() < max_points_ ? points.size() : max_points_;
+    if (count == 0) {
         return;
     }
 
     glUseProgram(program_);
     glBindVertexArray(vao_);
-
-    const std::size_t count = points.size() < max_points_ ? points.size() : max_points_;
-    for (std::size_t i = 0; i < count; ++i) {
-        const PointInstance& point = points[i];
-        glUniform2f(u_pos_location_, point.x_ndc, point.y_ndc);
-        glUniform4f(u_color_location_, point.color.r, point.color.g, point.color.b, point.color.a);
-        glUniform1f(u_point_size_location_, point.point_size);
-        glDrawArrays(GL_POINTS, 0, 1);
-    }
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, static_cast<GLsizeiptr>(count * sizeof(PointInstance)),
+                    points.data());
+    glDrawArrays(GL_POINTS, 0, static_cast<GLsizei>(count));
 }
 
 } // namespace solar::app
