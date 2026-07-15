@@ -31,8 +31,8 @@ AppObjects make_app() {
     auto ephemeris = std::make_unique<core::KeplerEphemeris>(bodies);
 
     sim::SimulationClock clock{core::Epoch::at_now()};
-    clock.set_time_scale(sim::TimeScale::real_time);
-    clock.set_acceleration(core::kSecondsPerDay);
+    clock.set_time_scale(sim::TimeScale::accelerated);
+    clock.set_acceleration(16 * core::kSecondsPerDay);
 
     auto renderer = std::make_unique<GlRenderer>();
     Scene scene(std::move(renderer));
