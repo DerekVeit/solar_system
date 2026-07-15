@@ -43,7 +43,7 @@ AppObjects make_app() {
     scene.add_body(BodyVisual{"Jupiter", Color{0.9f, 0.7f, 0.5f, 1.0f}, 16.0f});
 
     AppObjects app{
-        Window{{.title = "Solar System", .fullscreen = true}},
+        Window{{.title = "Solar System", .fullscreen = false}},
         sim::SolarSystem{std::move(ephemeris), clock},
         {},
         std::move(scene),
