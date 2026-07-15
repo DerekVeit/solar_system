@@ -8,7 +8,7 @@ BodyVisual::BodyVisual(std::string name, Color color, float point_size)
     , point_size_(point_size) {}
 
 void BodyVisual::append_point(const sim::SolarSystem& simulation, float view_half_extent_au,
-                              std::vector<PointInstance>& points) const {
+                              float aspect_ratio, std::vector<PointInstance>& points) const {
     if (name_ == "Sun") {
         points.push_back(PointInstance{0.0f, 0.0f, color_, point_size_});
         return;
@@ -16,7 +16,8 @@ void BodyVisual::append_point(const sim::SolarSystem& simulation, float view_hal
 
     const auto position = simulation.state(name_).position;
     const float scale = view_half_extent_au * static_cast<float>(core::kAuKm);
-    points.push_back(PointInstance{static_cast<float>(position.km.x) / scale,
+    const float aspect = aspect_ratio > 0.0f ? aspect_ratio : 1.0f;
+    points.push_back(PointInstance{static_cast<float>(position.km.x) / scale / aspect,
                                    static_cast<float>(position.km.y) / scale, color_, point_size_});
 }
 

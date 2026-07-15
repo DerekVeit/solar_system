@@ -18,7 +18,7 @@ class BodyVisual {
     [[nodiscard]] const std::string& name() const { return name_; }
 
     void append_point(const sim::SolarSystem& simulation, float view_half_extent_au,
-                      std::vector<PointInstance>& points) const;
+                      float aspect_ratio, std::vector<PointInstance>& points) const;
 
   private:
     std::string name_;

@@ -91,7 +91,12 @@ void AppObjects::run_loop() {
         window.set_clear_color(clear_color);
         window.clear_frame();
 
-        scene.render(simulation);
+        const int framebuffer_height = window.framebuffer_height();
+        const float aspect_ratio = framebuffer_height > 0
+                                       ? static_cast<float>(window.framebuffer_width()) /
+                                             static_cast<float>(framebuffer_height)
+                                       : 1.0f;
+        scene.render(simulation, aspect_ratio);
 
         window.swap_buffers();
         window.poll_events();

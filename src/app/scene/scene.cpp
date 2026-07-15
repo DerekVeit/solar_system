@@ -14,7 +14,7 @@ bool Scene::init() {
     return renderer_->init(bodies_.size());
 }
 
-void Scene::render(const sim::SolarSystem& simulation) {
+void Scene::render(const sim::SolarSystem& simulation, float aspect_ratio) {
     if (renderer_ == nullptr) {
         return;
     }
@@ -22,7 +22,7 @@ void Scene::render(const sim::SolarSystem& simulation) {
     std::vector<PointInstance> points;
     points.reserve(bodies_.size());
     for (const BodyVisual& body : bodies_) {
-        body.append_point(simulation, view_half_extent_au_, points);
+        body.append_point(simulation, view_half_extent_au_, aspect_ratio, points);
     }
     renderer_->draw_points(points);
 }

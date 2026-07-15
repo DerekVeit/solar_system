@@ -17,7 +17,7 @@ class Scene {
 
     bool init();
 
-    void render(const sim::SolarSystem& simulation);
+    void render(const sim::SolarSystem& simulation, float aspect_ratio);
 
   private:
     std::unique_ptr<IRenderer> renderer_;
