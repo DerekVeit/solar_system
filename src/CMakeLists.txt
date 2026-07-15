@@ -26,12 +26,15 @@ target_link_libraries(glad PUBLIC ${CMAKE_DL_LIBS})
 
 add_executable(solar_system
     app/color.cpp
-    app/earth_renderer.cpp
     app/files.cpp
     app/input.cpp
     app/logging.cpp
     app/main.cpp
+    app/render/gl_renderer.cpp
+    app/render/gl_shader.cpp
     app/run.cpp
+    app/scene/body_visual.cpp
+    app/scene/scene.cpp
     app/window.cpp
 )
 

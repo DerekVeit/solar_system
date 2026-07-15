@@ -5,6 +5,8 @@
 #include "app/files.hpp"
 #include "app/input.hpp"
 #include "app/logging.hpp"
+#include "app/render/gl_renderer.hpp"
+#include "app/scene/body_visual.hpp"
 #include "app/window.hpp"
 #include "core/constants.hpp"
 #include "core/json_loader.hpp"
@@ -32,18 +34,26 @@ AppObjects make_app() {
     clock.set_time_scale(sim::TimeScale::real_time);
     clock.set_acceleration(core::kSecondsPerDay);
 
+    auto renderer = std::make_unique<GlRenderer>();
+    Scene scene(std::move(renderer));
+    scene.add_body(BodyVisual{"Sun", Color{1.0f, 0.9f, 0.3f, 1.0f}, 20.0f});
+    scene.add_body(BodyVisual{"Earth", Color{0.45f, 0.75f, 1.0f, 1.0f}, 14.0f});
+    scene.add_body(BodyVisual{"Venus", Color{1.0f, 0.85f, 0.5f, 1.0f}, 12.0f});
+    scene.add_body(BodyVisual{"Mars", Color{1.0f, 0.4f, 0.3f, 1.0f}, 12.0f});
+    scene.add_body(BodyVisual{"Jupiter", Color{0.9f, 0.7f, 0.5f, 1.0f}, 16.0f});
+
     AppObjects app{
         Window{{.title = "Solar System", .fullscreen = true}},
         sim::SolarSystem{std::move(ephemeris), clock},
         {},
-        {},
+        std::move(scene),
     };
     app.context = AppContext{&app.window, &app.simulation};
 
     solar::app::register_key_handlers(app.context);
 
-    if (!app.earth_renderer.init()) {
-        throw std::runtime_error("failed to initialize Earth renderer");
+    if (!app.scene.init()) {
+        throw std::runtime_error("failed to initialize scene renderer");
     }
 
     return app;
@@ -81,7 +91,7 @@ void AppObjects::run_loop() {
         window.set_clear_color(clear_color);
         window.clear_frame();
 
-        earth_renderer.draw(simulation.state("Earth").position);
+        scene.render(simulation);
 
         window.swap_buffers();
         window.poll_events();
