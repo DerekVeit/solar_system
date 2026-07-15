@@ -37,10 +37,10 @@ AppObjects make_app() {
     auto renderer = std::make_unique<GlRenderer>();
     Scene scene(std::move(renderer));
     scene.add_body(BodyVisual{"Sun", Color{1.0f, 0.9f, 0.3f, 1.0f}, 20.0f});
-    scene.add_body(BodyVisual{"Earth", Color{0.45f, 0.75f, 1.0f, 1.0f}, 14.0f});
-    scene.add_body(BodyVisual{"Venus", Color{1.0f, 0.85f, 0.5f, 1.0f}, 12.0f});
-    scene.add_body(BodyVisual{"Mars", Color{1.0f, 0.4f, 0.3f, 1.0f}, 12.0f});
-    scene.add_body(BodyVisual{"Jupiter", Color{0.9f, 0.7f, 0.5f, 1.0f}, 16.0f});
+    scene.add_body(BodyVisual{"Earth", Color{0.45f, 0.75f, 1.0f, 1.0f}, 14.0f, 45.0});
+    scene.add_body(BodyVisual{"Venus", Color{1.0f, 0.85f, 0.5f, 1.0f}, 12.0f, 30.0});
+    scene.add_body(BodyVisual{"Mars", Color{1.0f, 0.4f, 0.3f, 1.0f}, 12.0f, 60.0});
+    scene.add_body(BodyVisual{"Jupiter", Color{0.9f, 0.7f, 0.5f, 1.0f}, 16.0f, 120.0});
 
     AppObjects app{
         Window{{.title = "Solar System", .fullscreen = false}},
