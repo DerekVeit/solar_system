@@ -35,6 +35,4 @@ struct Color {
     [[nodiscard]] ColorHSV as_hsv() const; // alpha is ignored
 };
 
-Color color_from_angle(double angle);
-
 } // namespace solar::app

@@ -84,24 +84,4 @@ bool ColorHSV::operator==(const ColorHSV& other) const {
     return equal(h, other.h) && equal(s, other.s) && equal(v, other.v);
 }
 
-Color color_from_angle(double angle) {
-    float red(0.0f);
-    float green(0.0f);
-    float blue(0.0f);
-
-    if (std::cos(angle) < 0) {
-        green = -std::cos(angle);
-    } else {
-        red = std::cos(angle);
-    }
-    blue = ((-std::sin(angle) + 1.0f) / 2.0f) * 0.8f + 0.2f;
-
-    float factor = 0.12;
-    red *= factor;
-    green *= factor;
-    blue *= factor;
-
-    return Color{red, green, blue, 1.0f};
-}
-
 } // namespace solar::app

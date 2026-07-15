@@ -74,21 +74,18 @@ void AppObjects::run_loop() {
 
         const double earth_angle = simulation.state("Earth").position.polar_xy().angle;
 
-        Color clear_color = color_from_angle(earth_angle);
-
         bool paused = simulation.clock().time_scale() == sim::TimeScale::paused;
         if (!paused) {
             log_timer += delta_seconds;
             if (log_timer >= log_interval) {
-                log("RGB: ({}) for {:.01f}° at {} FPS: {}", clear_color.to_string(),
-                    earth_angle * core::kRadToDeg, simulation.clock().epoch().to_string(),
-                    loop_counter);
+                log("{:.01f}° at {} FPS: {}", earth_angle * core::kRadToDeg,
+                    simulation.clock().epoch().to_string(), loop_counter);
                 log_timer -= log_interval;
                 loop_counter = 0;
             }
         }
 
-        window.set_clear_color(clear_color);
+        window.set_clear_color(solar::app::Color{0.0f, 0.0353f, 0.1176f, 1.0f});
         window.clear_frame();
 
         const int framebuffer_height = window.framebuffer_height();
