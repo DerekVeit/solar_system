@@ -19,6 +19,10 @@ class Scene {
 
     void render(const sim::SolarSystem& simulation, float aspect_ratio);
 
+    float scale();
+
+    void set_scale(float factor);
+
   private:
     std::unique_ptr<IRenderer> renderer_;
     std::vector<BodyVisual> bodies_;

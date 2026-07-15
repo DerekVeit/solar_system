@@ -1,6 +1,7 @@
 #include "app/input.hpp"
 
 #include "app/logging.hpp"
+#include "app/scene/scene.hpp"
 #include "app/window.hpp"
 #include "sim/clock.hpp"
 #include "sim/solar_system.hpp"
@@ -37,6 +38,8 @@ void key_callback(GLFWwindow* glfw_window, int key, int /*scancode*/, int action
 
     Window* window = app_context->window;
     sim::SolarSystem* simulation = app_context->simulation;
+    Scene* scene = app_context->scene;
+
     if (window == nullptr) {
         fmt::print(stderr, "app_context->window is nullptr\n");
         return;
@@ -75,6 +78,12 @@ void key_callback(GLFWwindow* glfw_window, int key, int /*scancode*/, int action
             break;
         case GLFW_KEY_KP_ADD:
             change_acceleration(clock, 2.0);
+            break;
+        case GLFW_KEY_PAGE_UP:
+            scene->set_scale(scene->scale() * 0.80f);
+            break;
+        case GLFW_KEY_PAGE_DOWN:
+            scene->set_scale(scene->scale() * 1.25f);
             break;
         default:
             break;

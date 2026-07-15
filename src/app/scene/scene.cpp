@@ -27,4 +27,8 @@ void Scene::render(const sim::SolarSystem& simulation, float aspect_ratio) {
     renderer_->draw_points(points);
 }
 
+float Scene::scale() { return view_half_extent_au_ / 2.0f; }
+
+void Scene::set_scale(float factor) { view_half_extent_au_ = 2.0f * factor; }
+
 } // namespace solar::app

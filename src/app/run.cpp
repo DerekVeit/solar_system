@@ -48,7 +48,7 @@ AppObjects make_app() {
         {},
         std::move(scene),
     };
-    app.context = AppContext{&app.window, &app.simulation};
+    app.context = AppContext{&app.window, &app.simulation, &app.scene};
 
     solar::app::register_key_handlers(app.context);
 
