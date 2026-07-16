@@ -42,6 +42,7 @@ void Scene::render(const sim::SolarSystem& simulation, float aspect_ratio, int f
         .half_extent_au = view_half_extent_au_,
         .aspect_ratio = aspect_ratio,
         .framebuffer_height = framebuffer_height,
+        .body_scaling = body_scaling_,
     };
 
     for (const BodyVisual& body : bodies_) {

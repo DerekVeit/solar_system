@@ -106,8 +106,9 @@ float BodyVisual::point_size_pixels(const ViewFrame& view) const {
 
     const float scale_km = view.half_extent_au * static_cast<float>(core::kAuKm);
     const float diameter_ndc = static_cast<float>((2.0 * radius_km_) / scale_km);
+    const float size_factor = view.body_scaling ? display_size_factor_ : 1.0f;
     const float point_size =
-        diameter_ndc * static_cast<float>(view.framebuffer_height) * 0.5f * display_size_factor_;
+        diameter_ndc * static_cast<float>(view.framebuffer_height) * 0.5f * size_factor;
     return std::max(point_size, kMinPointSize);
 }
 

@@ -7,6 +7,7 @@ struct ViewFrame {
     float half_extent_au{2.0f};
     float aspect_ratio{1.0f};
     int framebuffer_height{0};
+    bool body_scaling{true};
 };
 
 } // namespace solar::app
