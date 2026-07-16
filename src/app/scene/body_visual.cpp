@@ -94,12 +94,13 @@ void append_tail(const sim::SolarSystem& simulation, const core::BodyDefinition&
 } // namespace
 
 BodyVisual::BodyVisual(std::string name, Color color, double radius_km, double tail_duration_days,
-                       float display_size_factor)
+                       float display_size_factor, bool draws_orbit_trails)
     : name_(std::move(name))
     , color_(color)
     , radius_km_(radius_km)
     , tail_duration_seconds_(tail_duration_days * core::kSecondsPerDay)
-    , display_size_factor_(display_size_factor) {}
+    , display_size_factor_(display_size_factor)
+    , draws_orbit_trails_(draws_orbit_trails) {}
 
 float BodyVisual::point_size_pixels(const ViewFrame& view) const {
     if (radius_km_ <= 0.0 || view.half_extent_au <= 0.0f || view.framebuffer_height <= 0) {

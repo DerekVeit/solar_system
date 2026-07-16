@@ -21,10 +21,10 @@ class BodyVisual {
     static constexpr Color kTailColor{0.55f, 0.65f, 0.85f, 0.25f};
 
     BodyVisual(std::string name, Color color, double radius_km, double tail_duration_days,
-               float display_size_factor);
+               float display_size_factor, bool draws_orbit_trails);
 
     [[nodiscard]] const std::string& name() const { return name_; }
-    [[nodiscard]] bool draws_orbit_trails() const { return name_ != "Sun"; }
+    [[nodiscard]] bool draws_orbit_trails() const { return draws_orbit_trails_; }
 
     void append_draw(const sim::SolarSystem& simulation, const ViewFrame& view,
                      DrawBatch& batch) const;
@@ -37,6 +37,7 @@ class BodyVisual {
     double radius_km_{0.0};
     double tail_duration_seconds_{0.0};
     float display_size_factor_{1.0f};
+    bool draws_orbit_trails_{false};
 };
 
 } // namespace solar::app

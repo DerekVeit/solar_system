@@ -45,8 +45,13 @@ BodyVisualSettings resolve_body_visual_settings(const BodyVisualDefaults& defaul
 }
 
 BodyVisual make_body_visual(const core::BodyDefinition& body, const BodyVisualSettings& settings) {
-    return BodyVisual{body.name, settings.color, body.radius_km, settings.tail_duration_days,
-                      settings.display_size_factor};
+    const bool draws_orbit_trails = body.elements.semi_major_axis_km > 0.0;
+    return BodyVisual{body.name,
+                      settings.color,
+                      body.radius_km,
+                      settings.tail_duration_days,
+                      settings.display_size_factor,
+                      draws_orbit_trails};
 }
 
 void warn_about_visual_config_mismatches(const std::vector<core::BodyDefinition>& catalog,
