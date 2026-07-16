@@ -96,11 +96,13 @@ void append_tail(const sim::SolarSystem& simulation, const core::BodyDefinition&
 
 } // namespace
 
-BodyVisual::BodyVisual(std::string name, Color color, double radius_km, double tail_duration_days)
+BodyVisual::BodyVisual(std::string name, Color color, double radius_km, double tail_duration_days,
+                       float display_size_factor)
     : name_(std::move(name))
     , color_(color)
     , radius_km_(radius_km)
-    , tail_duration_seconds_(tail_duration_days * core::kSecondsPerDay) {}
+    , tail_duration_seconds_(tail_duration_days * core::kSecondsPerDay)
+    , display_size_factor_(display_size_factor) {}
 
 float BodyVisual::point_size_pixels(float view_half_extent_au, int framebuffer_height) const {
     if (radius_km_ <= 0.0 || view_half_extent_au <= 0.0f || framebuffer_height <= 0) {
@@ -109,7 +111,8 @@ float BodyVisual::point_size_pixels(float view_half_extent_au, int framebuffer_h
 
     const float scale_km = view_half_extent_au * static_cast<float>(core::kAuKm);
     const float diameter_ndc = static_cast<float>((2.0 * radius_km_) / scale_km);
-    const float point_size = diameter_ndc * static_cast<float>(framebuffer_height) * 0.5f;
+    const float point_size =
+        diameter_ndc * static_cast<float>(framebuffer_height) * 0.5f * display_size_factor_;
     return std::max(point_size, kMinPointSize);
 }
 
