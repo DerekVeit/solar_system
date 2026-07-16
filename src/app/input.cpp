@@ -90,6 +90,21 @@ void key_callback(GLFWwindow* glfw_window, int key, int /*scancode*/, int action
             scene->body_scaling(enabled);
             log("body scaling {}", enabled ? "on" : "off");
         } break;
+        case GLFW_KEY_LEFT:
+            scene->pan_view_fraction(-0.1f, 0.0f);
+            break;
+        case GLFW_KEY_RIGHT:
+            scene->pan_view_fraction(0.1f, 0.0f);
+            break;
+        case GLFW_KEY_UP:
+            scene->pan_view_fraction(0.0f, 0.1f);
+            break;
+        case GLFW_KEY_DOWN:
+            scene->pan_view_fraction(0.0f, -0.1f);
+            break;
+        case GLFW_KEY_HOME:
+            scene->reset_view_center();
+            break;
         default:
             break;
     }
