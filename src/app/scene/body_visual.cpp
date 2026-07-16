@@ -84,12 +84,13 @@ void append_tail(const sim::SolarSystem& simulation, const core::BodyDefinition&
             core::epoch_before_mean_anomaly(mu, body.elements, epoch_now, target_mean_anomaly);
         const core::Displacement position =
             simulation.ephemeris().state(body.name, sample_epoch).position;
+        Color tail_color = BodyVisual::kTailColor;
+        tail_color.a = BodyVisual::kTailColor.a * static_cast<float>(1.0 - fraction);
         const LineVertex vertex =
-            to_line_vertex(position, BodyVisual::kTailColor, view_half_extent_au, aspect_ratio);
+            to_line_vertex(position, tail_color, view_half_extent_au, aspect_ratio);
         trail.vertices.push_back(vertex);
-        points.push_back(to_point_instance(position, BodyVisual::kTailColor,
-                                           BodyVisual::kTailPointSize, view_half_extent_au,
-                                           aspect_ratio));
+        points.push_back(to_point_instance(position, tail_color, BodyVisual::kTailPointSize,
+                                           view_half_extent_au, aspect_ratio));
     }
 }
 
