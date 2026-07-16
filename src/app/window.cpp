@@ -63,6 +63,8 @@ Window::Window(const WindowConfig& config) {
     glViewport(0, 0, framebuffer_width, framebuffer_height);
 
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glClearColor(0.02f, 0.02f, 0.06f, 1.0f);
 }
 
