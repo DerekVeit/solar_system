@@ -6,7 +6,7 @@
 #include "app/input.hpp"
 #include "app/logging.hpp"
 #include "app/render/gl_renderer.hpp"
-#include "app/scene/body_visual.hpp"
+#include "app/scene/body_visual_catalog.hpp"
 #include "app/window.hpp"
 #include "core/constants.hpp"
 #include "core/json_loader.hpp"
@@ -16,22 +16,10 @@
 #include "sim/solar_system.hpp"
 
 #include <chrono>
-#include <string>
-#include <vector>
 
 namespace {
 
 constexpr double log_interval = 1.0;
-
-[[nodiscard]] double body_radius_km(const std::vector<solar::core::BodyDefinition>& bodies,
-                                    const std::string& name) {
-    for (const solar::core::BodyDefinition& body : bodies) {
-        if (body.name == name) {
-            return body.radius_km;
-        }
-    }
-    return 0.0;
-}
 
 } // namespace
 
@@ -47,16 +35,7 @@ AppObjects make_app() {
 
     auto renderer = std::make_unique<GlRenderer>();
     Scene scene(std::move(renderer));
-    scene.add_body(
-        BodyVisual{"Sun", Color{1.0f, 0.9f, 0.3f, 1.0f}, body_radius_km(bodies, "Sun"), 0.0, 5.0f});
-    scene.add_body(BodyVisual{"Earth", Color{0.45f, 0.75f, 1.0f, 1.0f},
-                              body_radius_km(bodies, "Earth"), 45.0});
-    scene.add_body(
-        BodyVisual{"Venus", Color{1.0f, 0.85f, 0.5f, 1.0f}, body_radius_km(bodies, "Venus"), 30.0});
-    scene.add_body(
-        BodyVisual{"Mars", Color{1.0f, 0.4f, 0.3f, 1.0f}, body_radius_km(bodies, "Mars"), 60.0});
-    scene.add_body(BodyVisual{"Jupiter", Color{0.9f, 0.7f, 0.5f, 1.0f},
-                              body_radius_km(bodies, "Jupiter"), 120.0});
+    populate_scene(scene, bodies);
 
     AppObjects app{
         Window{{.title = "Solar System", .fullscreen = false}},

@@ -35,6 +35,7 @@ add_executable(solar_system
     app/render/gl_shader.cpp
     app/run.cpp
     app/scene/body_visual.cpp
+    app/scene/body_visual_catalog.cpp
     app/scene/scene.cpp
     app/window.cpp
 )
