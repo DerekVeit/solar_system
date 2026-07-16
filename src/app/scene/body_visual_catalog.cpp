@@ -33,13 +33,14 @@ BodyVisualSettings resolve_body_visual_settings(const BodyVisualDefaults& defaul
                                                 const BodyVisualOverrideEntry* override) {
     if (override == nullptr) {
         return BodyVisualSettings{defaults.color, defaults.tail_duration_days,
-                                  defaults.display_size_factor};
+                                  defaults.display_size_factor, defaults.visible};
     }
 
     return BodyVisualSettings{
         override->color.value_or(defaults.color),
         override->tail_duration_days.value_or(defaults.tail_duration_days),
         override->display_size_factor.value_or(defaults.display_size_factor),
+        override->visible.value_or(defaults.visible),
     };
 }
 
@@ -70,6 +71,9 @@ void populate_scene(Scene& scene, const std::vector<core::BodyDefinition>& catal
     for (const core::BodyDefinition& body : catalog) {
         const BodyVisualSettings settings =
             resolve_body_visual_settings(config.defaults, find_override(config, body.name));
+        if (!settings.visible) {
+            continue;
+        }
         scene.add_body(make_body_visual(body, settings));
     }
 }

@@ -2,7 +2,8 @@
   "defaults": {
     "color": [0.7, 0.7, 0.8, 1.0],
     "tail_duration_days": 30.0,
-    "display_size_factor": 500.0
+    "display_size_factor": 500.0,
+    "visible": true
   },
   "bodies": [
     {

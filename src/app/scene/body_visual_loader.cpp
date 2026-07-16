@@ -28,6 +28,9 @@ BodyVisualDefaults parse_defaults(const nlohmann::json& json) {
     if (json.contains("display_size_factor")) {
         defaults.display_size_factor = json.at("display_size_factor").get<float>();
     }
+    if (json.contains("visible")) {
+        defaults.visible = json.at("visible").get<bool>();
+    }
     return defaults;
 }
 
@@ -43,6 +46,9 @@ BodyVisualOverrideEntry parse_override(const nlohmann::json& json) {
     }
     if (json.contains("display_size_factor")) {
         override_entry.display_size_factor = json.at("display_size_factor").get<float>();
+    }
+    if (json.contains("visible")) {
+        override_entry.visible = json.at("visible").get<bool>();
     }
     return override_entry;
 }
