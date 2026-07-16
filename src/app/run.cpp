@@ -47,7 +47,8 @@ AppObjects make_app() {
 
     auto renderer = std::make_unique<GlRenderer>();
     Scene scene(std::move(renderer));
-    scene.add_body(BodyVisual{"Sun", Color{1.0f, 0.9f, 0.3f, 1.0f}, body_radius_km(bodies, "Sun")});
+    scene.add_body(
+        BodyVisual{"Sun", Color{1.0f, 0.9f, 0.3f, 1.0f}, body_radius_km(bodies, "Sun"), 0.0, 5.0f});
     scene.add_body(BodyVisual{"Earth", Color{0.45f, 0.75f, 1.0f, 1.0f},
                               body_radius_km(bodies, "Earth"), 45.0});
     scene.add_body(

@@ -20,7 +20,7 @@ class BodyVisual {
     static constexpr Color kTailColor{0.55f, 0.65f, 0.85f, 0.25f};
 
     BodyVisual(std::string name, Color color, double radius_km, double tail_duration_days = 30.0,
-               float display_size_factor = 1.0f);
+               float display_size_factor = 500.0f);
 
     [[nodiscard]] const std::string& name() const { return name_; }
     [[nodiscard]] bool draws_orbit_trails() const { return name_ != "Sun"; }
