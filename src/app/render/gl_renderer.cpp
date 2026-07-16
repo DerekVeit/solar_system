@@ -177,10 +177,10 @@ void GlRenderer::draw_line_primitives(unsigned int mode, std::span<const LinePri
 }
 
 void GlRenderer::draw(const DrawBatch& batch) {
+    draw_points(batch.points);
     draw_line_primitives(GL_LINE_STRIP, batch.line_trails, max_line_trail_vertices_);
     draw_line_primitives(GL_LINE_LOOP, batch.line_loops, max_line_loop_vertices_);
     draw_line_primitives(GL_LINES, batch.lines, max_line_vertices_);
-    draw_points(batch.points);
 }
 
 } // namespace solar::app
