@@ -118,9 +118,10 @@ float BodyVisual::point_size_pixels(const ViewFrame& view) const {
 void BodyVisual::append_draw(const sim::SolarSystem& simulation, const ViewFrame& view,
                              DrawBatch& batch) const {
     const float point_size = point_size_pixels(view);
+    const core::Displacement position = simulation.state(name_).position;
+    batch.points.push_back(to_point_instance(position, color_, point_size, view));
 
-    if (name_ == "Sun") {
-        batch.points.push_back(PointInstance{0.0f, 0.0f, color_, point_size});
+    if (!draws_orbit_trails_) {
         return;
     }
 
@@ -133,9 +134,6 @@ void BodyVisual::append_draw(const sim::SolarSystem& simulation, const ViewFrame
     if (mu <= 0.0) {
         return;
     }
-
-    const core::Displacement position = simulation.state(name_).position;
-    batch.points.push_back(to_point_instance(position, color_, point_size, view));
 
     LinePrimitive orbit_loop;
     append_orbit_loop(simulation, *body, mu, view, orbit_loop);
