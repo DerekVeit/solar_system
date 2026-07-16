@@ -23,10 +23,13 @@ class Scene {
 
     void set_scale(float factor);
 
+    void body_scaling(bool enabled);
+
   private:
     std::unique_ptr<IRenderer> renderer_;
     std::vector<BodyVisual> bodies_;
     float view_half_extent_au_{2.0f};
+    bool body_scaling_{true};
 };
 
 } // namespace solar::app

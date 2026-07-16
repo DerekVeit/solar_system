@@ -85,6 +85,11 @@ void key_callback(GLFWwindow* glfw_window, int key, int /*scancode*/, int action
         case GLFW_KEY_PAGE_DOWN:
             scene->set_scale(scene->scale() * 1.25f);
             break;
+        case GLFW_KEY_S: {
+            bool enabled = (mods == GLFW_MOD_SHIFT);
+            scene->body_scaling(enabled);
+            log("body scaling {}", enabled ? "on" : "off");
+        } break;
         default:
             break;
     }

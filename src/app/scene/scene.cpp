@@ -48,4 +48,6 @@ float Scene::scale() { return view_half_extent_au_ / 2.0f; }
 
 void Scene::set_scale(float factor) { view_half_extent_au_ = 2.0f * factor; }
 
+void Scene::body_scaling(bool enabled) { body_scaling_ = enabled; }
+
 } // namespace solar::app
