@@ -135,6 +135,10 @@ void BodyVisual::append_draw(const sim::SolarSystem& simulation, float view_half
         return;
     }
 
+    const core::Displacement position = simulation.state(name_).position;
+    batch.points.push_back(
+        to_point_instance(position, color_, point_size, view_half_extent_au, aspect_ratio));
+
     LinePrimitive orbit_loop;
     append_orbit_loop(simulation, *body, mu, view_half_extent_au, aspect_ratio, orbit_loop);
     if (!orbit_loop.vertices.empty()) {
@@ -147,10 +151,6 @@ void BodyVisual::append_draw(const sim::SolarSystem& simulation, float view_half
     if (!tail_trail.vertices.empty()) {
         batch.line_trails.push_back(std::move(tail_trail));
     }
-
-    const core::Displacement position = simulation.state(name_).position;
-    batch.points.push_back(
-        to_point_instance(position, color_, point_size, view_half_extent_au, aspect_ratio));
 }
 
 } // namespace solar::app
