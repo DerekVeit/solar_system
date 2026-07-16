@@ -14,22 +14,25 @@ class BodyVisual {
     static constexpr std::size_t kOrbitSamples = 256;
     static constexpr std::size_t kTailSamples = 48;
     static constexpr float kTailPointSize = 6.0f;
+    static constexpr float kMinPointSize = 2.0f;
 
     static constexpr Color kOrbitTrailColor{0.45f, 0.45f, 0.45f, 0.25f};
     static constexpr Color kTailColor{0.55f, 0.65f, 0.85f, 0.75f};
 
-    BodyVisual(std::string name, Color color, float point_size, double tail_duration_days = 30.0);
+    BodyVisual(std::string name, Color color, double radius_km, double tail_duration_days = 30.0);
 
     [[nodiscard]] const std::string& name() const { return name_; }
     [[nodiscard]] bool draws_orbit_trails() const { return name_ != "Sun"; }
 
     void append_draw(const sim::SolarSystem& simulation, float view_half_extent_au,
-                     float aspect_ratio, DrawBatch& batch) const;
+                     float aspect_ratio, int framebuffer_height, DrawBatch& batch) const;
 
   private:
+    [[nodiscard]] float point_size_pixels(float view_half_extent_au, int framebuffer_height) const;
+
     std::string name_;
     Color color_;
-    float point_size_{1.0f};
+    double radius_km_{0.0};
     double tail_duration_seconds_{0.0};
 };
 

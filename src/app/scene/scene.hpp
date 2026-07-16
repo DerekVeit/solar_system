@@ -17,7 +17,7 @@ class Scene {
 
     bool init();
 
-    void render(const sim::SolarSystem& simulation, float aspect_ratio);
+    void render(const sim::SolarSystem& simulation, float aspect_ratio, int framebuffer_height);
 
     float scale();
 

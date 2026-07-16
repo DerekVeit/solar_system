@@ -5,6 +5,8 @@
 #include "core/kepler.hpp"
 #include "core/types.hpp"
 
+#include <algorithm>
+
 namespace solar::app {
 
 namespace {
@@ -93,16 +95,29 @@ void append_tail(const sim::SolarSystem& simulation, const core::BodyDefinition&
 
 } // namespace
 
-BodyVisual::BodyVisual(std::string name, Color color, float point_size, double tail_duration_days)
+BodyVisual::BodyVisual(std::string name, Color color, double radius_km, double tail_duration_days)
     : name_(std::move(name))
     , color_(color)
-    , point_size_(point_size)
+    , radius_km_(radius_km)
     , tail_duration_seconds_(tail_duration_days * core::kSecondsPerDay) {}
 
+float BodyVisual::point_size_pixels(float view_half_extent_au, int framebuffer_height) const {
+    if (radius_km_ <= 0.0 || view_half_extent_au <= 0.0f || framebuffer_height <= 0) {
+        return kMinPointSize;
+    }
+
+    const float scale_km = view_half_extent_au * static_cast<float>(core::kAuKm);
+    const float diameter_ndc = static_cast<float>((2.0 * radius_km_) / scale_km);
+    const float point_size = diameter_ndc * static_cast<float>(framebuffer_height) * 0.5f;
+    return std::max(point_size, kMinPointSize);
+}
+
 void BodyVisual::append_draw(const sim::SolarSystem& simulation, float view_half_extent_au,
-                             float aspect_ratio, DrawBatch& batch) const {
+                             float aspect_ratio, int framebuffer_height, DrawBatch& batch) const {
+    const float point_size = point_size_pixels(view_half_extent_au, framebuffer_height);
+
     if (name_ == "Sun") {
-        batch.points.push_back(PointInstance{0.0f, 0.0f, color_, point_size_});
+        batch.points.push_back(PointInstance{0.0f, 0.0f, color_, point_size});
         return;
     }
 
@@ -131,7 +146,7 @@ void BodyVisual::append_draw(const sim::SolarSystem& simulation, float view_half
 
     const core::Displacement position = simulation.state(name_).position;
     batch.points.push_back(
-        to_point_instance(position, color_, point_size_, view_half_extent_au, aspect_ratio));
+        to_point_instance(position, color_, point_size, view_half_extent_au, aspect_ratio));
 }
 
 } // namespace solar::app

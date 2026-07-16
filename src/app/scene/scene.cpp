@@ -28,7 +28,7 @@ bool Scene::init() {
     return renderer_->init(capacity);
 }
 
-void Scene::render(const sim::SolarSystem& simulation, float aspect_ratio) {
+void Scene::render(const sim::SolarSystem& simulation, float aspect_ratio, int framebuffer_height) {
     if (renderer_ == nullptr) {
         return;
     }
@@ -39,7 +39,7 @@ void Scene::render(const sim::SolarSystem& simulation, float aspect_ratio) {
     batch.line_trails.reserve(bodies_.size());
 
     for (const BodyVisual& body : bodies_) {
-        body.append_draw(simulation, view_half_extent_au_, aspect_ratio, batch);
+        body.append_draw(simulation, view_half_extent_au_, aspect_ratio, framebuffer_height, batch);
     }
     renderer_->draw(batch);
 }
