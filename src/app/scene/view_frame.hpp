@@ -8,6 +8,9 @@ struct ViewFrame {
     float aspect_ratio{1.0f};
     int framebuffer_height{0};
     bool body_scaling{true};
+    /// Camera center in world coordinates (AU, ecliptic plane).
+    float center_x_au{0.0f};
+    float center_y_au{0.0f};
 };
 
 } // namespace solar::app

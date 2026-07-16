@@ -23,8 +23,10 @@ namespace {
                                         const ViewFrame& view) {
     const float scale = ndc_scale(view);
     const float aspect = ndc_aspect(view);
-    return LineVertex{static_cast<float>(position.km.x) / scale / aspect,
-                      static_cast<float>(position.km.y) / scale, color};
+    const float center_x_km = view.center_x_au * static_cast<float>(core::kAuKm);
+    const float center_y_km = view.center_y_au * static_cast<float>(core::kAuKm);
+    return LineVertex{(static_cast<float>(position.km.x) - center_x_km) / scale / aspect,
+                      (static_cast<float>(position.km.y) - center_y_km) / scale, color};
 }
 
 [[nodiscard]] PointInstance to_point_instance(const core::Displacement& position, Color color,
