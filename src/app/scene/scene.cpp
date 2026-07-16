@@ -33,6 +33,8 @@ void Scene::render(const sim::SolarSystem& simulation, float aspect_ratio, int f
         return;
     }
 
+    last_aspect_ratio_ = aspect_ratio > 0.0f ? aspect_ratio : 1.0f;
+
     DrawBatch batch;
     batch.points.reserve(bodies_.size() + bodies_.size() * BodyVisual::kTailSamples);
     batch.line_loops.reserve(bodies_.size());
@@ -43,6 +45,8 @@ void Scene::render(const sim::SolarSystem& simulation, float aspect_ratio, int f
         .aspect_ratio = aspect_ratio,
         .framebuffer_height = framebuffer_height,
         .body_scaling = body_scaling_,
+        .center_x_au = view_center_x_au_,
+        .center_y_au = view_center_y_au_,
     };
 
     for (const BodyVisual& body : bodies_) {
@@ -56,5 +60,18 @@ float Scene::scale() { return view_half_extent_au_ / 2.0f; }
 void Scene::set_scale(float factor) { view_half_extent_au_ = 2.0f * factor; }
 
 void Scene::body_scaling(bool enabled) { body_scaling_ = enabled; }
+
+void Scene::pan_view_fraction(float delta_x_fraction, float delta_y_fraction) {
+    const float aspect = last_aspect_ratio_;
+    const float view_width_au = 2.0f * view_half_extent_au_ * aspect;
+    const float view_height_au = 2.0f * view_half_extent_au_;
+    view_center_x_au_ += delta_x_fraction * view_width_au;
+    view_center_y_au_ += delta_y_fraction * view_height_au;
+}
+
+void Scene::reset_view_center() {
+    view_center_x_au_ = 0.0f;
+    view_center_y_au_ = 0.0f;
+}
 
 } // namespace solar::app

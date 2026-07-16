@@ -25,11 +25,19 @@ class Scene {
 
     void body_scaling(bool enabled);
 
+    /// Pan the camera by fractions of the current view width and height.
+    void pan_view_fraction(float delta_x_fraction, float delta_y_fraction);
+
+    void reset_view_center();
+
   private:
     std::unique_ptr<IRenderer> renderer_;
     std::vector<BodyVisual> bodies_;
     float view_half_extent_au_{2.0f};
     bool body_scaling_{true};
+    float view_center_x_au_{0.0f};
+    float view_center_y_au_{0.0f};
+    float last_aspect_ratio_{1.0f};
 };
 
 } // namespace solar::app
