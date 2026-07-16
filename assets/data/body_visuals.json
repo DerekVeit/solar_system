@@ -1,0 +1,34 @@
+{
+  "defaults": {
+    "color": [0.7, 0.7, 0.8, 1.0],
+    "tail_duration_days": 30.0,
+    "display_size_factor": 500.0
+  },
+  "bodies": [
+    {
+      "name": "Sun",
+      "color": [1.0, 0.9, 0.3, 1.0],
+      "tail_duration_days": 0.0,
+      "display_size_factor": 5.0
+    },
+    {
+      "name": "Earth",
+      "color": [0.45, 0.75, 1.0, 1.0],
+      "tail_duration_days": 45.0
+    },
+    {
+      "name": "Venus",
+      "color": [1.0, 0.85, 0.5, 1.0]
+    },
+    {
+      "name": "Mars",
+      "color": [1.0, 0.4, 0.3, 1.0],
+      "tail_duration_days": 60.0
+    },
+    {
+      "name": "Jupiter",
+      "color": [0.9, 0.7, 0.5, 1.0],
+      "tail_duration_days": 120.0
+    }
+  ]
+}

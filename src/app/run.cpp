@@ -35,7 +35,7 @@ AppObjects make_app() {
 
     auto renderer = std::make_unique<GlRenderer>();
     Scene scene(std::move(renderer));
-    populate_scene(scene, bodies);
+    populate_scene(scene, bodies, asset_path("data/body_visuals.json"));
 
     AppObjects app{
         Window{{.title = "Solar System", .fullscreen = false}},
