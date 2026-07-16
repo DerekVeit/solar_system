@@ -13,7 +13,7 @@ class BodyVisual {
   public:
     static constexpr std::size_t kOrbitSamples = 256;
     static constexpr std::size_t kTailSamples = 48;
-    static constexpr float kTailPointSize = 6.0f;
+    static constexpr float kTailPointSize = 0.0f;
     static constexpr float kMinPointSize = 2.0f;
 
     static constexpr Color kOrbitTrailColor{0.45f, 0.45f, 0.45f, 0.25f};
