@@ -11,7 +11,10 @@ TEST_CASE("find_body returns catalog entries by name", "[ephemeris]") {
     const solar::core::BodyDefinition* earth = solar::core::find_body(ephemeris, "Earth");
     REQUIRE(earth != nullptr);
     CHECK(earth->name == "Earth");
-    CHECK(solar::core::find_body(ephemeris, "Pluto") == nullptr);
+    const solar::core::BodyDefinition* pluto = solar::core::find_body(ephemeris, "Pluto");
+    REQUIRE(pluto != nullptr);
+    CHECK(pluto->name == "Pluto");
+    CHECK(solar::core::find_body(ephemeris, "Eris") == nullptr);
 }
 
 TEST_CASE("central_gravitational_parameter returns Sun mu", "[ephemeris]") {
