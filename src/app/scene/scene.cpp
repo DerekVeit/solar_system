@@ -38,8 +38,14 @@ void Scene::render(const sim::SolarSystem& simulation, float aspect_ratio, int f
     batch.line_loops.reserve(bodies_.size());
     batch.line_trails.reserve(bodies_.size());
 
+    const ViewFrame view{
+        .half_extent_au = view_half_extent_au_,
+        .aspect_ratio = aspect_ratio,
+        .framebuffer_height = framebuffer_height,
+    };
+
     for (const BodyVisual& body : bodies_) {
-        body.append_draw(simulation, view_half_extent_au_, aspect_ratio, framebuffer_height, batch);
+        body.append_draw(simulation, view, batch);
     }
     renderer_->draw(batch);
 }

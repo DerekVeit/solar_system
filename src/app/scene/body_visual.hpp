@@ -2,6 +2,7 @@
 
 #include "app/color.hpp"
 #include "app/render/types.hpp"
+#include "app/scene/view_frame.hpp"
 #include "sim/solar_system.hpp"
 
 #include <string>
@@ -25,11 +26,11 @@ class BodyVisual {
     [[nodiscard]] const std::string& name() const { return name_; }
     [[nodiscard]] bool draws_orbit_trails() const { return name_ != "Sun"; }
 
-    void append_draw(const sim::SolarSystem& simulation, float view_half_extent_au,
-                     float aspect_ratio, int framebuffer_height, DrawBatch& batch) const;
+    void append_draw(const sim::SolarSystem& simulation, const ViewFrame& view,
+                     DrawBatch& batch) const;
 
   private:
-    [[nodiscard]] float point_size_pixels(float view_half_extent_au, int framebuffer_height) const;
+    [[nodiscard]] float point_size_pixels(const ViewFrame& view) const;
 
     std::string name_;
     Color color_;
