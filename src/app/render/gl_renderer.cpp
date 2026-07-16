@@ -30,6 +30,10 @@ constexpr std::string_view kPointFragmentShader = R"(#version 460 core
 in vec4 v_color;
 out vec4 frag_color;
 void main() {
+    const vec2 coord = gl_PointCoord - vec2(0.5);
+    if (dot(coord, coord) > 0.25) {
+        discard;
+    }
     frag_color = v_color;
 }
 )";
