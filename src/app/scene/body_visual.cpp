@@ -1,6 +1,7 @@
 #include "app/scene/body_visual.hpp"
 
 #include "core/constants.hpp"
+#include "core/ephemeris.hpp"
 #include "core/kepler.hpp"
 #include "core/types.hpp"
 
@@ -29,24 +30,6 @@ namespace {
                                               float aspect_ratio) {
     const LineVertex vertex = to_line_vertex(position, color, view_half_extent_au, aspect_ratio);
     return PointInstance{vertex.x_ndc, vertex.y_ndc, color, point_size};
-}
-
-[[nodiscard]] const core::BodyDefinition* find_body(const sim::SolarSystem& simulation,
-                                                    const std::string& name) {
-    for (const core::BodyDefinition& body : simulation.ephemeris().bodies()) {
-        if (body.name == name) {
-            return &body;
-        }
-    }
-    return nullptr;
-}
-
-[[nodiscard]] double sun_mu(const sim::SolarSystem& simulation) {
-    const core::BodyDefinition* sun = find_body(simulation, "Sun");
-    if (sun == nullptr) {
-        return 0.0;
-    }
-    return sun->gravitational_parameter_km3_s2;
 }
 
 void append_orbit_loop(const sim::SolarSystem& simulation, const core::BodyDefinition& body,
@@ -123,12 +106,12 @@ void BodyVisual::append_draw(const sim::SolarSystem& simulation, float view_half
         return;
     }
 
-    const core::BodyDefinition* body = find_body(simulation, name_);
+    const core::BodyDefinition* body = core::find_body(simulation.ephemeris(), name_);
     if (body == nullptr) {
         return;
     }
 
-    const double mu = sun_mu(simulation);
+    const double mu = core::central_gravitational_parameter(simulation.ephemeris());
     if (mu <= 0.0) {
         return;
     }

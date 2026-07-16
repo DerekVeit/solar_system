@@ -1,4 +1,5 @@
 add_library(solar_core STATIC
+    core/ephemeris.cpp
     core/kepler.cpp
     core/kepler_ephemeris.cpp
     core/json_loader.cpp

@@ -1,5 +1,6 @@
 add_executable(solar_system_tests
     test_color.cpp
+    test_ephemeris.cpp
     test_horizons.cpp
     test_kepler.cpp
     test_json_loader.cpp

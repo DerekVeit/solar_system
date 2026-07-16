@@ -25,4 +25,9 @@ class EphemerisProvider {
 
 using EphemerisProviderPtr = std::unique_ptr<EphemerisProvider>;
 
+[[nodiscard]] const BodyDefinition* find_body(const EphemerisProvider& ephemeris,
+                                              const std::string& name);
+
+[[nodiscard]] double central_gravitational_parameter(const EphemerisProvider& ephemeris);
+
 } // namespace solar::core
