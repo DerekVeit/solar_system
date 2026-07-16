@@ -4,8 +4,6 @@
 #include "core/kepler.hpp"
 #include "core/types.hpp"
 
-#include <cmath>
-
 namespace solar::app {
 
 namespace {
@@ -51,44 +49,10 @@ namespace {
     return sun->gravitational_parameter_km3_s2;
 }
 
-[[nodiscard]] double orbital_period_seconds(double mu, const core::KeplerianElements& elements) {
-    const double semi_major_axis = elements.semi_major_axis_km;
-    if (mu <= 0.0 || semi_major_axis <= 0.0) {
-        return 0.0;
-    }
-    return core::kTwoPi * std::sqrt(semi_major_axis * semi_major_axis * semi_major_axis / mu);
-}
-
-[[nodiscard]] double mean_motion(double mu, const core::KeplerianElements& elements) {
-    const double semi_major_axis = elements.semi_major_axis_km;
-    if (mu <= 0.0 || semi_major_axis <= 0.0) {
-        return 0.0;
-    }
-    return std::sqrt(mu / (semi_major_axis * semi_major_axis * semi_major_axis));
-}
-
-[[nodiscard]] double normalize_angle(double radians) {
-    radians = std::fmod(radians, core::kTwoPi);
-    if (radians < 0.0) {
-        radians += core::kTwoPi;
-    }
-    return radians;
-}
-
-[[nodiscard]] core::Epoch epoch_before_mean_anomaly(double mu,
-                                                    const core::KeplerianElements& elements,
-                                                    core::Epoch reference_epoch,
-                                                    double target_mean_anomaly) {
-    const double mean_anomaly_now = core::mean_anomaly_at_epoch(mu, elements, reference_epoch);
-    const double delta_mean_anomaly = normalize_angle(mean_anomaly_now - target_mean_anomaly);
-    const double delta_seconds = delta_mean_anomaly / mean_motion(mu, elements);
-    return core::Epoch{reference_epoch.jd - delta_seconds / core::kSecondsPerDay};
-}
-
 void append_orbit_loop(const sim::SolarSystem& simulation, const core::BodyDefinition& body,
                        double mu, float view_half_extent_au, float aspect_ratio,
                        LinePrimitive& loop) {
-    const double period_seconds = orbital_period_seconds(mu, body.elements);
+    const double period_seconds = core::orbital_period_seconds(mu, body.elements);
     if (period_seconds <= 0.0) {
         return;
     }
@@ -118,7 +82,7 @@ void append_tail(const sim::SolarSystem& simulation, const core::BodyDefinition&
 
     const core::Epoch epoch_now = simulation.clock().epoch();
     const double mean_anomaly_now = core::mean_anomaly_at_epoch(mu, body.elements, epoch_now);
-    const double mean_motion_value = mean_motion(mu, body.elements);
+    const double mean_motion_value = core::mean_motion(mu, body.elements);
     if (mean_motion_value <= 0.0) {
         return;
     }
@@ -130,9 +94,9 @@ void append_tail(const sim::SolarSystem& simulation, const core::BodyDefinition&
         const double fraction =
             static_cast<double>(sample) / static_cast<double>(BodyVisual::kTailSamples - 1);
         const double target_mean_anomaly =
-            normalize_angle(mean_anomaly_now - tail_mean_anomaly_span * fraction);
+            core::normalize_angle(mean_anomaly_now - tail_mean_anomaly_span * fraction);
         const core::Epoch sample_epoch =
-            epoch_before_mean_anomaly(mu, body.elements, epoch_now, target_mean_anomaly);
+            core::epoch_before_mean_anomaly(mu, body.elements, epoch_now, target_mean_anomaly);
         const core::Displacement position =
             simulation.ephemeris().state(body.name, sample_epoch).position;
         const LineVertex vertex =

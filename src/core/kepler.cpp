@@ -7,14 +7,6 @@ namespace solar::core {
 
 namespace {
 
-double normalize_angle(double radians) {
-    radians = std::fmod(radians, kTwoPi);
-    if (radians < 0.0) {
-        radians += kTwoPi;
-    }
-    return radians;
-}
-
 glm::dmat3 rotation_matrix(const KeplerianElements& elements) {
     const double cos_i = std::cos(elements.inclination_rad);
     const double sin_i = std::sin(elements.inclination_rad);
@@ -58,12 +50,47 @@ Velocity velocity_in_orbital_plane(GravitationalParameter mu, const KeplerianEle
 
 } // namespace
 
+double normalize_angle(double radians) {
+    radians = std::fmod(radians, kTwoPi);
+    if (radians < 0.0) {
+        radians += kTwoPi;
+    }
+    return radians;
+}
+
+double mean_motion(GravitationalParameter mu, const KeplerianElements& elements) {
+    const double semi_major_axis = elements.semi_major_axis_km;
+    if (mu <= 0.0 || semi_major_axis <= 0.0) {
+        return 0.0;
+    }
+    return std::sqrt(mu / cube(semi_major_axis));
+}
+
+double orbital_period_seconds(GravitationalParameter mu, const KeplerianElements& elements) {
+    const double motion = mean_motion(mu, elements);
+    if (motion <= 0.0) {
+        return 0.0;
+    }
+    return kTwoPi / motion;
+}
+
+Epoch epoch_before_mean_anomaly(GravitationalParameter mu, const KeplerianElements& elements,
+                                Epoch reference_epoch, double target_mean_anomaly) {
+    const double mean_anomaly_now = mean_anomaly_at_epoch(mu, elements, reference_epoch);
+    const double delta_mean_anomaly = normalize_angle(mean_anomaly_now - target_mean_anomaly);
+    const double motion = mean_motion(mu, elements);
+    if (motion <= 0.0) {
+        return reference_epoch;
+    }
+    const double delta_seconds = delta_mean_anomaly / motion;
+    return Epoch{reference_epoch.jd - delta_seconds / kSecondsPerDay};
+}
+
 double mean_anomaly_at_epoch(GravitationalParameter mu, const KeplerianElements& elements,
                              Epoch epoch) {
     const Duration elapsed{(epoch.jd - elements.epoch.jd) * kSecondsPerDay};
-
-    const double mean_motion = std::sqrt(mu / cube(elements.semi_major_axis_km));
-    return normalize_angle(elements.mean_anomaly_at_epoch_rad + mean_motion * elapsed.count());
+    const double motion = mean_motion(mu, elements);
+    return normalize_angle(elements.mean_anomaly_at_epoch_rad + motion * elapsed.count());
 }
 
 double solve_kepler(double mean_anomaly_rad, double eccentricity) {

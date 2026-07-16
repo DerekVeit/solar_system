@@ -109,3 +109,55 @@ TEST_CASE("state_from_kepler advances circular orbit to expected positions", "[k
     CHECK(state.position.km.x == Approx(expected_x).margin(2e4));
     CHECK(state.position.km.y == Approx(expected_y).margin(2e4));
 }
+
+TEST_CASE("normalize_angle wraps radians to 0..2pi", "[kepler]") {
+    using solar::core::kTwoPi;
+    using solar::core::normalize_angle;
+
+    CHECK(normalize_angle(0.0) == Approx(0.0));
+    CHECK(normalize_angle(kTwoPi) == Approx(0.0).margin(1e-12));
+    CHECK(normalize_angle(-kPi) == Approx(kPi));
+    CHECK(normalize_angle(3.0 * kTwoPi + kPi / 4.0) == Approx(kPi / 4.0));
+}
+
+TEST_CASE("mean_motion and orbital_period_seconds are consistent", "[kepler]") {
+    const solar::core::KeplerianElements elements{
+        .semi_major_axis_km = solar::core::kAuKm,
+        .eccentricity = 0.0,
+        .inclination_rad = 0.0,
+        .longitude_ascending_node_rad = 0.0,
+        .argument_periapsis_rad = 0.0,
+        .mean_anomaly_at_epoch_rad = 0.0,
+        .epoch = solar::core::Epoch{solar::core::kJ2000Jd},
+    };
+
+    const double motion = solar::core::mean_motion(kSunMu, elements);
+    const double period = solar::core::orbital_period_seconds(kSunMu, elements);
+
+    CHECK(motion ==
+          Approx(std::sqrt(kSunMu / (solar::core::kAuKm * solar::core::kAuKm * solar::core::kAuKm)))
+              .margin(1e-12));
+    CHECK(period == Approx(solar::core::kTwoPi / motion).margin(1e-6));
+    CHECK(period / solar::core::kSecondsPerDay == Approx(kYearDays).margin(0.5));
+}
+
+TEST_CASE("epoch_before_mean_anomaly recovers target mean anomaly", "[kepler]") {
+    const solar::core::KeplerianElements elements{
+        .semi_major_axis_km = solar::core::kAuKm,
+        .eccentricity = 0.1,
+        .inclination_rad = 0.0,
+        .longitude_ascending_node_rad = 0.0,
+        .argument_periapsis_rad = 0.0,
+        .mean_anomaly_at_epoch_rad = kPi / 4.0,
+        .epoch = solar::core::Epoch{solar::core::kJ2000Jd},
+    };
+
+    const solar::core::Epoch reference{solar::core::kJ2000Jd + 17.0};
+    const double target_mean_anomaly = kPi / 3.0;
+    const solar::core::Epoch earlier =
+        solar::core::epoch_before_mean_anomaly(kSunMu, elements, reference, target_mean_anomaly);
+
+    const double recovered = solar::core::mean_anomaly_at_epoch(kSunMu, elements, earlier);
+
+    CHECK(recovered == Approx(target_mean_anomaly).margin(1e-10));
+}
