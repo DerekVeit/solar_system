@@ -11,22 +11,12 @@ namespace solar::app {
 
 namespace {
 
-[[nodiscard]] float ndc_scale(const ViewFrame& view) {
-    return view.half_extent_au * static_cast<float>(core::kAuKm);
-}
-
-[[nodiscard]] float ndc_aspect(const ViewFrame& view) {
-    return view.aspect_ratio > 0.0f ? view.aspect_ratio : 1.0f;
-}
-
 [[nodiscard]] LineVertex to_line_vertex(const core::Displacement& position, Color color,
                                         const ViewFrame& view) {
-    const float scale = ndc_scale(view);
-    const float aspect = ndc_aspect(view);
-    const float center_x_km = view.center_x_au * static_cast<float>(core::kAuKm);
-    const float center_y_km = view.center_y_au * static_cast<float>(core::kAuKm);
-    return LineVertex{(static_cast<float>(position.km.x) - center_x_km) / scale / aspect,
-                      (static_cast<float>(position.km.y) - center_y_km) / scale, color};
+    float x_ndc = 0.0f;
+    float y_ndc = 0.0f;
+    view.camera.world_to_ndc(position, x_ndc, y_ndc);
+    return LineVertex{x_ndc, y_ndc, color};
 }
 
 [[nodiscard]] PointInstance to_point_instance(const core::Displacement& position, Color color,
@@ -103,11 +93,12 @@ BodyVisual::BodyVisual(std::string name, Color color, double radius_km, double t
     , draws_orbit_trails_(draws_orbit_trails) {}
 
 float BodyVisual::point_size_pixels(const ViewFrame& view) const {
-    if (radius_km_ <= 0.0 || view.half_extent_au <= 0.0f || view.framebuffer_height <= 0) {
+    const float half_extent_au = view.camera.half_extent_au();
+    if (radius_km_ <= 0.0 || half_extent_au <= 0.0f || view.framebuffer_height <= 0) {
         return kMinPointSize;
     }
 
-    const float scale_km = view.half_extent_au * static_cast<float>(core::kAuKm);
+    const float scale_km = half_extent_au * static_cast<float>(core::kAuKm);
     const float diameter_ndc = static_cast<float>((2.0 * radius_km_) / scale_km);
     const float size_factor = view.body_scaling ? display_size_factor_ : 1.0f;
     const float point_size =

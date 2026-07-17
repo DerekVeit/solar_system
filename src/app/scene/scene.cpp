@@ -48,12 +48,9 @@ void Scene::render(const sim::SolarSystem& simulation, float aspect_ratio, int f
     batch.line_trails.reserve(bodies_.size());
 
     const ViewFrame view{
-        .half_extent_au = camera_.half_extent_au(),
-        .aspect_ratio = camera_.aspect_ratio(),
+        .camera = camera_,
         .framebuffer_height = framebuffer_height,
         .body_scaling = body_scaling_,
-        .center_x_au = camera_.center_x_au(),
-        .center_y_au = camera_.center_y_au(),
     };
 
     for (const BodyVisual& body : bodies_) {
