@@ -49,6 +49,10 @@ void key_callback(GLFWwindow* glfw_window, int key, int /*scancode*/, int action
         fmt::print(stderr, "app_context->simulation is nullptr\n");
         return;
     }
+    if (scene == nullptr) {
+        fmt::print(stderr, "app_context->scene is nullptr\n");
+        return;
+    }
     sim::SimulationClock& clock = simulation->clock();
 
     switch (key) {
