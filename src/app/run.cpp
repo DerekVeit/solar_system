@@ -73,7 +73,7 @@ void AppObjects::run_loop() {
         if (!paused) {
             log_timer += delta_seconds;
             if (log_timer >= log_interval) {
-                log("{:.01f}° at {} FPS: {}", earth_angle * core::kRadToDeg,
+                log("{:.01f}° at {}, FPS: {}", earth_angle * core::kRadToDeg,
                     simulation.clock().epoch().to_string(), loop_counter);
                 log_timer -= log_interval;
                 loop_counter = 0;
