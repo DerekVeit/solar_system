@@ -29,7 +29,7 @@ class Scene {
 
     void body_scaling(bool enabled);
 
-    /// Pan the camera by fractions of the current view width and height.
+    /// Pan by fractions of the current view width and height (screen-aligned).
     void pan_view_fraction(float delta_x_fraction, float delta_y_fraction);
 
     void reset_view_center();
@@ -39,8 +39,12 @@ class Scene {
 
     std::optional<std::string> release_from_follow();
 
+    void add_yaw(float delta_rad);
+    void add_pitch(float delta_rad);
+    void reset_orientation();
+
   private:
-    void update_view_center_from_follow(const sim::SolarSystem& simulation);
+    void update_camera_from_follow(const sim::SolarSystem& simulation);
 
     std::unique_ptr<IRenderer> renderer_;
     std::vector<BodyVisual> bodies_;
@@ -49,6 +53,7 @@ class Scene {
     std::optional<std::string> followed_body_;
     float follow_offset_x_au_{0.0f};
     float follow_offset_y_au_{0.0f};
+    float follow_offset_z_au_{0.0f};
 };
 
 } // namespace solar::app
