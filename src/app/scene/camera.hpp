@@ -33,9 +33,6 @@ class Camera {
     void world_to_camera_relative(const core::Displacement& position, float& x_km, float& y_km,
                                   float& z_km) const;
 
-    /// Map a world position (km) to OpenGL NDC xy for the current framing.
-    void world_to_ndc(const core::Displacement& position, float& x_ndc, float& y_ndc) const;
-
     /// View matrix (identity while translation is applied as camera-relative positions).
     [[nodiscard]] glm::mat4 view_matrix() const;
 

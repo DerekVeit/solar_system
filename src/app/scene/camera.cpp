@@ -44,14 +44,6 @@ void Camera::world_to_camera_relative(const core::Displacement& position, float&
     z_km = static_cast<float>(position.km.z);
 }
 
-void Camera::world_to_ndc(const core::Displacement& position, float& x_ndc, float& y_ndc) const {
-    const float scale_km = half_extent_au_ * static_cast<float>(core::kAuKm);
-    const float center_x_km = center_x_au_ * static_cast<float>(core::kAuKm);
-    const float center_y_km = center_y_au_ * static_cast<float>(core::kAuKm);
-    x_ndc = (static_cast<float>(position.km.x) - center_x_km) / scale_km / aspect_ratio_;
-    y_ndc = (static_cast<float>(position.km.y) - center_y_km) / scale_km;
-}
-
 glm::mat4 Camera::view_matrix() const {
     // Translation is applied when building camera-relative vertex positions.
     return glm::mat4{1.0f};
