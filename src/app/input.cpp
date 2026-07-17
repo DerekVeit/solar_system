@@ -68,7 +68,7 @@ void key_callback(GLFWwindow* glfw_window, int key, int /*scancode*/, int action
             log("{}  real", clock.epoch().to_string());
             clock.set_time_scale(sim::TimeScale::real_time);
             break;
-        case GLFW_KEY_A:
+        case GLFW_KEY_T:
             log("{}  accelerated", clock.epoch().to_string());
             clock.set_time_scale(sim::TimeScale::accelerated);
             break;
@@ -90,11 +90,23 @@ void key_callback(GLFWwindow* glfw_window, int key, int /*scancode*/, int action
         case GLFW_KEY_PAGE_DOWN:
             scene->set_view_half_extent_au(scene->view_half_extent_au() * 1.25f);
             break;
-        case GLFW_KEY_S: {
+        case GLFW_KEY_B: {
             bool enabled = (mods == GLFW_MOD_SHIFT);
             scene->body_scaling(enabled);
             log("body scaling {}", enabled ? "on" : "off");
         } break;
+        case GLFW_KEY_W:
+            scene->add_pitch(Camera::kYawPitchStepRad);
+            break;
+        case GLFW_KEY_S:
+            scene->add_pitch(-Camera::kYawPitchStepRad);
+            break;
+        case GLFW_KEY_A:
+            scene->add_yaw(Camera::kYawPitchStepRad);
+            break;
+        case GLFW_KEY_D:
+            scene->add_yaw(-Camera::kYawPitchStepRad);
+            break;
         case GLFW_KEY_LEFT:
             scene->pan_view_fraction(-0.1f, 0.0f);
             break;
@@ -110,6 +122,10 @@ void key_callback(GLFWwindow* glfw_window, int key, int /*scancode*/, int action
         case GLFW_KEY_HOME:
             scene->reset_view_center();
             log("view centered on Sun");
+            break;
+        case GLFW_KEY_END:
+            scene->reset_orientation();
+            log("camera orientation reset");
             break;
         case GLFW_KEY_GRAVE_ACCENT: {
             std::optional<std::string> previously_followed_body = scene->release_from_follow();
