@@ -8,10 +8,19 @@ namespace solar::app {
 
 class GlRenderer final : public IRenderer {
   public:
+    GlRenderer() = default;
+    ~GlRenderer() override;
+
+    GlRenderer(const GlRenderer&) = delete;
+    GlRenderer& operator=(const GlRenderer&) = delete;
+    GlRenderer(GlRenderer&&) = delete;
+    GlRenderer& operator=(GlRenderer&&) = delete;
+
     bool init(const RenderCapacity& capacity) override;
     void draw(const DrawBatch& batch) override;
 
   private:
+    void destroy();
     void draw_points(std::span<const PointInstance> points);
     void draw_line_primitives(unsigned int mode, std::span<const LinePrimitive> primitives,
                               std::size_t max_vertices);

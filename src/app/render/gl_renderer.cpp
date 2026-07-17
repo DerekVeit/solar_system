@@ -70,10 +70,45 @@ void setup_line_vertex_layout() {
 
 } // namespace
 
+GlRenderer::~GlRenderer() { destroy(); }
+
+void GlRenderer::destroy() {
+    if (point_program_ != 0) {
+        glDeleteProgram(point_program_);
+        point_program_ = 0;
+    }
+    if (line_program_ != 0) {
+        glDeleteProgram(line_program_);
+        line_program_ = 0;
+    }
+    if (point_vbo_ != 0) {
+        glDeleteBuffers(1, &point_vbo_);
+        point_vbo_ = 0;
+    }
+    if (point_vao_ != 0) {
+        glDeleteVertexArrays(1, &point_vao_);
+        point_vao_ = 0;
+    }
+    if (line_vbo_ != 0) {
+        glDeleteBuffers(1, &line_vbo_);
+        line_vbo_ = 0;
+    }
+    if (line_vao_ != 0) {
+        glDeleteVertexArrays(1, &line_vao_);
+        line_vao_ = 0;
+    }
+    max_points_ = 0;
+    max_line_vertices_ = 0;
+    max_line_trail_vertices_ = 0;
+    max_line_loop_vertices_ = 0;
+}
+
 bool GlRenderer::init(const RenderCapacity& capacity) {
     if (capacity.max_points == 0) {
         return false;
     }
+
+    destroy();
 
     try {
         const unsigned int point_vertex_shader =
@@ -131,6 +166,7 @@ bool GlRenderer::init(const RenderCapacity& capacity) {
         max_line_loop_vertices_ = capacity.max_line_loop_vertices;
         return true;
     } catch (const std::exception&) {
+        destroy();
         return false;
     }
 }
