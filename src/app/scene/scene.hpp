@@ -5,6 +5,8 @@
 #include "sim/solar_system.hpp"
 
 #include <memory>
+#include <optional>
+#include <string>
 #include <vector>
 
 namespace solar::app {
@@ -30,7 +32,12 @@ class Scene {
 
     void reset_view_center();
 
+    void set_follow_target(const sim::SolarSystem& simulation,
+                           std::optional<std::string> body_name);
+
   private:
+    void update_view_center_from_follow(const sim::SolarSystem& simulation);
+
     std::unique_ptr<IRenderer> renderer_;
     std::vector<BodyVisual> bodies_;
     float view_half_extent_au_{2.0f};
@@ -38,6 +45,9 @@ class Scene {
     float view_center_x_au_{0.0f};
     float view_center_y_au_{0.0f};
     float last_aspect_ratio_{1.0f};
+    std::optional<std::string> followed_body_;
+    float follow_offset_x_au_{0.0f};
+    float follow_offset_y_au_{0.0f};
 };
 
 } // namespace solar::app

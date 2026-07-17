@@ -1,5 +1,9 @@
 #include "app/scene/scene.hpp"
 
+#include "app/logging.hpp"
+#include "core/constants.hpp"
+#include "core/ephemeris.hpp"
+
 namespace solar::app {
 
 Scene::Scene(std::unique_ptr<IRenderer> renderer)
@@ -34,6 +38,8 @@ void Scene::render(const sim::SolarSystem& simulation, float aspect_ratio, int f
     }
 
     last_aspect_ratio_ = aspect_ratio > 0.0f ? aspect_ratio : 1.0f;
+
+    update_view_center_from_follow(simulation);
 
     DrawBatch batch;
     batch.points.reserve(bodies_.size() + bodies_.size() * BodyVisual::kTailSamples);
@@ -72,6 +78,37 @@ void Scene::pan_view_fraction(float delta_x_fraction, float delta_y_fraction) {
 void Scene::reset_view_center() {
     view_center_x_au_ = 0.0f;
     view_center_y_au_ = 0.0f;
+}
+
+void Scene::set_follow_target(const sim::SolarSystem& simulation,
+                              std::optional<std::string> body_name) {
+    if (!body_name) {
+        followed_body_ = std::nullopt;
+        return;
+    }
+
+    if (core::find_body(simulation.ephemeris(), *body_name) == nullptr) {
+        log("follow target not in catalog: {}", *body_name);
+        return;
+    }
+
+    followed_body_ = std::move(body_name);
+}
+
+void Scene::update_view_center_from_follow(const sim::SolarSystem& simulation) {
+    if (!followed_body_) {
+        return;
+    }
+
+    if (core::find_body(simulation.ephemeris(), *followed_body_) == nullptr) {
+        log("follow target no longer in catalog; clearing follow: {}", *followed_body_);
+        followed_body_ = std::nullopt;
+        return;
+    }
+
+    const core::Displacement position = simulation.state(*followed_body_).position;
+    view_center_x_au_ = static_cast<float>(position.km.x / core::kAuKm) + follow_offset_x_au_;
+    view_center_y_au_ = static_cast<float>(position.km.y / core::kAuKm) + follow_offset_y_au_;
 }
 
 } // namespace solar::app
