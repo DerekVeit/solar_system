@@ -61,9 +61,11 @@ void Scene::render(const sim::SolarSystem& simulation, float aspect_ratio, int f
     renderer_->draw(batch);
 }
 
-float Scene::scale() { return view_half_extent_au_ / 2.0f; }
-
-void Scene::set_scale(float factor) { view_half_extent_au_ = 2.0f * factor; }
+void Scene::set_view_half_extent_au(float half_extent_au) {
+    if (half_extent_au > 0.0f) {
+        view_half_extent_au_ = half_extent_au;
+    }
+}
 
 void Scene::body_scaling(bool enabled) { body_scaling_ = enabled; }
 

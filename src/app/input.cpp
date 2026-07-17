@@ -81,10 +81,10 @@ void key_callback(GLFWwindow* glfw_window, int key, int /*scancode*/, int action
             change_acceleration(clock, 2.0);
             break;
         case GLFW_KEY_PAGE_UP:
-            scene->set_scale(scene->scale() * 0.80f);
+            scene->set_view_half_extent_au(scene->view_half_extent_au() * 0.80f);
             break;
         case GLFW_KEY_PAGE_DOWN:
-            scene->set_scale(scene->scale() * 1.25f);
+            scene->set_view_half_extent_au(scene->view_half_extent_au() * 1.25f);
             break;
         case GLFW_KEY_S: {
             bool enabled = (mods == GLFW_MOD_SHIFT);

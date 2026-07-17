@@ -21,9 +21,10 @@ class Scene {
 
     void render(const sim::SolarSystem& simulation, float aspect_ratio, int framebuffer_height);
 
-    float scale();
+    /// Half the visible view height in AU (center to top edge).
+    [[nodiscard]] float view_half_extent_au() const { return view_half_extent_au_; }
 
-    void set_scale(float factor);
+    void set_view_half_extent_au(float half_extent_au);
 
     void body_scaling(bool enabled);
 
