@@ -98,6 +98,7 @@ void AppObjects::run_loop() {
 }
 
 void AppObjects::log_shutdown_report() const {
+    log("Mercury position at shutdown: {}", simulation.state("Mercury").to_string());
     log("Earth position at shutdown: {}", simulation.state("Earth").to_string());
     log("Venus position at shutdown: {}", simulation.state("Venus").to_string());
     log("Mars position at shutdown: {}", simulation.state("Mars").to_string());
