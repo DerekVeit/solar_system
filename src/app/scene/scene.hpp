@@ -2,6 +2,7 @@
 
 #include "app/render/renderer.hpp"
 #include "app/scene/body_visual.hpp"
+#include "app/scene/camera.hpp"
 #include "sim/solar_system.hpp"
 
 #include <memory>
@@ -22,7 +23,7 @@ class Scene {
     void render(const sim::SolarSystem& simulation, float aspect_ratio, int framebuffer_height);
 
     /// Half the visible view height in AU (center to top edge).
-    [[nodiscard]] float view_half_extent_au() const { return view_half_extent_au_; }
+    [[nodiscard]] float view_half_extent_au() const { return camera_.half_extent_au(); }
 
     void set_view_half_extent_au(float half_extent_au);
 
@@ -43,11 +44,8 @@ class Scene {
 
     std::unique_ptr<IRenderer> renderer_;
     std::vector<BodyVisual> bodies_;
-    float view_half_extent_au_{2.0f};
+    Camera camera_;
     bool body_scaling_{true};
-    float view_center_x_au_{0.0f};
-    float view_center_y_au_{0.0f};
-    float last_aspect_ratio_{1.0f};
     std::optional<std::string> followed_body_;
     float follow_offset_x_au_{0.0f};
     float follow_offset_y_au_{0.0f};

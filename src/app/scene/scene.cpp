@@ -4,6 +4,8 @@
 #include "core/constants.hpp"
 #include "core/ephemeris.hpp"
 
+#include <utility>
+
 namespace solar::app {
 
 Scene::Scene(std::unique_ptr<IRenderer> renderer)
@@ -37,8 +39,7 @@ void Scene::render(const sim::SolarSystem& simulation, float aspect_ratio, int f
         return;
     }
 
-    last_aspect_ratio_ = aspect_ratio > 0.0f ? aspect_ratio : 1.0f;
-
+    camera_.set_aspect_ratio(aspect_ratio);
     update_view_center_from_follow(simulation);
 
     DrawBatch batch;
@@ -47,12 +48,12 @@ void Scene::render(const sim::SolarSystem& simulation, float aspect_ratio, int f
     batch.line_trails.reserve(bodies_.size());
 
     const ViewFrame view{
-        .half_extent_au = view_half_extent_au_,
-        .aspect_ratio = aspect_ratio,
+        .half_extent_au = camera_.half_extent_au(),
+        .aspect_ratio = camera_.aspect_ratio(),
         .framebuffer_height = framebuffer_height,
         .body_scaling = body_scaling_,
-        .center_x_au = view_center_x_au_,
-        .center_y_au = view_center_y_au_,
+        .center_x_au = camera_.center_x_au(),
+        .center_y_au = camera_.center_y_au(),
     };
 
     for (const BodyVisual& body : bodies_) {
@@ -62,19 +63,14 @@ void Scene::render(const sim::SolarSystem& simulation, float aspect_ratio, int f
 }
 
 void Scene::set_view_half_extent_au(float half_extent_au) {
-    if (half_extent_au > 0.0f) {
-        view_half_extent_au_ = half_extent_au;
-    }
+    camera_.set_half_extent_au(half_extent_au);
 }
 
 void Scene::body_scaling(bool enabled) { body_scaling_ = enabled; }
 
 void Scene::pan_view_fraction(float delta_x_fraction, float delta_y_fraction) {
-    const float aspect = last_aspect_ratio_;
-    const float view_width_au = 2.0f * view_half_extent_au_ * aspect;
-    const float view_height_au = 2.0f * view_half_extent_au_;
-    const float delta_x_au = delta_x_fraction * view_width_au;
-    const float delta_y_au = delta_y_fraction * view_height_au;
+    const float delta_x_au = delta_x_fraction * camera_.view_width_au();
+    const float delta_y_au = delta_y_fraction * camera_.view_height_au();
 
     if (followed_body_) {
         follow_offset_x_au_ += delta_x_au;
@@ -82,16 +78,14 @@ void Scene::pan_view_fraction(float delta_x_fraction, float delta_y_fraction) {
         return;
     }
 
-    view_center_x_au_ += delta_x_au;
-    view_center_y_au_ += delta_y_au;
+    camera_.pan_au(delta_x_au, delta_y_au);
 }
 
 void Scene::reset_view_center() {
     followed_body_ = std::nullopt;
     follow_offset_x_au_ = 0.0f;
     follow_offset_y_au_ = 0.0f;
-    view_center_x_au_ = 0.0f;
-    view_center_y_au_ = 0.0f;
+    camera_.reset_center();
 }
 
 void Scene::set_follow_target(const sim::SolarSystem& simulation,
@@ -137,8 +131,8 @@ void Scene::update_view_center_from_follow(const sim::SolarSystem& simulation) {
     }
 
     const core::Displacement position = simulation.state(*followed_body_).position;
-    view_center_x_au_ = static_cast<float>(position.km.x / core::kAuKm) + follow_offset_x_au_;
-    view_center_y_au_ = static_cast<float>(position.km.y / core::kAuKm) + follow_offset_y_au_;
+    camera_.set_center_au(static_cast<float>(position.km.x / core::kAuKm) + follow_offset_x_au_,
+                          static_cast<float>(position.km.y / core::kAuKm) + follow_offset_y_au_);
 }
 
 } // namespace solar::app
