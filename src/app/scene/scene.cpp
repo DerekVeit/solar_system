@@ -113,6 +113,17 @@ void Scene::set_follow_target(const sim::SolarSystem& simulation,
     follow_offset_y_au_ = 0.0f;
 }
 
+std::optional<std::string> Scene::release_from_follow() {
+    std::optional<std::string> previously_followed_body = std::nullopt;
+    if (followed_body_.has_value()) {
+        previously_followed_body = std::exchange(followed_body_, std::nullopt);
+    } else {
+        log("not following any target");
+    }
+
+    return previously_followed_body;
+}
+
 void Scene::update_view_center_from_follow(const sim::SolarSystem& simulation) {
     if (!followed_body_) {
         return;

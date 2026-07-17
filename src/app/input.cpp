@@ -111,6 +111,13 @@ void key_callback(GLFWwindow* glfw_window, int key, int /*scancode*/, int action
             scene->reset_view_center();
             log("view centered on Sun");
             break;
+        case GLFW_KEY_GRAVE_ACCENT: {
+            std::optional<std::string> previously_followed_body = scene->release_from_follow();
+            if (previously_followed_body.has_value()) {
+                log("released from following {}", *previously_followed_body);
+            }
+            break;
+        }
         default:
             if (key >= GLFW_KEY_0 && key <= GLFW_KEY_9) {
                 const std::size_t index = static_cast<std::size_t>(key - GLFW_KEY_0);

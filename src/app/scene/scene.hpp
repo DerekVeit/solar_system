@@ -36,6 +36,8 @@ class Scene {
     void set_follow_target(const sim::SolarSystem& simulation,
                            std::optional<std::string> body_name);
 
+    std::optional<std::string> release_from_follow();
+
   private:
     void update_view_center_from_follow(const sim::SolarSystem& simulation);
 
