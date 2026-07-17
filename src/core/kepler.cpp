@@ -26,10 +26,9 @@ glm::dmat3 rotation_matrix(const KeplerianElements& elements) {
         cos_w * sin_i,
     };
     const glm::dvec3 w{
-        // The perifocal z is always 0.
-        0.0, // sin_O * sin_i,
-        0.0, // -cos_O * sin_i,
-        1.0, // cos_i,
+        sin_O * sin_i,
+        -cos_O * sin_i,
+        cos_i,
     };
 
     return glm::dmat3{p, q, w};
