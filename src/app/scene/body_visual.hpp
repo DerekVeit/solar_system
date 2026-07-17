@@ -17,8 +17,8 @@ class BodyVisual {
     static constexpr float kTailPointSize = 0.0f;
     static constexpr float kMinPointSize = 2.0f;
 
-    static constexpr Color kOrbitTrailColor{0.45f, 0.45f, 0.45f, 0.15f};
-    static constexpr Color kTailColor{0.55f, 0.65f, 0.85f, 0.25f};
+    static constexpr Color kOrbitTrailColor{0.45f, 0.45f, 0.45f, 0.35f};
+    static constexpr Color kTailColor{0.55f, 0.65f, 0.85f, 0.55f};
 
     BodyVisual(std::string name, Color color, double radius_km, double tail_duration_days,
                float display_size_factor, bool draws_orbit_trails);
