@@ -66,6 +66,7 @@ at the current wall-clock epoch.
 | **Page Up** / **Page Down** | Zoom in / out |
 | **Arrow keys** | Pan camera (or offset while following) |
 | **Home** | Clear follow, center view on the Sun |
+| **`** | Clear follow, but keep current view |
 | **0**–**9** | Follow Sun through Pluto (catalog order) |
 | **s** / **S** | Body size scaling off / on |
 
