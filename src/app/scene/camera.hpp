@@ -1,0 +1,40 @@
+#pragma once
+
+#include "core/types.hpp"
+
+namespace solar::app {
+
+/// Scene-owned camera: world framing for the ecliptic view.
+///
+/// For 1-A, projection to NDC is computed on the CPU via world_to_ndc.
+/// Center and half-extent are in AU; body positions are in km.
+class Camera {
+  public:
+    [[nodiscard]] float center_x_au() const { return center_x_au_; }
+    [[nodiscard]] float center_y_au() const { return center_y_au_; }
+    void set_center_au(float x_au, float y_au);
+    void reset_center();
+
+    /// Half the visible view height in AU (center to top edge).
+    [[nodiscard]] float half_extent_au() const { return half_extent_au_; }
+    void set_half_extent_au(float half_extent_au);
+
+    [[nodiscard]] float aspect_ratio() const { return aspect_ratio_; }
+    void set_aspect_ratio(float aspect_ratio);
+
+    [[nodiscard]] float view_width_au() const;
+    [[nodiscard]] float view_height_au() const;
+
+    void pan_au(float delta_x_au, float delta_y_au);
+
+    /// Map a world position (km) to OpenGL NDC xy for the current framing.
+    void world_to_ndc(const core::Displacement& position, float& x_ndc, float& y_ndc) const;
+
+  private:
+    float center_x_au_{0.0f};
+    float center_y_au_{0.0f};
+    float half_extent_au_{2.0f};
+    float aspect_ratio_{1.0f};
+};
+
+} // namespace solar::app
