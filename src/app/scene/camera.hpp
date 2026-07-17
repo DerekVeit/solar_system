@@ -2,12 +2,14 @@
 
 #include "core/types.hpp"
 
+#include <glm/mat4x4.hpp>
+
 namespace solar::app {
 
 /// Scene-owned camera: world framing for the ecliptic view.
 ///
-/// For 1-A, projection to NDC is computed on the CPU via world_to_ndc.
-/// Center and half-extent are in AU; body positions are in km.
+/// Geometry is emitted in camera-relative km; view and projection matrices
+/// map that space to clip coordinates (orthographic for now).
 class Camera {
   public:
     [[nodiscard]] float center_x_au() const { return center_x_au_; }
@@ -27,8 +29,18 @@ class Camera {
 
     void pan_au(float delta_x_au, float delta_y_au);
 
+    /// World position (km) relative to the camera origin, as float km.
+    void world_to_camera_relative(const core::Displacement& position, float& x_km, float& y_km,
+                                  float& z_km) const;
+
     /// Map a world position (km) to OpenGL NDC xy for the current framing.
     void world_to_ndc(const core::Displacement& position, float& x_ndc, float& y_ndc) const;
+
+    /// View matrix (identity while translation is applied as camera-relative positions).
+    [[nodiscard]] glm::mat4 view_matrix() const;
+
+    /// Orthographic projection in camera-relative km (matches prior NDC framing).
+    [[nodiscard]] glm::mat4 projection_matrix() const;
 
   private:
     float center_x_au_{0.0f};
