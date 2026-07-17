@@ -1,7 +1,22 @@
 # Solar System
 
-C++20 simulation of solar system geometry and motion. Phase 0 provides a
-fullscreen GLFW/OpenGL window, Keplerian ephemeris core, and unit tests.
+C++20 interactive simulation of solar system geometry and motion. Bodies move
+on Keplerian orbits in the ecliptic plane and are drawn in a GLFW/OpenGL window
+with orbit trails, camera pan/zoom, and optional body follow.
+
+## Features
+
+- **Keplerian ephemeris** — osculating elements for the Sun, eight planets, and
+  Pluto (J2000-era data in `assets/data/bodies.json`)
+- **Simulation clock** — paused, real-time, or accelerated time scales
+- **Ecliptic view** — point sprites for bodies, grey orbit loops, fading motion
+  tails
+- **Camera** — pan, zoom, Home reset, and follow a body (`0`–`9`)
+- **Presentation config** — colors, tail length, size scaling, and visibility in
+  `assets/data/body_visuals.json`
+
+For a map of the codebase aimed at new contributors, see
+[docs/DEVELOPER.md](docs/DEVELOPER.md).
 
 ## Requirements
 
@@ -28,11 +43,46 @@ cmake --build build
 ctest --test-dir build --output-on-failure
 ```
 
+The build copies `assets/` next to the `solar_system` executable.
+
 ## Run
 
 ```bash
 ./build/src/solar_system
 ```
 
-Press **Escape** to quit. The simulation clock advances one day per real-time
-second while the window is open.
+The app starts in accelerated time (default 16 simulation days per real second)
+at the current wall-clock epoch.
+
+## Controls
+
+| Key | Action |
+|-----|--------|
+| **Esc** | Quit |
+| **Space** | Pause time |
+| **R** | Real-time scale |
+| **A** | Accelerated time scale |
+| **-** / **+** (or numpad) | Halve / double acceleration |
+| **Page Up** / **Page Down** | Zoom in / out |
+| **Arrow keys** | Pan camera (or offset while following) |
+| **Home** | Clear follow, center view on the Sun |
+| **0**–**9** | Follow Sun through Pluto (catalog order) |
+| **s** / **S** | Body size scaling off / on |
+
+## Data
+
+| File | Role |
+|------|------|
+| `assets/data/bodies.json` | Physical/orbital definitions (mu, radius, Kepler elements) |
+| `assets/data/body_visuals.json` | Colors, tails, display size factors, visibility |
+
+## Layout
+
+| Path | Role |
+|------|------|
+| `src/core/` | Ephemeris types, Kepler math, JSON body loader |
+| `src/sim/` | Simulation clock and facade over the ephemeris |
+| `src/app/` | Window, input, scene, OpenGL renderer |
+| `assets/` | Runtime data (copied beside the binary) |
+| `tests/` | Catch2 unit tests |
+| `docs/` | Developer-oriented documentation |
