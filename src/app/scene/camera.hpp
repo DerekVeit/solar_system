@@ -7,11 +7,10 @@
 
 namespace solar::app {
 
-/// Scene-owned camera: position, orbit angles, and orthographic framing.
+/// Scene-owned camera: orbit look-at + yaw/pitch/radius, orthographic framing.
 ///
-/// Free mode: eye (x,y,z) is authoritative; look along yaw/pitch.
-/// Follow mode: target is authoritative; eye = target - radius * forward(yaw, pitch).
-/// Geometry is emitted in camera-relative km; V is the rotation from lookAt.
+/// Free and follow both use a look-at target; eye = target - radius * forward(yaw, pitch).
+/// Follow updates the target from a body; free pans the target. Geometry is eye-relative km.
 class Camera {
   public:
     static constexpr float kDefaultRadiusAu = 5.0f;
@@ -35,28 +34,26 @@ class Camera {
     void add_pitch(float delta_rad);
     void reset_orientation();
 
-    /// Free-camera eye in AU (ignored while following until release).
-    void set_eye_au(float x_au, float y_au, float z_au);
-    void pan_eye_au(float delta_x_au, float delta_y_au, float delta_z_au);
+    /// Free look-at target in AU (used when not following).
+    void pan_free_target_au(float delta_x_au, float delta_y_au, float delta_z_au);
 
     /// Follow look-at point in AU (body + offset). Call each frame while following.
     void set_follow_target_au(float x_au, float y_au, float z_au);
     void clear_follow();
     [[nodiscard]] bool following() const { return following_; }
 
-    /// Copy resolved eye into free-eye state (e.g. when releasing follow).
-    void capture_eye_from_resolved();
+    /// Keep framing after releasing follow: free target becomes the current look-at.
+    void capture_free_target_from_resolved();
 
     void reset_to_default_view();
 
-    /// Resolve eye/target from mode, then map world km → camera-relative float km.
     void world_to_camera_relative(const core::Displacement& position, float& x_km, float& y_km,
                                   float& z_km) const;
 
     [[nodiscard]] glm::mat4 view_matrix() const;
     [[nodiscard]] glm::mat4 projection_matrix() const;
 
-    /// Unit axes of the current view (after resolve): right, up, forward (toward target).
+    /// Unit view axes: right, up, forward (toward target).
     void view_basis(glm::vec3& right_au, glm::vec3& up_au, glm::vec3& forward_au) const;
 
   private:
@@ -65,13 +62,20 @@ class Camera {
         glm::vec3 target_au{0.0f, 0.0f, 0.0f};
     };
 
+    struct Basis {
+        glm::vec3 right{1.0f, 0.0f, 0.0f};
+        glm::vec3 up{0.0f, 1.0f, 0.0f};
+        glm::vec3 forward{0.0f, 0.0f, -1.0f};
+    };
+
     [[nodiscard]] glm::vec3 forward_from_angles() const;
+    [[nodiscard]] Basis basis_from_angles() const;
     [[nodiscard]] Resolved resolve() const;
     void clamp_pitch();
 
-    float eye_x_au_{0.0f};
-    float eye_y_au_{0.0f};
-    float eye_z_au_{kDefaultRadiusAu};
+    float free_target_x_au_{0.0f};
+    float free_target_y_au_{0.0f};
+    float free_target_z_au_{0.0f};
 
     float follow_target_x_au_{0.0f};
     float follow_target_y_au_{0.0f};

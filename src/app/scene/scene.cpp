@@ -70,25 +70,22 @@ void Scene::pan_view_fraction(float delta_x_fraction, float delta_y_fraction) {
     const float delta_x_au = delta_x_fraction * camera_.view_width_au();
     const float delta_y_au = delta_y_fraction * camera_.view_height_au();
 
-    if (followed_body_) {
-        // Offset in the current view plane so pan stays screen-aligned while tilted.
-        glm::vec3 right{};
-        glm::vec3 up{};
-        glm::vec3 forward{};
-        camera_.view_basis(right, up, forward);
-        follow_offset_x_au_ += right.x * delta_x_au + up.x * delta_y_au;
-        follow_offset_y_au_ += right.y * delta_x_au + up.y * delta_y_au;
-        follow_offset_z_au_ += right.z * delta_x_au + up.z * delta_y_au;
-        return;
-    }
-
     glm::vec3 right{};
     glm::vec3 up{};
     glm::vec3 forward{};
     camera_.view_basis(right, up, forward);
-    camera_.pan_eye_au(right.x * delta_x_au + up.x * delta_y_au,
-                       right.y * delta_x_au + up.y * delta_y_au,
-                       right.z * delta_x_au + up.z * delta_y_au);
+    const float dx = right.x * delta_x_au + up.x * delta_y_au;
+    const float dy = right.y * delta_x_au + up.y * delta_y_au;
+    const float dz = right.z * delta_x_au + up.z * delta_y_au;
+
+    if (followed_body_) {
+        follow_offset_x_au_ += dx;
+        follow_offset_y_au_ += dy;
+        follow_offset_z_au_ += dz;
+        return;
+    }
+
+    camera_.pan_free_target_au(dx, dy, dz);
 }
 
 void Scene::reset_view_center() {
@@ -102,7 +99,7 @@ void Scene::reset_view_center() {
 void Scene::set_follow_target(const sim::SolarSystem& simulation,
                               std::optional<std::string> body_name) {
     if (!body_name) {
-        camera_.capture_eye_from_resolved();
+        camera_.capture_free_target_from_resolved();
         camera_.clear_follow();
         followed_body_ = std::nullopt;
         follow_offset_x_au_ = 0.0f;
@@ -127,7 +124,7 @@ std::optional<std::string> Scene::release_from_follow() {
     if (!previously_followed_body) {
         log("not following any target");
     } else {
-        camera_.capture_eye_from_resolved();
+        camera_.capture_free_target_from_resolved();
         camera_.clear_follow();
         follow_offset_x_au_ = 0.0f;
         follow_offset_y_au_ = 0.0f;
@@ -152,7 +149,7 @@ void Scene::update_camera_from_follow(const sim::SolarSystem& simulation) {
     if (core::find_body(simulation.ephemeris(), *followed_body_) == nullptr) {
         log("follow target no longer in catalog; clearing follow: {}", *followed_body_);
         followed_body_ = std::nullopt;
-        camera_.capture_eye_from_resolved();
+        camera_.capture_free_target_from_resolved();
         camera_.clear_follow();
         return;
     }

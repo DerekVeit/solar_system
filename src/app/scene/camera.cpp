@@ -9,19 +9,6 @@
 
 namespace solar::app {
 
-namespace {
-
-[[nodiscard]] glm::vec3 stable_up(const glm::vec3& eye_au, const glm::vec3& target_au) {
-    const glm::vec3 forward = glm::normalize(target_au - eye_au);
-    const glm::vec3 world_up{0.0f, 0.0f, 1.0f};
-    if (std::abs(glm::dot(forward, world_up)) > 0.999f) {
-        return glm::vec3{0.0f, 1.0f, 0.0f};
-    }
-    return world_up;
-}
-
-} // namespace
-
 void Camera::set_half_extent_au(float half_extent_au) {
     if (half_extent_au > 0.0f) {
         half_extent_au_ = half_extent_au;
@@ -58,16 +45,10 @@ void Camera::reset_orientation() {
     radius_au_ = kDefaultRadiusAu;
 }
 
-void Camera::set_eye_au(float x_au, float y_au, float z_au) {
-    eye_x_au_ = x_au;
-    eye_y_au_ = y_au;
-    eye_z_au_ = z_au;
-}
-
-void Camera::pan_eye_au(float delta_x_au, float delta_y_au, float delta_z_au) {
-    eye_x_au_ += delta_x_au;
-    eye_y_au_ += delta_y_au;
-    eye_z_au_ += delta_z_au;
+void Camera::pan_free_target_au(float delta_x_au, float delta_y_au, float delta_z_au) {
+    free_target_x_au_ += delta_x_au;
+    free_target_y_au_ += delta_y_au;
+    free_target_z_au_ += delta_z_au;
 }
 
 void Camera::set_follow_target_au(float x_au, float y_au, float z_au) {
@@ -79,19 +60,19 @@ void Camera::set_follow_target_au(float x_au, float y_au, float z_au) {
 
 void Camera::clear_follow() { following_ = false; }
 
-void Camera::capture_eye_from_resolved() {
+void Camera::capture_free_target_from_resolved() {
     const Resolved resolved = resolve();
-    eye_x_au_ = resolved.eye_au.x;
-    eye_y_au_ = resolved.eye_au.y;
-    eye_z_au_ = resolved.eye_au.z;
+    free_target_x_au_ = resolved.target_au.x;
+    free_target_y_au_ = resolved.target_au.y;
+    free_target_z_au_ = resolved.target_au.z;
 }
 
 void Camera::reset_to_default_view() {
     following_ = false;
     reset_orientation();
-    eye_x_au_ = 0.0f;
-    eye_y_au_ = 0.0f;
-    eye_z_au_ = radius_au_;
+    free_target_x_au_ = 0.0f;
+    free_target_y_au_ = 0.0f;
+    free_target_z_au_ = 0.0f;
     follow_target_x_au_ = 0.0f;
     follow_target_y_au_ = 0.0f;
     follow_target_z_au_ = 0.0f;
@@ -103,19 +84,35 @@ glm::vec3 Camera::forward_from_angles() const {
                      std::sin(pitch_rad_)};
 }
 
+Camera::Basis Camera::basis_from_angles() const {
+    // Continuous basis: yaw defines the horizontal "right" so top-down has no up-vector flip.
+    const glm::vec3 forward = forward_from_angles();
+    glm::vec3 right{std::cos(yaw_rad_), std::sin(yaw_rad_), 0.0f};
+
+    glm::vec3 up = glm::cross(right, forward);
+    const float up_length = glm::length(up);
+    if (up_length < 1e-6f) {
+        // Looking nearly along ±world Y in the ecliptic plane; fall back to world Z as up.
+        up = glm::vec3{0.0f, 0.0f, 1.0f};
+        right = glm::normalize(glm::cross(forward, up));
+        up = glm::normalize(glm::cross(right, forward));
+    } else {
+        up /= up_length;
+        right = glm::normalize(glm::cross(forward, up));
+    }
+
+    return Basis{right, up, forward};
+}
+
 Camera::Resolved Camera::resolve() const {
     Resolved resolved;
-    const glm::vec3 forward = forward_from_angles();
-
     if (following_) {
         resolved.target_au =
             glm::vec3{follow_target_x_au_, follow_target_y_au_, follow_target_z_au_};
-        resolved.eye_au = resolved.target_au - forward * radius_au_;
     } else {
-        resolved.eye_au = glm::vec3{eye_x_au_, eye_y_au_, eye_z_au_};
-        resolved.target_au = resolved.eye_au + forward;
+        resolved.target_au = glm::vec3{free_target_x_au_, free_target_y_au_, free_target_z_au_};
     }
-
+    resolved.eye_au = resolved.target_au - forward_from_angles() * radius_au_;
     return resolved;
 }
 
@@ -131,20 +128,16 @@ void Camera::world_to_camera_relative(const core::Displacement& position, float&
 }
 
 void Camera::view_basis(glm::vec3& right_au, glm::vec3& up_au, glm::vec3& forward_au) const {
-    const Resolved resolved = resolve();
-    forward_au = glm::normalize(resolved.target_au - resolved.eye_au);
-    const glm::vec3 up_hint = stable_up(resolved.eye_au, resolved.target_au);
-    right_au = glm::normalize(glm::cross(forward_au, up_hint));
-    up_au = glm::normalize(glm::cross(right_au, forward_au));
+    const Basis basis = basis_from_angles();
+    right_au = basis.right;
+    up_au = basis.up;
+    forward_au = basis.forward;
 }
 
 glm::mat4 Camera::view_matrix() const {
-    const Resolved resolved = resolve();
-    const glm::vec3 eye_km = resolved.eye_au * static_cast<float>(core::kAuKm);
-    const glm::vec3 target_km = resolved.target_au * static_cast<float>(core::kAuKm);
-    const glm::vec3 up = stable_up(resolved.eye_au, resolved.target_au);
-    // Vertices are already eye-relative; use lookAt from the origin.
-    return glm::lookAt(glm::vec3{0.0f}, target_km - eye_km, up);
+    const Basis basis = basis_from_angles();
+    // Eye-relative positions: rotation only (eye at the origin).
+    return glm::lookAt(glm::vec3{0.0f}, basis.forward, basis.up);
 }
 
 glm::mat4 Camera::projection_matrix() const {
