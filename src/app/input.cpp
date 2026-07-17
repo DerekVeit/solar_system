@@ -96,16 +96,16 @@ void key_callback(GLFWwindow* glfw_window, int key, int /*scancode*/, int action
             log("body scaling {}", enabled ? "on" : "off");
         } break;
         case GLFW_KEY_W:
-            scene->add_pitch(Camera::kYawPitchStepRad);
-            break;
-        case GLFW_KEY_S:
             scene->add_pitch(-Camera::kYawPitchStepRad);
             break;
+        case GLFW_KEY_S:
+            scene->add_pitch(Camera::kYawPitchStepRad);
+            break;
         case GLFW_KEY_A:
-            scene->add_yaw(Camera::kYawPitchStepRad);
+            scene->add_yaw(-Camera::kYawPitchStepRad);
             break;
         case GLFW_KEY_D:
-            scene->add_yaw(-Camera::kYawPitchStepRad);
+            scene->add_yaw(Camera::kYawPitchStepRad);
             break;
         case GLFW_KEY_LEFT:
             scene->pan_view_fraction(-0.1f, 0.0f);
