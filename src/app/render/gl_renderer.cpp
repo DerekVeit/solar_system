@@ -4,6 +4,7 @@
 #include "app/render/types.hpp"
 
 #include <glad/gl.h>
+#include <glm/gtc/type_ptr.hpp>
 
 #include <cstddef>
 #include <string_view>
@@ -13,14 +14,17 @@ namespace solar::app {
 namespace {
 
 constexpr std::string_view kPointVertexShader = R"(#version 460 core
-layout(location = 0) in vec2 a_pos;
+layout(location = 0) in vec3 a_pos;
 layout(location = 1) in vec4 a_color;
 layout(location = 2) in float a_point_size;
+
+uniform mat4 u_view;
+uniform mat4 u_projection;
 
 out vec4 v_color;
 
 void main() {
-    gl_Position = vec4(a_pos, 0.0, 1.0);
+    gl_Position = u_projection * u_view * vec4(a_pos, 1.0);
     gl_PointSize = a_point_size;
     v_color = a_color;
 }
@@ -39,13 +43,16 @@ void main() {
 )";
 
 constexpr std::string_view kLineVertexShader = R"(#version 460 core
-layout(location = 0) in vec2 a_pos;
+layout(location = 0) in vec3 a_pos;
 layout(location = 1) in vec4 a_color;
+
+uniform mat4 u_view;
+uniform mat4 u_projection;
 
 out vec4 v_color;
 
 void main() {
-    gl_Position = vec4(a_pos, 0.0, 1.0);
+    gl_Position = u_projection * u_view * vec4(a_pos, 1.0);
     v_color = a_color;
 }
 )";
@@ -60,8 +67,8 @@ void main() {
 
 void setup_line_vertex_layout() {
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(LineVertex),
-                          reinterpret_cast<void*>(offsetof(LineVertex, x_ndc)));
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(LineVertex),
+                          reinterpret_cast<void*>(offsetof(LineVertex, x_km)));
 
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(LineVertex),
@@ -97,6 +104,10 @@ void GlRenderer::destroy() {
         glDeleteVertexArrays(1, &line_vao_);
         line_vao_ = 0;
     }
+    point_view_loc_ = -1;
+    point_projection_loc_ = -1;
+    line_view_loc_ = -1;
+    line_projection_loc_ = -1;
     max_points_ = 0;
     max_line_vertices_ = 0;
     max_line_trail_vertices_ = 0;
@@ -126,6 +137,11 @@ bool GlRenderer::init(const RenderCapacity& capacity) {
         glDeleteShader(line_vertex_shader);
         glDeleteShader(line_fragment_shader);
 
+        point_view_loc_ = glGetUniformLocation(point_program_, "u_view");
+        point_projection_loc_ = glGetUniformLocation(point_program_, "u_projection");
+        line_view_loc_ = glGetUniformLocation(line_program_, "u_view");
+        line_projection_loc_ = glGetUniformLocation(line_program_, "u_projection");
+
         glGenVertexArrays(1, &point_vao_);
         glGenBuffers(1, &point_vbo_);
         glBindVertexArray(point_vao_);
@@ -135,8 +151,8 @@ bool GlRenderer::init(const RenderCapacity& capacity) {
                      GL_DYNAMIC_DRAW);
 
         glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(PointInstance),
-                              reinterpret_cast<void*>(offsetof(PointInstance, x_ndc)));
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(PointInstance),
+                              reinterpret_cast<void*>(offsetof(PointInstance, x_km)));
         glEnableVertexAttribArray(1);
         glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(PointInstance),
                               reinterpret_cast<void*>(offsetof(PointInstance, color)));
@@ -171,7 +187,19 @@ bool GlRenderer::init(const RenderCapacity& capacity) {
     }
 }
 
-void GlRenderer::draw_points(std::span<const PointInstance> points) {
+void GlRenderer::set_camera_uniforms(unsigned int program, int view_loc, int projection_loc,
+                                     const glm::mat4& view, const glm::mat4& projection) const {
+    glUseProgram(program);
+    if (view_loc >= 0) {
+        glUniformMatrix4fv(view_loc, 1, GL_FALSE, glm::value_ptr(view));
+    }
+    if (projection_loc >= 0) {
+        glUniformMatrix4fv(projection_loc, 1, GL_FALSE, glm::value_ptr(projection));
+    }
+}
+
+void GlRenderer::draw_points(std::span<const PointInstance> points, const glm::mat4& view,
+                             const glm::mat4& projection) {
     if (point_program_ == 0 || point_vao_ == 0 || point_vbo_ == 0) {
         return;
     }
@@ -181,7 +209,7 @@ void GlRenderer::draw_points(std::span<const PointInstance> points) {
         return;
     }
 
-    glUseProgram(point_program_);
+    set_camera_uniforms(point_program_, point_view_loc_, point_projection_loc_, view, projection);
     glBindVertexArray(point_vao_);
     glBindBuffer(GL_ARRAY_BUFFER, point_vbo_);
     glBufferSubData(GL_ARRAY_BUFFER, 0, static_cast<GLsizeiptr>(count * sizeof(PointInstance)),
@@ -190,12 +218,13 @@ void GlRenderer::draw_points(std::span<const PointInstance> points) {
 }
 
 void GlRenderer::draw_line_primitives(unsigned int mode, std::span<const LinePrimitive> primitives,
-                                      std::size_t max_vertices) {
+                                      std::size_t max_vertices, const glm::mat4& view,
+                                      const glm::mat4& projection) {
     if (line_program_ == 0 || line_vao_ == 0 || line_vbo_ == 0) {
         return;
     }
 
-    glUseProgram(line_program_);
+    set_camera_uniforms(line_program_, line_view_loc_, line_projection_loc_, view, projection);
     glBindVertexArray(line_vao_);
     glBindBuffer(GL_ARRAY_BUFFER, line_vbo_);
 
@@ -212,11 +241,12 @@ void GlRenderer::draw_line_primitives(unsigned int mode, std::span<const LinePri
     }
 }
 
-void GlRenderer::draw(const DrawBatch& batch) {
-    draw_points(batch.points);
-    draw_line_primitives(GL_LINE_STRIP, batch.line_trails, max_line_trail_vertices_);
-    draw_line_primitives(GL_LINE_LOOP, batch.line_loops, max_line_loop_vertices_);
-    draw_line_primitives(GL_LINES, batch.lines, max_line_vertices_);
+void GlRenderer::draw(const DrawBatch& batch, const glm::mat4& view, const glm::mat4& projection) {
+    draw_points(batch.points, view, projection);
+    draw_line_primitives(GL_LINE_STRIP, batch.line_trails, max_line_trail_vertices_, view,
+                         projection);
+    draw_line_primitives(GL_LINE_LOOP, batch.line_loops, max_line_loop_vertices_, view, projection);
+    draw_line_primitives(GL_LINES, batch.lines, max_line_vertices_, view, projection);
 }
 
 } // namespace solar::app

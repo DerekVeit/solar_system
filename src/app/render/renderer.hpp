@@ -2,6 +2,8 @@
 
 #include "app/render/types.hpp"
 
+#include <glm/mat4x4.hpp>
+
 namespace solar::app {
 
 /// Backend-agnostic draw API for the solar system view.
@@ -11,7 +13,9 @@ class IRenderer {
 
     virtual bool init(const RenderCapacity& capacity) = 0;
 
-    virtual void draw(const DrawBatch& batch) = 0;
+    /// Draw camera-relative geometry with view and projection matrices.
+    virtual void draw(const DrawBatch& batch, const glm::mat4& view,
+                      const glm::mat4& projection) = 0;
 };
 
 } // namespace solar::app

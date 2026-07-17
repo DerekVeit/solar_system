@@ -56,7 +56,7 @@ void Scene::render(const sim::SolarSystem& simulation, float aspect_ratio, int f
     for (const BodyVisual& body : bodies_) {
         body.append_draw(simulation, view, batch);
     }
-    renderer_->draw(batch);
+    renderer_->draw(batch, camera_.view_matrix(), camera_.projection_matrix());
 }
 
 void Scene::set_view_half_extent_au(float half_extent_au) {

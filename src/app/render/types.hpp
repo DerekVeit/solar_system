@@ -6,16 +6,20 @@
 
 namespace solar::app {
 
+/// Point in camera-relative km (world minus camera origin).
 struct PointInstance {
-    float x_ndc{0.0f};
-    float y_ndc{0.0f};
+    float x_km{0.0f};
+    float y_km{0.0f};
+    float z_km{0.0f};
     Color color{};
     float point_size{1.0f};
 };
 
+/// Line vertex in camera-relative km.
 struct LineVertex {
-    float x_ndc{0.0f};
-    float y_ndc{0.0f};
+    float x_km{0.0f};
+    float y_km{0.0f};
+    float z_km{0.0f};
     Color color{};
 };
 

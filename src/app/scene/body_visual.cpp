@@ -13,16 +13,17 @@ namespace {
 
 [[nodiscard]] LineVertex to_line_vertex(const core::Displacement& position, Color color,
                                         const ViewFrame& view) {
-    float x_ndc = 0.0f;
-    float y_ndc = 0.0f;
-    view.camera.world_to_ndc(position, x_ndc, y_ndc);
-    return LineVertex{x_ndc, y_ndc, color};
+    float x_km = 0.0f;
+    float y_km = 0.0f;
+    float z_km = 0.0f;
+    view.camera.world_to_camera_relative(position, x_km, y_km, z_km);
+    return LineVertex{x_km, y_km, z_km, color};
 }
 
 [[nodiscard]] PointInstance to_point_instance(const core::Displacement& position, Color color,
                                               float point_size, const ViewFrame& view) {
     const LineVertex vertex = to_line_vertex(position, color, view);
-    return PointInstance{vertex.x_ndc, vertex.y_ndc, color, point_size};
+    return PointInstance{vertex.x_km, vertex.y_km, vertex.z_km, color, point_size};
 }
 
 void append_orbit_loop(const sim::SolarSystem& simulation, const core::BodyDefinition& body,
