@@ -71,11 +71,23 @@ void Scene::pan_view_fraction(float delta_x_fraction, float delta_y_fraction) {
     const float aspect = last_aspect_ratio_;
     const float view_width_au = 2.0f * view_half_extent_au_ * aspect;
     const float view_height_au = 2.0f * view_half_extent_au_;
-    view_center_x_au_ += delta_x_fraction * view_width_au;
-    view_center_y_au_ += delta_y_fraction * view_height_au;
+    const float delta_x_au = delta_x_fraction * view_width_au;
+    const float delta_y_au = delta_y_fraction * view_height_au;
+
+    if (followed_body_) {
+        follow_offset_x_au_ += delta_x_au;
+        follow_offset_y_au_ += delta_y_au;
+        return;
+    }
+
+    view_center_x_au_ += delta_x_au;
+    view_center_y_au_ += delta_y_au;
 }
 
 void Scene::reset_view_center() {
+    followed_body_ = std::nullopt;
+    follow_offset_x_au_ = 0.0f;
+    follow_offset_y_au_ = 0.0f;
     view_center_x_au_ = 0.0f;
     view_center_y_au_ = 0.0f;
 }
@@ -84,6 +96,8 @@ void Scene::set_follow_target(const sim::SolarSystem& simulation,
                               std::optional<std::string> body_name) {
     if (!body_name) {
         followed_body_ = std::nullopt;
+        follow_offset_x_au_ = 0.0f;
+        follow_offset_y_au_ = 0.0f;
         return;
     }
 
@@ -93,6 +107,8 @@ void Scene::set_follow_target(const sim::SolarSystem& simulation,
     }
 
     followed_body_ = std::move(body_name);
+    follow_offset_x_au_ = 0.0f;
+    follow_offset_y_au_ = 0.0f;
 }
 
 void Scene::update_view_center_from_follow(const sim::SolarSystem& simulation) {
