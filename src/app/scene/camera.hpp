@@ -10,12 +10,16 @@ namespace solar::app {
 /// Scene-owned camera: orbit look-at + yaw/pitch/radius, orthographic framing.
 ///
 /// Free and follow both use a look-at target; eye = target - radius * forward(yaw, pitch).
-/// Follow updates the target from a body; free pans the target. Geometry is eye-relative km.
+/// Follow updates the target from a body; free pans the target. View basis uses world Z as up
+/// (ecliptic normal) so pitch stays continuous. Geometry is eye-relative km.
 class Camera {
   public:
     static constexpr float kDefaultRadiusAu = 5.0f;
-    static constexpr float kDefaultPitchRad = -1.57079632679f; // -pi/2: look toward -Z from above
+    // Yaw +pi/2 with near-top-down pitch keeps +X screen-right and +Y screen-up (world Z up).
+    static constexpr float kDefaultYawRad = 1.57079632679f;    // +pi/2
+    static constexpr float kDefaultPitchRad = -1.56979632679f; // nearly -pi/2 (avoids lookAt pole)
     static constexpr float kYawPitchStepRad = 0.0872664626f;   // 5 degrees
+    static constexpr float kPitchLimitRad = 1.56979632679f;    // pi/2 - 0.001
 
     [[nodiscard]] float half_extent_au() const { return half_extent_au_; }
     void set_half_extent_au(float half_extent_au);
@@ -82,7 +86,7 @@ class Camera {
     float follow_target_z_au_{0.0f};
     bool following_{false};
 
-    float yaw_rad_{0.0f};
+    float yaw_rad_{kDefaultYawRad};
     float pitch_rad_{kDefaultPitchRad};
     float radius_au_{kDefaultRadiusAu};
 

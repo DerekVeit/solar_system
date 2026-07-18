@@ -24,11 +24,10 @@ float Camera::view_width_au() const { return 2.0f * half_extent_au_ * aspect_rat
 float Camera::view_height_au() const { return 2.0f * half_extent_au_; }
 
 void Camera::clamp_pitch() {
-    constexpr float kLimit = glm::half_pi<float>();
-    if (pitch_rad_ > kLimit) {
-        pitch_rad_ = kLimit;
-    } else if (pitch_rad_ < -kLimit) {
-        pitch_rad_ = -kLimit;
+    if (pitch_rad_ > kPitchLimitRad) {
+        pitch_rad_ = kPitchLimitRad;
+    } else if (pitch_rad_ < -kPitchLimitRad) {
+        pitch_rad_ = -kPitchLimitRad;
     }
 }
 
@@ -40,7 +39,7 @@ void Camera::add_pitch(float delta_rad) {
 }
 
 void Camera::reset_orientation() {
-    yaw_rad_ = 0.0f;
+    yaw_rad_ = kDefaultYawRad;
     pitch_rad_ = kDefaultPitchRad;
     radius_au_ = kDefaultRadiusAu;
 }
@@ -85,22 +84,22 @@ glm::vec3 Camera::forward_from_angles() const {
 }
 
 Camera::Basis Camera::basis_from_angles() const {
-    // Continuous basis: yaw defines the horizontal "right" so top-down has no up-vector flip.
+    // World Z (ecliptic normal) as up — same construction as glm::lookAt.
+    // Pitch is clamped off ±pi/2 so forward is never parallel to world up; that avoids the
+    // 90° roll flip from swapping up hints at the poles or at the horizon.
     const glm::vec3 forward = forward_from_angles();
-    glm::vec3 right{std::cos(yaw_rad_), std::sin(yaw_rad_), 0.0f};
+    constexpr glm::vec3 world_up{0.0f, 0.0f, 1.0f};
 
-    glm::vec3 up = glm::cross(right, forward);
-    const float up_length = glm::length(up);
-    if (up_length < 1e-6f) {
-        // Looking nearly along ±world Y in the ecliptic plane; fall back to world Z as up.
-        up = glm::vec3{0.0f, 0.0f, 1.0f};
-        right = glm::normalize(glm::cross(forward, up));
-        up = glm::normalize(glm::cross(right, forward));
+    glm::vec3 right = glm::cross(forward, world_up);
+    const float right_length = glm::length(right);
+    if (right_length < 1e-6f) {
+        // Degenerate only if pitch clamp is bypassed; keep a yaw-stable fallback.
+        const glm::vec3 fallback_up{-std::sin(yaw_rad_), std::cos(yaw_rad_), 0.0f};
+        right = glm::normalize(glm::cross(forward, fallback_up));
     } else {
-        up /= up_length;
-        right = glm::normalize(glm::cross(forward, up));
+        right /= right_length;
     }
-
+    const glm::vec3 up = glm::normalize(glm::cross(right, forward));
     return Basis{right, up, forward};
 }
 
