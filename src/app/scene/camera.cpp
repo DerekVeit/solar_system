@@ -131,7 +131,7 @@ glm::mat4 Camera::view_matrix() const {
 glm::mat4 Camera::projection_matrix() const {
     const float half_height_km = half_extent_au_ * static_cast<float>(core::kAuKm);
     const float half_width_km = half_height_km * aspect_ratio_;
-    const float depth_km = static_cast<float>(core::kAuKm) * 50.0f;
+    const float depth_km = static_cast<float>(core::kAuKm) * 100.0f;
     return glm::ortho(-half_width_km, half_width_km, -half_height_km, half_height_km, -depth_km,
                       depth_km);
 }
