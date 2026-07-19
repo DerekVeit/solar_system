@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/constants.hpp"
 #include "core/types.hpp"
 
 #include <glm/mat4x4.hpp>
@@ -15,12 +16,11 @@ namespace solar::app {
 /// Geometry is eye-relative km.
 class Camera {
   public:
-    static constexpr float kDefaultRadiusAu = 5.0f;
-    // Yaw +pi/2 with near-top-down pitch keeps +X screen-right and +Y screen-up (world Z up).
-    static constexpr float kDefaultYawRad = 1.57079632679f;    // +pi/2
-    static constexpr float kDefaultPitchRad = -1.56979632679f; // nearly -pi/2 (avoids lookAt pole)
-    static constexpr float kYawPitchStepRad = 0.0872664626f;   // 5 degrees
-    static constexpr float kPitchLimitRad = 1.56979632679f;    // pi/2 - 0.001
+    static constexpr float kDefaultRadiusAu = 5.0f;           // distance from target
+    static constexpr float kDefaultYawRad = core::kPi / 2;    // π/2 = pointed at world +Y
+    static constexpr float kDefaultPitchRad = -core::kPi / 2; // -π/2 = pointed down, world -Z
+    static constexpr float kYawPitchStepRad = core::kPi / 36; // 5°
+    static constexpr float kPitchLimitRad = core::kPi / 2;    // no further than straight up or down
 
     [[nodiscard]] float half_extent_au() const { return half_extent_au_; }
     void set_half_extent_au(float half_extent_au);
