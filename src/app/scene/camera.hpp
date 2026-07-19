@@ -10,8 +10,9 @@ namespace solar::app {
 /// Scene-owned camera: orbit look-at + yaw/pitch/radius, orthographic framing.
 ///
 /// Free and follow both use a look-at target; eye = target - radius * forward(yaw, pitch).
-/// Follow updates the target from a body; free pans the target. View basis uses world Z as up
-/// (ecliptic normal) so pitch stays continuous. Geometry is eye-relative km.
+/// Follow updates the target from a body; free pans the target.
+/// View basis: yaw sets a horizontal right, forward from yaw/pitch, up = right × forward.
+/// Geometry is eye-relative km.
 class Camera {
   public:
     static constexpr float kDefaultRadiusAu = 5.0f;

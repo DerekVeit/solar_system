@@ -84,21 +84,10 @@ glm::vec3 Camera::forward_from_angles() const {
 }
 
 Camera::Basis Camera::basis_from_angles() const {
-    // World Z (ecliptic normal) as up — same construction as glm::lookAt.
-    // Pitch is clamped off ±pi/2 so forward is never parallel to world up; that avoids the
-    // 90° roll flip from swapping up hints at the poles or at the horizon.
+    // yaw starts at π/2 (0 from forward)
+    const float yaw_right = yaw_rad_ - kDefaultYawRad;
+    const glm::vec3 right{std::cos(yaw_right), std::sin(yaw_right), 0.0f};
     const glm::vec3 forward = forward_from_angles();
-    constexpr glm::vec3 world_up{0.0f, 0.0f, 1.0f};
-
-    glm::vec3 right = glm::cross(forward, world_up);
-    const float right_length = glm::length(right);
-    if (right_length < 1e-6f) {
-        // Degenerate only if pitch clamp is bypassed; keep a yaw-stable fallback.
-        const glm::vec3 fallback_up{-std::sin(yaw_rad_), std::cos(yaw_rad_), 0.0f};
-        right = glm::normalize(glm::cross(forward, fallback_up));
-    } else {
-        right /= right_length;
-    }
     const glm::vec3 up = glm::normalize(glm::cross(right, forward));
     return Basis{right, up, forward};
 }
