@@ -2,6 +2,7 @@
 
 #include "app/follow_targets.hpp"
 #include "app/logging.hpp"
+#include "app/scene/camera.hpp"
 #include "app/scene/scene.hpp"
 #include "app/window.hpp"
 #include "sim/clock.hpp"
@@ -108,16 +109,16 @@ void key_callback(GLFWwindow* glfw_window, int key, int /*scancode*/, int action
             scene->add_yaw(Camera::kYawPitchStepRad);
             break;
         case GLFW_KEY_LEFT:
-            scene->pan_view_fraction(-0.1f, 0.0f);
+            scene->pan_view_fraction(-Camera::kPanFraction, 0.0f);
             break;
         case GLFW_KEY_RIGHT:
-            scene->pan_view_fraction(0.1f, 0.0f);
+            scene->pan_view_fraction(Camera::kPanFraction, 0.0f);
             break;
         case GLFW_KEY_UP:
-            scene->pan_view_fraction(0.0f, 0.1f);
+            scene->pan_view_fraction(0.0f, Camera::kPanFraction);
             break;
         case GLFW_KEY_DOWN:
-            scene->pan_view_fraction(0.0f, -0.1f);
+            scene->pan_view_fraction(0.0f, -Camera::kPanFraction);
             break;
         case GLFW_KEY_HOME:
             scene->reset_view_center();

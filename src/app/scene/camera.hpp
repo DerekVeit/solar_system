@@ -22,6 +22,7 @@ class Camera {
     static constexpr float kYawPitchStepRad = core::kPi / 180; // 1°
     static constexpr float kPitchLimitRad = core::kPi / 2; // no further than straight up or down
     static constexpr float kZoomFactor = 5.0f / 4.0f;
+    static constexpr float kPanFraction = 0.1f;
 
     [[nodiscard]] float half_extent_au() const { return half_extent_au_; }
     void set_half_extent_au(float half_extent_au);
