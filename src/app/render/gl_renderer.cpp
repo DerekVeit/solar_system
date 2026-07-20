@@ -166,6 +166,9 @@ bool GlRenderer::init(const RenderCapacity& capacity) {
     destroy();
 
     try {
+        // % = potential extraction soon
+
+        // % sphere_program_ = create_program(kSphereVertexShader, kSphereFragmentShader)
         const unsigned int sphere_vertex_shader =
             compile_shader(GL_VERTEX_SHADER, kSphereVertexShader);
         const unsigned int sphere_fragment_shader =
@@ -174,6 +177,7 @@ bool GlRenderer::init(const RenderCapacity& capacity) {
         glDeleteShader(sphere_vertex_shader);
         glDeleteShader(sphere_fragment_shader);
 
+        // % line_program_ = create_program(kLineVertexShader, kLineFragmentShader)
         const unsigned int line_vertex_shader = compile_shader(GL_VERTEX_SHADER, kLineVertexShader);
         const unsigned int line_fragment_shader =
             compile_shader(GL_FRAGMENT_SHADER, kLineFragmentShader);
@@ -181,13 +185,17 @@ bool GlRenderer::init(const RenderCapacity& capacity) {
         glDeleteShader(line_vertex_shader);
         glDeleteShader(line_fragment_shader);
 
+        // % cache_sphere_uniforms()
         sphere_view_loc_ = glGetUniformLocation(sphere_program_, "u_view");
         sphere_projection_loc_ = glGetUniformLocation(sphere_program_, "u_projection");
         sphere_model_loc_ = glGetUniformLocation(sphere_program_, "u_model");
         sphere_color_loc_ = glGetUniformLocation(sphere_program_, "u_color");
+
+        // % cache_line_uniforms()
         line_view_loc_ = glGetUniformLocation(line_program_, "u_view");
         line_projection_loc_ = glGetUniformLocation(line_program_, "u_projection");
 
+        // % create_sphere_mesh_gpu()
         std::vector<float> sphere_positions;
         std::vector<unsigned int> sphere_indices;
         generate_unit_sphere(sphere_positions, sphere_indices);
@@ -209,6 +217,7 @@ bool GlRenderer::init(const RenderCapacity& capacity) {
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
                               reinterpret_cast<void*>(0));
 
+        // % create_line_buffers(capacity)
         glGenVertexArrays(1, &line_vao_);
         glGenBuffers(1, &line_vbo_);
         glBindVertexArray(line_vao_);
