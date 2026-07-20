@@ -63,8 +63,8 @@ void main() {
 )";
 
 // Low-poly unit sphere: enough to read as a ball at solar-system zoom levels.
-constexpr int kSphereSlices = 16;
-constexpr int kSphereStacks = 12;
+constexpr int kSphereSlices = 48;
+constexpr int kSphereStacks = 24;
 
 void generate_unit_sphere(std::vector<float>& positions, std::vector<unsigned int>& indices) {
     positions.clear();
