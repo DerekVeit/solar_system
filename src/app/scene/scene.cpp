@@ -27,7 +27,7 @@ bool Scene::init() {
     }
 
     const RenderCapacity capacity{
-        .max_points = bodies_.size() + trail_bodies * BodyVisual::kTailSamples,
+        .max_spheres = bodies_.size(),
         .max_line_vertices = 0,
         .max_line_trail_vertices = trail_bodies * BodyVisual::kTailSamples,
         .max_line_loop_vertices = trail_bodies * BodyVisual::kOrbitSamples,
@@ -44,7 +44,7 @@ void Scene::render(const sim::SolarSystem& simulation, float aspect_ratio, int f
     update_camera_from_follow(simulation);
 
     DrawBatch batch;
-    batch.points.reserve(bodies_.size() + bodies_.size() * BodyVisual::kTailSamples);
+    batch.spheres.reserve(bodies_.size());
     batch.line_loops.reserve(bodies_.size());
     batch.line_trails.reserve(bodies_.size());
 

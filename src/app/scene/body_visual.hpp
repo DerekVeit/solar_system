@@ -9,13 +9,12 @@
 
 namespace solar::app {
 
-/// Visual representation of one simulated body in the ecliptic view.
+/// Visual representation of one simulated body.
 class BodyVisual {
   public:
     static constexpr std::size_t kOrbitSamples = 256;
     static constexpr std::size_t kTailSamples = 48;
-    static constexpr float kTailPointSize = 0.0f;
-    static constexpr float kMinPointSize = 2.0f;
+    static constexpr float kMinScreenDiameterPx = 2.0f;
 
     static constexpr Color kOrbitTrailColor{0.45f, 0.45f, 0.45f, 0.35f};
     static constexpr Color kTailColor{0.55f, 0.65f, 0.85f, 0.55f};
@@ -30,7 +29,8 @@ class BodyVisual {
                      DrawBatch& batch) const;
 
   private:
-    [[nodiscard]] float point_size_pixels(const ViewFrame& view) const;
+    /// Drawn sphere radius in km (physical radius, display factor, min screen size).
+    [[nodiscard]] float drawn_radius_km(const ViewFrame& view) const;
 
     std::string name_;
     Color color_;

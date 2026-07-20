@@ -4,41 +4,38 @@
 #include "app/render/types.hpp"
 
 #include <glad/gl.h>
+#include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <cmath>
 #include <cstddef>
+#include <numbers>
 #include <string_view>
+#include <vector>
 
 namespace solar::app {
 
 namespace {
 
-constexpr std::string_view kPointVertexShader = R"(#version 460 core
-layout(location = 0) in vec3 a_pos;
-layout(location = 1) in vec4 a_color;
-layout(location = 2) in float a_point_size;
+constexpr float kPi = std::numbers::pi_v<float>;
 
+constexpr std::string_view kSphereVertexShader = R"(#version 460 core
+layout(location = 0) in vec3 a_pos;
+
+uniform mat4 u_model;
 uniform mat4 u_view;
 uniform mat4 u_projection;
 
-out vec4 v_color;
-
 void main() {
-    gl_Position = u_projection * u_view * vec4(a_pos, 1.0);
-    gl_PointSize = a_point_size;
-    v_color = a_color;
+    gl_Position = u_projection * u_view * u_model * vec4(a_pos, 1.0);
 }
 )";
 
-constexpr std::string_view kPointFragmentShader = R"(#version 460 core
-in vec4 v_color;
+constexpr std::string_view kSphereFragmentShader = R"(#version 460 core
+uniform vec4 u_color;
 out vec4 frag_color;
 void main() {
-    const vec2 coord = gl_PointCoord - vec2(0.5);
-    if (dot(coord, coord) > 0.25) {
-        discard;
-    }
-    frag_color = v_color;
+    frag_color = u_color;
 }
 )";
 
@@ -65,6 +62,46 @@ void main() {
 }
 )";
 
+// Low-poly unit sphere: enough to read as a ball at solar-system zoom levels.
+constexpr int kSphereSlices = 16;
+constexpr int kSphereStacks = 12;
+
+void generate_unit_sphere(std::vector<float>& positions, std::vector<unsigned int>& indices) {
+    positions.clear();
+    indices.clear();
+
+    for (int stack = 0; stack <= kSphereStacks; ++stack) {
+        const float v = static_cast<float>(stack) / static_cast<float>(kSphereStacks);
+        const float phi = v * kPi;
+        const float y = std::cos(phi);
+        const float ring_radius = std::sin(phi);
+
+        for (int slice = 0; slice <= kSphereSlices; ++slice) {
+            const float u = static_cast<float>(slice) / static_cast<float>(kSphereSlices);
+            const float theta = u * (2.0f * kPi);
+            const float x = ring_radius * std::cos(theta);
+            const float z = ring_radius * std::sin(theta);
+            positions.push_back(x);
+            positions.push_back(y);
+            positions.push_back(z);
+        }
+    }
+
+    const int stride = kSphereSlices + 1;
+    for (int stack = 0; stack < kSphereStacks; ++stack) {
+        for (int slice = 0; slice < kSphereSlices; ++slice) {
+            const unsigned int i0 = static_cast<unsigned int>(stack * stride + slice);
+            const unsigned int i1 = i0 + static_cast<unsigned int>(stride);
+            indices.push_back(i0);
+            indices.push_back(i1);
+            indices.push_back(i0 + 1);
+            indices.push_back(i0 + 1);
+            indices.push_back(i1);
+            indices.push_back(i1 + 1);
+        }
+    }
+}
+
 void setup_line_vertex_layout() {
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(LineVertex),
@@ -80,21 +117,25 @@ void setup_line_vertex_layout() {
 GlRenderer::~GlRenderer() { destroy(); }
 
 void GlRenderer::destroy() {
-    if (point_program_ != 0) {
-        glDeleteProgram(point_program_);
-        point_program_ = 0;
+    if (sphere_program_ != 0) {
+        glDeleteProgram(sphere_program_);
+        sphere_program_ = 0;
     }
     if (line_program_ != 0) {
         glDeleteProgram(line_program_);
         line_program_ = 0;
     }
-    if (point_vbo_ != 0) {
-        glDeleteBuffers(1, &point_vbo_);
-        point_vbo_ = 0;
+    if (sphere_vbo_ != 0) {
+        glDeleteBuffers(1, &sphere_vbo_);
+        sphere_vbo_ = 0;
     }
-    if (point_vao_ != 0) {
-        glDeleteVertexArrays(1, &point_vao_);
-        point_vao_ = 0;
+    if (sphere_ebo_ != 0) {
+        glDeleteBuffers(1, &sphere_ebo_);
+        sphere_ebo_ = 0;
+    }
+    if (sphere_vao_ != 0) {
+        glDeleteVertexArrays(1, &sphere_vao_);
+        sphere_vao_ = 0;
     }
     if (line_vbo_ != 0) {
         glDeleteBuffers(1, &line_vbo_);
@@ -104,31 +145,34 @@ void GlRenderer::destroy() {
         glDeleteVertexArrays(1, &line_vao_);
         line_vao_ = 0;
     }
-    point_view_loc_ = -1;
-    point_projection_loc_ = -1;
+    sphere_view_loc_ = -1;
+    sphere_projection_loc_ = -1;
+    sphere_model_loc_ = -1;
+    sphere_color_loc_ = -1;
     line_view_loc_ = -1;
     line_projection_loc_ = -1;
-    max_points_ = 0;
+    sphere_index_count_ = 0;
+    max_spheres_ = 0;
     max_line_vertices_ = 0;
     max_line_trail_vertices_ = 0;
     max_line_loop_vertices_ = 0;
 }
 
 bool GlRenderer::init(const RenderCapacity& capacity) {
-    if (capacity.max_points == 0) {
+    if (capacity.max_spheres == 0) {
         return false;
     }
 
     destroy();
 
     try {
-        const unsigned int point_vertex_shader =
-            compile_shader(GL_VERTEX_SHADER, kPointVertexShader);
-        const unsigned int point_fragment_shader =
-            compile_shader(GL_FRAGMENT_SHADER, kPointFragmentShader);
-        point_program_ = link_program(point_vertex_shader, point_fragment_shader);
-        glDeleteShader(point_vertex_shader);
-        glDeleteShader(point_fragment_shader);
+        const unsigned int sphere_vertex_shader =
+            compile_shader(GL_VERTEX_SHADER, kSphereVertexShader);
+        const unsigned int sphere_fragment_shader =
+            compile_shader(GL_FRAGMENT_SHADER, kSphereFragmentShader);
+        sphere_program_ = link_program(sphere_vertex_shader, sphere_fragment_shader);
+        glDeleteShader(sphere_vertex_shader);
+        glDeleteShader(sphere_fragment_shader);
 
         const unsigned int line_vertex_shader = compile_shader(GL_VERTEX_SHADER, kLineVertexShader);
         const unsigned int line_fragment_shader =
@@ -137,28 +181,33 @@ bool GlRenderer::init(const RenderCapacity& capacity) {
         glDeleteShader(line_vertex_shader);
         glDeleteShader(line_fragment_shader);
 
-        point_view_loc_ = glGetUniformLocation(point_program_, "u_view");
-        point_projection_loc_ = glGetUniformLocation(point_program_, "u_projection");
+        sphere_view_loc_ = glGetUniformLocation(sphere_program_, "u_view");
+        sphere_projection_loc_ = glGetUniformLocation(sphere_program_, "u_projection");
+        sphere_model_loc_ = glGetUniformLocation(sphere_program_, "u_model");
+        sphere_color_loc_ = glGetUniformLocation(sphere_program_, "u_color");
         line_view_loc_ = glGetUniformLocation(line_program_, "u_view");
         line_projection_loc_ = glGetUniformLocation(line_program_, "u_projection");
 
-        glGenVertexArrays(1, &point_vao_);
-        glGenBuffers(1, &point_vbo_);
-        glBindVertexArray(point_vao_);
-        glBindBuffer(GL_ARRAY_BUFFER, point_vbo_);
-        glBufferData(GL_ARRAY_BUFFER,
-                     static_cast<GLsizeiptr>(capacity.max_points * sizeof(PointInstance)), nullptr,
-                     GL_DYNAMIC_DRAW);
+        std::vector<float> sphere_positions;
+        std::vector<unsigned int> sphere_indices;
+        generate_unit_sphere(sphere_positions, sphere_indices);
+        sphere_index_count_ = static_cast<int>(sphere_indices.size());
 
+        glGenVertexArrays(1, &sphere_vao_);
+        glGenBuffers(1, &sphere_vbo_);
+        glGenBuffers(1, &sphere_ebo_);
+        glBindVertexArray(sphere_vao_);
+        glBindBuffer(GL_ARRAY_BUFFER, sphere_vbo_);
+        glBufferData(GL_ARRAY_BUFFER,
+                     static_cast<GLsizeiptr>(sphere_positions.size() * sizeof(float)),
+                     sphere_positions.data(), GL_STATIC_DRAW);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sphere_ebo_);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+                     static_cast<GLsizeiptr>(sphere_indices.size() * sizeof(unsigned int)),
+                     sphere_indices.data(), GL_STATIC_DRAW);
         glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(PointInstance),
-                              reinterpret_cast<void*>(offsetof(PointInstance, x_km)));
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(PointInstance),
-                              reinterpret_cast<void*>(offsetof(PointInstance, color)));
-        glEnableVertexAttribArray(2);
-        glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(PointInstance),
-                              reinterpret_cast<void*>(offsetof(PointInstance, point_size)));
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
+                              reinterpret_cast<void*>(0));
 
         glGenVertexArrays(1, &line_vao_);
         glGenBuffers(1, &line_vbo_);
@@ -174,9 +223,7 @@ bool GlRenderer::init(const RenderCapacity& capacity) {
 
         glBindVertexArray(0);
 
-        glEnable(GL_PROGRAM_POINT_SIZE);
-
-        max_points_ = capacity.max_points;
+        max_spheres_ = capacity.max_spheres;
         max_line_vertices_ = capacity.max_line_vertices;
         max_line_trail_vertices_ = capacity.max_line_trail_vertices;
         max_line_loop_vertices_ = capacity.max_line_loop_vertices;
@@ -198,23 +245,40 @@ void GlRenderer::set_camera_uniforms(unsigned int program, int view_loc, int pro
     }
 }
 
-void GlRenderer::draw_points(std::span<const PointInstance> points, const glm::mat4& view,
-                             const glm::mat4& projection) {
-    if (point_program_ == 0 || point_vao_ == 0 || point_vbo_ == 0) {
+void GlRenderer::draw_spheres(std::span<const SphereInstance> spheres, const glm::mat4& view,
+                              const glm::mat4& projection) {
+    if (sphere_program_ == 0 || sphere_vao_ == 0 || sphere_index_count_ <= 0) {
         return;
     }
 
-    const std::size_t count = points.size() < max_points_ ? points.size() : max_points_;
+    const std::size_t count = spheres.size() < max_spheres_ ? spheres.size() : max_spheres_;
     if (count == 0) {
         return;
     }
 
-    set_camera_uniforms(point_program_, point_view_loc_, point_projection_loc_, view, projection);
-    glBindVertexArray(point_vao_);
-    glBindBuffer(GL_ARRAY_BUFFER, point_vbo_);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, static_cast<GLsizeiptr>(count * sizeof(PointInstance)),
-                    points.data());
-    glDrawArrays(GL_POINTS, 0, static_cast<GLsizei>(count));
+    set_camera_uniforms(sphere_program_, sphere_view_loc_, sphere_projection_loc_, view,
+                        projection);
+    glBindVertexArray(sphere_vao_);
+
+    for (std::size_t i = 0; i < count; ++i) {
+        const SphereInstance& sphere = spheres[i];
+        if (sphere.radius_km <= 0.0f) {
+            continue;
+        }
+
+        const glm::mat4 model =
+            glm::translate(glm::mat4{1.0f}, glm::vec3{sphere.x_km, sphere.y_km, sphere.z_km}) *
+            glm::scale(glm::mat4{1.0f}, glm::vec3{sphere.radius_km});
+
+        if (sphere_model_loc_ >= 0) {
+            glUniformMatrix4fv(sphere_model_loc_, 1, GL_FALSE, glm::value_ptr(model));
+        }
+        if (sphere_color_loc_ >= 0) {
+            glUniform4f(sphere_color_loc_, sphere.color.r, sphere.color.g, sphere.color.b,
+                        sphere.color.a);
+        }
+        glDrawElements(GL_TRIANGLES, sphere_index_count_, GL_UNSIGNED_INT, nullptr);
+    }
 }
 
 void GlRenderer::draw_line_primitives(unsigned int mode, std::span<const LinePrimitive> primitives,
@@ -242,7 +306,7 @@ void GlRenderer::draw_line_primitives(unsigned int mode, std::span<const LinePri
 }
 
 void GlRenderer::draw(const DrawBatch& batch, const glm::mat4& view, const glm::mat4& projection) {
-    draw_points(batch.points, view, projection);
+    draw_spheres(batch.spheres, view, projection);
     draw_line_primitives(GL_LINE_STRIP, batch.line_trails, max_line_trail_vertices_, view,
                          projection);
     draw_line_primitives(GL_LINE_LOOP, batch.line_loops, max_line_loop_vertices_, view, projection);

@@ -6,13 +6,13 @@
 
 namespace solar::app {
 
-/// Point in camera-relative km (world minus camera origin).
-struct PointInstance {
+/// Sphere in camera-relative km (center = world minus camera origin).
+struct SphereInstance {
     float x_km{0.0f};
     float y_km{0.0f};
     float z_km{0.0f};
+    float radius_km{1.0f};
     Color color{};
-    float point_size{1.0f};
 };
 
 /// Line vertex in camera-relative km.
@@ -29,14 +29,14 @@ struct LinePrimitive {
 
 /// Per-frame geometry collected by the scene and consumed by the renderer.
 struct DrawBatch {
-    std::vector<PointInstance> points;
+    std::vector<SphereInstance> spheres;
     std::vector<LinePrimitive> lines;
     std::vector<LinePrimitive> line_trails;
     std::vector<LinePrimitive> line_loops;
 };
 
 struct RenderCapacity {
-    std::size_t max_points{0};
+    std::size_t max_spheres{0};
     std::size_t max_line_vertices{0};
     std::size_t max_line_trail_vertices{0};
     std::size_t max_line_loop_vertices{0};

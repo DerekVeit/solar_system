@@ -20,10 +20,10 @@ namespace {
     return LineVertex{x_km, y_km, z_km, color};
 }
 
-[[nodiscard]] PointInstance to_point_instance(const core::Displacement& position, Color color,
-                                              float point_size, const ViewFrame& view) {
+[[nodiscard]] SphereInstance to_sphere_instance(const core::Displacement& position, Color color,
+                                                float radius_km, const ViewFrame& view) {
     const LineVertex vertex = to_line_vertex(position, color, view);
-    return PointInstance{vertex.x_km, vertex.y_km, vertex.z_km, color, point_size};
+    return SphereInstance{vertex.x_km, vertex.y_km, vertex.z_km, radius_km, color};
 }
 
 void append_orbit_loop(const sim::SolarSystem& simulation, const core::BodyDefinition& body,
@@ -49,8 +49,7 @@ void append_orbit_loop(const sim::SolarSystem& simulation, const core::BodyDefin
 }
 
 void append_tail(const sim::SolarSystem& simulation, const core::BodyDefinition& body, double mu,
-                 const ViewFrame& view, double tail_duration_seconds, LinePrimitive& trail,
-                 std::vector<PointInstance>& points) {
+                 const ViewFrame& view, double tail_duration_seconds, LinePrimitive& trail) {
     if (tail_duration_seconds <= 0.0 || BodyVisual::kTailSamples < 2) {
         return;
     }
@@ -76,9 +75,7 @@ void append_tail(const sim::SolarSystem& simulation, const core::BodyDefinition&
             simulation.ephemeris().state(body.name, sample_epoch).position;
         Color tail_color = BodyVisual::kTailColor;
         tail_color.a = BodyVisual::kTailColor.a * static_cast<float>(1.0 - fraction);
-        const LineVertex vertex = to_line_vertex(position, tail_color, view);
-        trail.vertices.push_back(vertex);
-        points.push_back(to_point_instance(position, tail_color, BodyVisual::kTailPointSize, view));
+        trail.vertices.push_back(to_line_vertex(position, tail_color, view));
     }
 }
 
@@ -93,25 +90,29 @@ BodyVisual::BodyVisual(std::string name, Color color, double radius_km, double t
     , display_size_factor_(display_size_factor)
     , draws_orbit_trails_(draws_orbit_trails) {}
 
-float BodyVisual::point_size_pixels(const ViewFrame& view) const {
+float BodyVisual::drawn_radius_km(const ViewFrame& view) const {
     const float half_extent_au = view.camera.half_extent_au();
-    if (radius_km_ <= 0.0 || half_extent_au <= 0.0f || view.framebuffer_height <= 0) {
-        return kMinPointSize;
+    const float size_factor = view.body_scaling ? display_size_factor_ : 1.0f;
+    if (radius_km_ <= 0.0 || half_extent_au <= 0.0f || view.framebuffer_height <= 0 ||
+        size_factor <= 0.0f) {
+        return 0.0f;
     }
 
-    const float scale_km = half_extent_au * static_cast<float>(core::kAuKm);
-    const float diameter_ndc = static_cast<float>((2.0 * radius_km_) / scale_km);
-    const float size_factor = view.body_scaling ? display_size_factor_ : 1.0f;
-    const float point_size =
-        diameter_ndc * static_cast<float>(view.framebuffer_height) * 0.5f * size_factor;
-    return std::max(point_size, kMinPointSize);
+    float radius_km = static_cast<float>(radius_km_) * size_factor;
+
+    // Keep a ~2px screen diameter floor (same idea as the old point-sprite minimum).
+    // Ortho: full height is 2 * half_extent; diameter_px = radius * height / half_extent_km.
+    const float half_extent_km = half_extent_au * static_cast<float>(core::kAuKm);
+    const float min_radius_km =
+        (kMinScreenDiameterPx * half_extent_km) / static_cast<float>(view.framebuffer_height);
+    return std::max(radius_km, min_radius_km);
 }
 
 void BodyVisual::append_draw(const sim::SolarSystem& simulation, const ViewFrame& view,
                              DrawBatch& batch) const {
-    const float point_size = point_size_pixels(view);
+    const float radius_km = drawn_radius_km(view);
     const core::Displacement position = simulation.state(name_).position;
-    batch.points.push_back(to_point_instance(position, color_, point_size, view));
+    batch.spheres.push_back(to_sphere_instance(position, color_, radius_km, view));
 
     if (!draws_orbit_trails_) {
         return;
@@ -134,7 +135,7 @@ void BodyVisual::append_draw(const sim::SolarSystem& simulation, const ViewFrame
     }
 
     LinePrimitive tail_trail;
-    append_tail(simulation, *body, mu, view, tail_duration_seconds_, tail_trail, batch.points);
+    append_tail(simulation, *body, mu, view, tail_duration_seconds_, tail_trail);
     if (!tail_trail.vertices.empty()) {
         batch.line_trails.push_back(std::move(tail_trail));
     }
