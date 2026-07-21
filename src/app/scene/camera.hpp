@@ -18,7 +18,7 @@ class Camera {
   public:
     static constexpr float kDefaultRadiusAu = 5.0f;            // distance from target
     static constexpr float kDefaultYawRad = core::kPi / 2;     // π/2 = pointed at world +Y
-    static constexpr float kDefaultPitchRad = -core::kPi / 2;  // -π/2 = pointed down, world -Z
+    static constexpr float kDefaultPitchRad = -core::kPi / 24; // -π/2 = pointed down, world -Z
     static constexpr float kYawPitchStepRad = core::kPi / 360; // 0.5°
     static constexpr float kPitchLimitRad = core::kPi / 2; // no further than straight up or down
     static constexpr float kZoomFactor = 1.02f;
