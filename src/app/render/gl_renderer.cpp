@@ -169,6 +169,9 @@ void GlRenderer::destroy() {
     sphere_projection_loc_ = -1;
     sphere_model_loc_ = -1;
     sphere_color_loc_ = -1;
+    sphere_ambient_loc_ = -1;
+    sphere_emission_loc_ = -1;
+    sphere_light_dir_loc_ = -1;
     line_view_loc_ = -1;
     line_projection_loc_ = -1;
     sphere_index_count_ = 0;
