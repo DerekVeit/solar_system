@@ -118,8 +118,15 @@ void BodyVisual::append_draw(const sim::SolarSystem& simulation, const ViewFrame
                              DrawBatch& batch) const {
     const float radius_km = drawn_radius_km(view);
     const core::Displacement position = simulation.state(name_).position;
-    const core::Displacement sun_position = simulation.state("Sun").position;
-    const glm::vec3 light_dir = glm::normalize(sun_position.km - position.km);
+    glm::vec3 light_dir{0.0f, 0.0f, 1.0f};
+    if (emission_ < 1.0f) {
+        const core::Displacement sun_position = simulation.state("Sun").position;
+        const glm::vec3 delta = sun_position.km - position.km;
+        const double len2 = glm::dot(delta, delta);
+        if (len2 > 0.0) {
+            light_dir = glm::vec3(glm::normalize(delta));
+        }
+    }
     batch.spheres.push_back(
         to_sphere_instance(position, color_, ambient_, emission_, light_dir, radius_km, view));
 
