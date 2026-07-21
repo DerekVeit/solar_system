@@ -32,12 +32,18 @@ namespace {
 BodyVisualSettings resolve_body_visual_settings(const BodyVisualDefaults& defaults,
                                                 const BodyVisualOverrideEntry* override) {
     if (override == nullptr) {
-        return BodyVisualSettings{defaults.color, defaults.tail_duration_days,
-                                  defaults.display_size_factor, defaults.visible};
+        return BodyVisualSettings{defaults.color,
+                                  defaults.ambient,
+                                  defaults.emission,
+                                  defaults.tail_duration_days,
+                                  defaults.display_size_factor,
+                                  defaults.visible};
     }
 
     return BodyVisualSettings{
         override->color.value_or(defaults.color),
+        override->ambient.value_or(defaults.ambient),
+        override->emission.value_or(defaults.emission),
         override->tail_duration_days.value_or(defaults.tail_duration_days),
         override->display_size_factor.value_or(defaults.display_size_factor),
         override->visible.value_or(defaults.visible),
@@ -48,6 +54,8 @@ BodyVisual make_body_visual(const core::BodyDefinition& body, const BodyVisualSe
     const bool draws_orbit_trails = body.elements.semi_major_axis_km > 0.0;
     return BodyVisual{body.name,
                       settings.color,
+                      settings.ambient,
+                      settings.emission,
                       body.radius_km,
                       settings.tail_duration_days,
                       settings.display_size_factor,

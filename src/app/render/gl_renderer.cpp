@@ -2,6 +2,7 @@
 
 #include "app/render/gl_shader.hpp"
 #include "app/render/types.hpp"
+#include "glm/ext/vector_float3.hpp"
 
 #include <glad/gl.h>
 #include <glm/gtc/matrix_transform.hpp>
@@ -26,16 +27,35 @@ uniform mat4 u_model;
 uniform mat4 u_view;
 uniform mat4 u_projection;
 
+out vec3 v_normal;
+
 void main() {
+    v_normal = normalize(mat3(u_model) * a_pos);
     gl_Position = u_projection * u_view * u_model * vec4(a_pos, 1.0);
 }
 )";
 
 constexpr std::string_view kSphereFragmentShader = R"(#version 460 core
+in vec3 v_normal;
+
 uniform vec4 u_color;
+uniform float u_ambient;
+uniform float u_emission;
+uniform vec3 u_light_dir;
+
 out vec4 frag_color;
+
 void main() {
-    frag_color = u_color;
+    vec3 N = normalize(v_normal);
+    vec3 L = normalize(u_light_dir);
+
+    float ndotl = max(dot(N, L), 0.0);
+
+    vec3 albedo = u_color.rgb;
+    vec3 lit = albedo * (u_ambient + (1.0 - u_ambient) * ndotl);
+    vec3 rgb = mix(lit, albedo, u_emission);
+
+    frag_color = vec4(rgb, u_color.a);
 }
 )";
 
@@ -190,6 +210,9 @@ bool GlRenderer::init(const RenderCapacity& capacity) {
         sphere_projection_loc_ = glGetUniformLocation(sphere_program_, "u_projection");
         sphere_model_loc_ = glGetUniformLocation(sphere_program_, "u_model");
         sphere_color_loc_ = glGetUniformLocation(sphere_program_, "u_color");
+        sphere_ambient_loc_ = glGetUniformLocation(sphere_program_, "u_ambient");
+        sphere_emission_loc_ = glGetUniformLocation(sphere_program_, "u_emission");
+        sphere_light_dir_loc_ = glGetUniformLocation(sphere_program_, "u_light_dir");
 
         // % cache_line_uniforms()
         line_view_loc_ = glGetUniformLocation(line_program_, "u_view");
@@ -285,6 +308,15 @@ void GlRenderer::draw_spheres(std::span<const SphereInstance> spheres, const glm
         if (sphere_color_loc_ >= 0) {
             glUniform4f(sphere_color_loc_, sphere.color.r, sphere.color.g, sphere.color.b,
                         sphere.color.a);
+        }
+        if (sphere_ambient_loc_ >= 0) {
+            glUniform1f(sphere_ambient_loc_, sphere.ambient);
+        }
+        if (sphere_emission_loc_ >= 0) {
+            glUniform1f(sphere_emission_loc_, sphere.emission);
+        }
+        if (sphere_light_dir_loc_ >= 0) {
+            glUniform3fv(sphere_light_dir_loc_, 1, glm::value_ptr(sphere.light_dir));
         }
         glDrawElements(GL_TRIANGLES, sphere_index_count_, GL_UNSIGNED_INT, nullptr);
     }

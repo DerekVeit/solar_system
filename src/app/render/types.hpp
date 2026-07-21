@@ -1,6 +1,7 @@
 #pragma once
 
 #include "app/color.hpp"
+#include "glm/ext/vector_float3.hpp"
 
 #include <vector>
 
@@ -13,6 +14,9 @@ struct SphereInstance {
     float z_km{0.0f};
     float radius_km{1.0f};
     Color color{};
+    float ambient{};
+    float emission{};
+    glm::vec3 light_dir{0.0f, 0.0f, 1.0f};
 };
 
 /// Line vertex in camera-relative km.

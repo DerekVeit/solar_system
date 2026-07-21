@@ -19,8 +19,8 @@ class BodyVisual {
     static constexpr Color kOrbitTrailColor{0.45f, 0.45f, 0.45f, 0.35f};
     static constexpr Color kTailColor{0.55f, 0.65f, 0.85f, 0.55f};
 
-    BodyVisual(std::string name, Color color, double radius_km, double tail_duration_days,
-               float display_size_factor, bool draws_orbit_trails);
+    BodyVisual(std::string name, Color color, float ambient, float emission, double radius_km,
+               double tail_duration_days, float display_size_factor, bool draws_orbit_trails);
 
     [[nodiscard]] const std::string& name() const { return name_; }
     [[nodiscard]] bool draws_orbit_trails() const { return draws_orbit_trails_; }
@@ -34,6 +34,8 @@ class BodyVisual {
 
     std::string name_;
     Color color_;
+    float ambient_{0.2f};
+    float emission_{0.0f};
     double radius_km_{0.0};
     double tail_duration_seconds_{0.0};
     float display_size_factor_{1.0f};

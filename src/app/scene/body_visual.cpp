@@ -4,6 +4,7 @@
 #include "core/ephemeris.hpp"
 #include "core/kepler.hpp"
 #include "core/types.hpp"
+#include "glm/geometric.hpp"
 
 #include <algorithm>
 
@@ -21,9 +22,11 @@ namespace {
 }
 
 [[nodiscard]] SphereInstance to_sphere_instance(const core::Displacement& position, Color color,
+                                                float ambient, float emission, glm::vec3 light_dir,
                                                 float radius_km, const ViewFrame& view) {
     const LineVertex vertex = to_line_vertex(position, color, view);
-    return SphereInstance{vertex.x_km, vertex.y_km, vertex.z_km, radius_km, color};
+    return SphereInstance{vertex.x_km, vertex.y_km, vertex.z_km, radius_km,
+                          color,       ambient,     emission,    light_dir};
 }
 
 void append_orbit_loop(const sim::SolarSystem& simulation, const core::BodyDefinition& body,
@@ -81,10 +84,13 @@ void append_tail(const sim::SolarSystem& simulation, const core::BodyDefinition&
 
 } // namespace
 
-BodyVisual::BodyVisual(std::string name, Color color, double radius_km, double tail_duration_days,
-                       float display_size_factor, bool draws_orbit_trails)
+BodyVisual::BodyVisual(std::string name, Color color, float ambient, float emission,
+                       double radius_km, double tail_duration_days, float display_size_factor,
+                       bool draws_orbit_trails)
     : name_(std::move(name))
     , color_(color)
+    , ambient_(ambient)
+    , emission_(emission)
     , radius_km_(radius_km)
     , tail_duration_seconds_(tail_duration_days * core::kSecondsPerDay)
     , display_size_factor_(display_size_factor)
@@ -112,7 +118,10 @@ void BodyVisual::append_draw(const sim::SolarSystem& simulation, const ViewFrame
                              DrawBatch& batch) const {
     const float radius_km = drawn_radius_km(view);
     const core::Displacement position = simulation.state(name_).position;
-    batch.spheres.push_back(to_sphere_instance(position, color_, radius_km, view));
+    const core::Displacement sun_position = simulation.state("Sun").position;
+    const glm::vec3 light_dir = glm::normalize(sun_position.km - position.km);
+    batch.spheres.push_back(
+        to_sphere_instance(position, color_, ambient_, emission_, light_dir, radius_km, view));
 
     if (!draws_orbit_trails_) {
         return;

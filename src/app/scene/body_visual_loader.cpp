@@ -22,6 +22,12 @@ BodyVisualDefaults parse_defaults(const nlohmann::json& json) {
     if (json.contains("color")) {
         defaults.color = parse_color(json.at("color"));
     }
+    if (json.contains("ambient")) {
+        defaults.ambient = json.at("ambient").get<float>();
+    }
+    if (json.contains("emission")) {
+        defaults.emission = json.at("emission").get<float>();
+    }
     if (json.contains("tail_duration_days")) {
         defaults.tail_duration_days = json.at("tail_duration_days").get<double>();
     }
@@ -40,6 +46,12 @@ BodyVisualOverrideEntry parse_override(const nlohmann::json& json) {
     };
     if (json.contains("color")) {
         override_entry.color = parse_color(json.at("color"));
+    }
+    if (json.contains("ambient")) {
+        override_entry.ambient = json.at("ambient").get<float>();
+    }
+    if (json.contains("emission")) {
+        override_entry.emission = json.at("emission").get<float>();
     }
     if (json.contains("tail_duration_days")) {
         override_entry.tail_duration_days = json.at("tail_duration_days").get<double>();
