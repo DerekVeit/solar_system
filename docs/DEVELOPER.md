@@ -174,26 +174,35 @@ do not store view state.
 
 ### BodyVisual (`body_visual.*`)
 
-One drawable body: name, color, radius, tail duration, display size factor,
-whether orbit decorations are enabled (`draws_orbit_trails_`, set from
-`semi_major_axis_km > 0` at construction).
+One drawable body: name, `BodySurface` (color / ambient / emission), radius,
+tail duration, display size factor, and whether orbit decorations are enabled
+(`draws_orbit_trails_`, set from `semi_major_axis_km > 0` at construction).
 
 `append_draw`:
 
-1. Always sample `simulation.state(name)` and project via `to_point_instance`
-   (view center offset applied here — same path for Sun and planets)
+1. Sample `simulation.state(name)`, build a lit sphere instance (view offset
+   applied here — same path for Sun and planets). Non-emissive bodies get a
+   light direction toward the Sun.
 2. If orbital trails: grey closed orbit loop + fading tail line/points
 
-Point size is derived from physical radius, zoom, framebuffer height, and
-optional `display_size_factor`. OpenGL may clamp very large point sizes.
+Drawn radius is derived from physical radius and optional
+`display_size_factor` (body size scaling can be toggled with `s` / `S`).
 
 ### Catalog and presentation config
 
 | File | Role |
 |------|------|
-| `body_visual_catalog.*` | Walk catalog, merge defaults/overrides, `add_body` if visible |
-| `body_visual_loader.*` | Parse `body_visuals.json` |
-| `body_visual_config.hpp` | Defaults + per-body optional overrides |
+| `body_visual_catalog.*` | Walk catalog, resolve spec (named entry or defaults), `add_body` if visible |
+| `body_visual_loader.*` | Parse `body_visuals.json` into fully resolved specs |
+| `body_visual_config.hpp` | `BodySurface`, `BodyVisualSpec`, `BodyVisualConfig` |
+
+JSON shape:
+
+- **`defaults`** — fully required: nested `surface` (`color`, `ambient`,
+  `emission`), plus `tail_duration_days`, `display_size_factor`, `visible`
+- **`bodies`** — optional per-name rows; each field (including nested
+  `surface` keys) merges onto defaults. Catalog bodies without a row use
+  defaults as-is.
 
 **When changing how a body looks:** prefer `body_visuals.json`. **When changing
 physics:** `bodies.json` / core. **When changing draw logic for all bodies:**
@@ -230,10 +239,11 @@ possible.
 | Path | Contents |
 |------|----------|
 | `assets/data/bodies.json` | Name, mu, radius, Kepler elements (Sun-outward order) |
-| `assets/data/body_visuals.json` | Defaults + per-body color, tail days, size factor, visible |
+| `assets/data/body_visuals.json` | Defaults + per-body surface, tail days, size factor, visible |
 
-Mismatch warnings (override without catalog entry, or catalog without
-override) are logged from `body_visual_catalog.cpp`.
+Mismatch warnings (visual entry with no catalog body, or catalog body with no
+visual entry — the latter uses defaults) are logged from
+`body_visual_catalog.cpp`.
 
 ---
 

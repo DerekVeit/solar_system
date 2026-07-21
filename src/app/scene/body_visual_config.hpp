@@ -2,43 +2,30 @@
 
 #include "app/color.hpp"
 
-#include <optional>
 #include <string>
-#include <vector>
+#include <unordered_map>
 
 namespace solar::app {
 
-struct BodyVisualDefaults {
-    Color color{0.7f, 0.7f, 0.8f, 1.0f};
-    float ambient{0.2f};
-    float emission{0.0f};
-    double tail_duration_days{30.0};
-    float display_size_factor{500.0f};
-    bool visible{true};
+/// Shading of a body's spherical surface (authored in body_visuals.json).
+struct BodySurface {
+    Color color{};
+    float ambient{};
+    float emission{};
 };
 
-struct BodyVisualOverrideEntry {
-    std::string name;
-    std::optional<Color> color;
-    std::optional<float> ambient;
-    std::optional<float> emission;
-    std::optional<double> tail_duration_days;
-    std::optional<float> display_size_factor;
-    std::optional<bool> visible;
+/// Fully resolved visual parameters for one body (defaults merged with overrides).
+struct BodyVisualSpec {
+    BodySurface surface{};
+    double tail_duration_days{};
+    float display_size_factor{};
+    bool visible{};
 };
 
-struct BodyVisualSettings {
-    Color color;
-    float ambient;
-    float emission;
-    double tail_duration_days;
-    float display_size_factor;
-    bool visible;
-};
-
+/// Loaded body_visuals.json: complete defaults plus per-name resolved specs.
 struct BodyVisualConfig {
-    BodyVisualDefaults defaults;
-    std::vector<BodyVisualOverrideEntry> overrides;
+    BodyVisualSpec defaults{};
+    std::unordered_map<std::string, BodyVisualSpec> by_name{};
 };
 
 } // namespace solar::app

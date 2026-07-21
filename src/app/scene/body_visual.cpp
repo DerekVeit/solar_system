@@ -22,12 +22,12 @@ namespace {
     return LineVertex{x_km, y_km, z_km, color};
 }
 
-[[nodiscard]] SphereInstance to_sphere_instance(const core::Displacement& position, Color color,
-                                                float ambient, float emission, glm::vec3 light_dir,
+[[nodiscard]] SphereInstance to_sphere_instance(const core::Displacement& position,
+                                                const BodySurface& surface, glm::vec3 light_dir,
                                                 float radius_km, const ViewFrame& view) {
-    const LineVertex vertex = to_line_vertex(position, color, view);
-    return SphereInstance{vertex.x_km, vertex.y_km, vertex.z_km, radius_km,
-                          color,       ambient,     emission,    light_dir};
+    const LineVertex vertex = to_line_vertex(position, surface.color, view);
+    return SphereInstance{vertex.x_km,   vertex.y_km,     vertex.z_km,      radius_km,
+                          surface.color, surface.ambient, surface.emission, light_dir};
 }
 
 void append_orbit_loop(const sim::SolarSystem& simulation, const core::BodyDefinition& body,
@@ -85,16 +85,13 @@ void append_tail(const sim::SolarSystem& simulation, const core::BodyDefinition&
 
 } // namespace
 
-BodyVisual::BodyVisual(std::string name, Color color, float ambient, float emission,
-                       double radius_km, double tail_duration_days, float display_size_factor,
+BodyVisual::BodyVisual(std::string name, BodyVisualSpec spec, double radius_km,
                        bool draws_orbit_trails)
     : name_(std::move(name))
-    , color_(color)
-    , ambient_(ambient)
-    , emission_(emission)
+    , surface_(spec.surface)
     , radius_km_(radius_km)
-    , tail_duration_seconds_(tail_duration_days * core::kSecondsPerDay)
-    , display_size_factor_(display_size_factor)
+    , tail_duration_seconds_(spec.tail_duration_days * core::kSecondsPerDay)
+    , display_size_factor_(spec.display_size_factor)
     , draws_orbit_trails_(draws_orbit_trails) {}
 
 float BodyVisual::drawn_radius_km(const ViewFrame& view) const {
@@ -120,16 +117,15 @@ void BodyVisual::append_draw(const sim::SolarSystem& simulation, const ViewFrame
     const float radius_km = drawn_radius_km(view);
     const core::Displacement position = simulation.state(name_).position;
     glm::vec3 light_dir{0.0f, 0.0f, 1.0f};
-    if (emission_ < 1.0f) {
+    if (surface_.emission < 1.0f) {
         const core::Displacement sun_position = simulation.state("Sun").position;
-        const glm::vec3 delta = sun_position.km - position.km;
+        const glm::dvec3 delta = sun_position.km - position.km;
         const double len2 = glm::dot(delta, delta);
         if (len2 > 0.0) {
             light_dir = glm::vec3(glm::normalize(delta));
         }
     }
-    batch.spheres.push_back(
-        to_sphere_instance(position, color_, ambient_, emission_, light_dir, radius_km, view));
+    batch.spheres.push_back(to_sphere_instance(position, surface_, light_dir, radius_km, view));
 
     if (!draws_orbit_trails_) {
         return;

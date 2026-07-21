@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include <stdexcept>
+#include <string>
 
 #include <nlohmann/json.hpp>
 
@@ -9,60 +10,84 @@ namespace solar::app {
 
 namespace {
 
-Color parse_color(const nlohmann::json& json) {
+[[nodiscard]] std::string path_message(const std::string& context, const std::string& detail) {
+    return context + ": " + detail;
+}
+
+Color parse_color(const nlohmann::json& json, const std::string& context) {
+    if (!json.is_array()) {
+        throw std::runtime_error(path_message(context, "color must be an array [r, g, b, a]"));
+    }
     const auto components = json.get<std::vector<float>>();
     if (components.size() != 4) {
-        throw std::runtime_error("color must have four components [r, g, b, a]");
+        throw std::runtime_error(
+            path_message(context, "color must have four components [r, g, b, a]"));
     }
     return Color{components[0], components[1], components[2], components[3]};
 }
 
-BodyVisualDefaults parse_defaults(const nlohmann::json& json) {
-    BodyVisualDefaults defaults;
-    if (json.contains("color")) {
-        defaults.color = parse_color(json.at("color"));
+void require_object(const nlohmann::json& json, const std::string& context) {
+    if (!json.is_object()) {
+        throw std::runtime_error(path_message(context, "expected a JSON object"));
     }
-    if (json.contains("ambient")) {
-        defaults.ambient = json.at("ambient").get<float>();
-    }
-    if (json.contains("emission")) {
-        defaults.emission = json.at("emission").get<float>();
-    }
-    if (json.contains("tail_duration_days")) {
-        defaults.tail_duration_days = json.at("tail_duration_days").get<double>();
-    }
-    if (json.contains("display_size_factor")) {
-        defaults.display_size_factor = json.at("display_size_factor").get<float>();
-    }
-    if (json.contains("visible")) {
-        defaults.visible = json.at("visible").get<bool>();
-    }
-    return defaults;
 }
 
-BodyVisualOverrideEntry parse_override(const nlohmann::json& json) {
-    BodyVisualOverrideEntry override_entry{
-        .name = json.at("name").get<std::string>(),
-    };
+void apply_surface_partial(const nlohmann::json& json, BodySurface& surface,
+                           const std::string& context) {
+    require_object(json, context);
     if (json.contains("color")) {
-        override_entry.color = parse_color(json.at("color"));
+        surface.color = parse_color(json.at("color"), context + ".color");
     }
     if (json.contains("ambient")) {
-        override_entry.ambient = json.at("ambient").get<float>();
+        surface.ambient = json.at("ambient").get<float>();
     }
     if (json.contains("emission")) {
-        override_entry.emission = json.at("emission").get<float>();
+        surface.emission = json.at("emission").get<float>();
+    }
+}
+
+BodySurface parse_surface_required(const nlohmann::json& json, const std::string& context) {
+    require_object(json, context);
+    for (const char* key : {"color", "ambient", "emission"}) {
+        if (!json.contains(key)) {
+            throw std::runtime_error(path_message(context, std::string(key) + " is required"));
+        }
+    }
+    BodySurface surface{};
+    apply_surface_partial(json, surface, context);
+    return surface;
+}
+
+void apply_spec_partial(const nlohmann::json& json, BodyVisualSpec& spec,
+                        const std::string& context) {
+    require_object(json, context);
+    if (json.contains("surface")) {
+        apply_surface_partial(json.at("surface"), spec.surface, context + ".surface");
     }
     if (json.contains("tail_duration_days")) {
-        override_entry.tail_duration_days = json.at("tail_duration_days").get<double>();
+        spec.tail_duration_days = json.at("tail_duration_days").get<double>();
     }
     if (json.contains("display_size_factor")) {
-        override_entry.display_size_factor = json.at("display_size_factor").get<float>();
+        spec.display_size_factor = json.at("display_size_factor").get<float>();
     }
     if (json.contains("visible")) {
-        override_entry.visible = json.at("visible").get<bool>();
+        spec.visible = json.at("visible").get<bool>();
     }
-    return override_entry;
+}
+
+BodyVisualSpec parse_spec_required(const nlohmann::json& json, const std::string& context) {
+    require_object(json, context);
+    for (const char* key : {"surface", "tail_duration_days", "display_size_factor", "visible"}) {
+        if (!json.contains(key)) {
+            throw std::runtime_error(path_message(context, std::string(key) + " is required"));
+        }
+    }
+    BodyVisualSpec spec{};
+    spec.surface = parse_surface_required(json.at("surface"), context + ".surface");
+    spec.tail_duration_days = json.at("tail_duration_days").get<double>();
+    spec.display_size_factor = json.at("display_size_factor").get<float>();
+    spec.visible = json.at("visible").get<bool>();
+    return spec;
 }
 
 } // namespace
@@ -74,12 +99,43 @@ BodyVisualConfig load_body_visual_config(const std::filesystem::path& path) {
     }
 
     const nlohmann::json root = nlohmann::json::parse(input);
-    BodyVisualConfig config{
-        .defaults = parse_defaults(root.at("defaults")),
-    };
+    if (!root.is_object()) {
+        throw std::runtime_error(path.string() + ": root must be a JSON object");
+    }
+    if (!root.contains("defaults")) {
+        throw std::runtime_error(path.string() + ": defaults is required");
+    }
+    if (!root.contains("bodies")) {
+        throw std::runtime_error(path.string() + ": bodies is required");
+    }
+    if (!root.at("bodies").is_array()) {
+        throw std::runtime_error(path.string() + ": bodies must be an array");
+    }
 
-    for (const auto& entry : root.at("bodies")) {
-        config.overrides.push_back(parse_override(entry));
+    BodyVisualConfig config{};
+    config.defaults = parse_spec_required(root.at("defaults"), path.string() + ": defaults");
+
+    const auto& bodies = root.at("bodies");
+    for (std::size_t i = 0; i < bodies.size(); ++i) {
+        const std::string entry_context = path.string() + ": bodies[" + std::to_string(i) + "]";
+        const nlohmann::json& entry = bodies.at(i);
+        require_object(entry, entry_context);
+        if (!entry.contains("name")) {
+            throw std::runtime_error(path_message(entry_context, "name is required"));
+        }
+
+        const std::string name = entry.at("name").get<std::string>();
+        if (name.empty()) {
+            throw std::runtime_error(path_message(entry_context, "name must be non-empty"));
+        }
+        if (config.by_name.contains(name)) {
+            throw std::runtime_error(
+                path_message(entry_context, "duplicate body entry \"" + name + "\""));
+        }
+
+        BodyVisualSpec spec = config.defaults;
+        apply_spec_partial(entry, spec, entry_context);
+        config.by_name.emplace(name, std::move(spec));
     }
 
     return config;

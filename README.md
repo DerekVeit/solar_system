@@ -12,8 +12,8 @@ with orbit trails, camera pan/zoom, and optional body follow.
 - **Ecliptic view** — point sprites for bodies, grey orbit loops, fading motion
   tails
 - **Camera** — pan, zoom, Home reset, and follow a body (`0`–`9`)
-- **Presentation config** — colors, tail length, size scaling, and visibility in
-  `assets/data/body_visuals.json`
+- **Presentation config** — surface shading (color, ambient, emission), tail
+  length, size scaling, and visibility in `assets/data/body_visuals.json`
 
 For a map of the codebase aimed at new contributors, see
 [docs/DEVELOPER.md](docs/DEVELOPER.md).
@@ -75,7 +75,7 @@ at the current wall-clock epoch.
 | File | Role |
 |------|------|
 | `assets/data/bodies.json` | Physical/orbital definitions (mu, radius, Kepler elements) |
-| `assets/data/body_visuals.json` | Colors, tails, display size factors, visibility |
+| `assets/data/body_visuals.json` | Defaults + per-body surface, tails, size, visibility |
 
 ## Layout
 
