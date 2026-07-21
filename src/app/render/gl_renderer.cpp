@@ -2,11 +2,11 @@
 
 #include "app/render/gl_shader.hpp"
 #include "app/render/types.hpp"
-#include "glm/ext/vector_float3.hpp"
 
 #include <glad/gl.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/vec3.hpp>
 
 #include <cmath>
 #include <cstddef>

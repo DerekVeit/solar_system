@@ -4,7 +4,8 @@
 #include "core/ephemeris.hpp"
 #include "core/kepler.hpp"
 #include "core/types.hpp"
-#include "glm/geometric.hpp"
+
+#include <glm/geometric.hpp>
 
 #include <algorithm>
 
