@@ -4,6 +4,7 @@
 #include "app/render/types.hpp"
 #include "app/scene/body_visual_config.hpp"
 #include "app/scene/view_frame.hpp"
+#include "core/ephemeris.hpp"
 #include "sim/solar_system.hpp"
 
 #include <string>
@@ -20,7 +21,7 @@ class BodyVisual {
     static constexpr Color kOrbitTrailColor{0.45f, 0.45f, 0.45f, 0.35f};
     static constexpr Color kTailColor{0.55f, 0.65f, 0.85f, 0.55f};
 
-    BodyVisual(std::string name, BodyVisualSpec spec, double radius_km, bool draws_orbit_trails);
+    BodyVisual(const core::BodyDefinition& body, BodyVisualSpec spec);
 
     [[nodiscard]] const std::string& name() const { return name_; }
     [[nodiscard]] bool draws_orbit_trails() const { return draws_orbit_trails_; }

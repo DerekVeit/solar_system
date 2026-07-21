@@ -176,7 +176,7 @@ do not store view state.
 
 One drawable body: name, `BodySurface` (color / ambient / emission), radius,
 tail duration, display size factor, and whether orbit decorations are enabled
-(`draws_orbit_trails_`, set from `semi_major_axis_km > 0` at construction).
+(`draws_orbit_trails_`, set from `semi_major_axis_km > 0` in the constructor).
 
 `append_draw`:
 
@@ -192,7 +192,7 @@ Drawn radius is derived from physical radius and optional
 
 | File | Role |
 |------|------|
-| `body_visual_catalog.*` | Walk catalog, resolve spec (named entry or defaults), `add_body` if visible |
+| `body_visual_catalog.*` | Walk catalog, resolve spec, construct `BodyVisual` if visible |
 | `body_visual_loader.*` | Parse `body_visuals.json` into fully resolved specs |
 | `body_visual_config.hpp` | `BodySurface`, `BodyVisualSpec`, `BodyVisualConfig` |
 

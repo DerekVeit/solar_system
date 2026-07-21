@@ -35,11 +35,6 @@ void warn_about_visual_config_mismatches(const std::vector<core::BodyDefinition>
 
 } // namespace
 
-BodyVisual make_body_visual(const core::BodyDefinition& body, const BodyVisualSpec& spec) {
-    const bool draws_orbit_trails = body.elements.semi_major_axis_km > 0.0;
-    return BodyVisual{body.name, spec, body.radius_km, draws_orbit_trails};
-}
-
 void populate_scene(Scene& scene, const std::vector<core::BodyDefinition>& catalog,
                     const BodyVisualConfig& config) {
     warn_about_visual_config_mismatches(catalog, config);
@@ -55,7 +50,7 @@ void populate_scene(Scene& scene, const std::vector<core::BodyDefinition>& catal
         if (!spec->visible) {
             continue;
         }
-        scene.add_body(make_body_visual(body, *spec));
+        scene.add_body(BodyVisual{body, *spec});
     }
 }
 

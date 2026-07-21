@@ -85,14 +85,13 @@ void append_tail(const sim::SolarSystem& simulation, const core::BodyDefinition&
 
 } // namespace
 
-BodyVisual::BodyVisual(std::string name, BodyVisualSpec spec, double radius_km,
-                       bool draws_orbit_trails)
-    : name_(std::move(name))
+BodyVisual::BodyVisual(const core::BodyDefinition& body, BodyVisualSpec spec)
+    : name_(body.name)
     , surface_(spec.surface)
-    , radius_km_(radius_km)
+    , radius_km_(body.radius_km)
     , tail_duration_seconds_(spec.tail_duration_days * core::kSecondsPerDay)
     , display_size_factor_(spec.display_size_factor)
-    , draws_orbit_trails_(draws_orbit_trails) {}
+    , draws_orbit_trails_(body.elements.semi_major_axis_km > 0.0) {}
 
 float BodyVisual::drawn_radius_km(const ViewFrame& view) const {
     const float half_extent_au = view.camera.half_extent_au();
