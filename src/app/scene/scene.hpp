@@ -42,6 +42,8 @@ class Scene {
     void add_yaw(float delta_rad);
     void add_pitch(float delta_rad);
     void reset_orientation();
+    void zoom_in();
+    void zoom_out();
 
   private:
     void update_camera_from_follow(const sim::SolarSystem& simulation);

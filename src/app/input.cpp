@@ -86,10 +86,10 @@ void key_callback(GLFWwindow* glfw_window, int key, int /*scancode*/, int action
             change_acceleration(clock, 2.0);
             break;
         case GLFW_KEY_PAGE_UP:
-            scene->set_view_half_extent_au(scene->view_half_extent_au() / Camera::kZoomFactor);
+            scene->zoom_in();
             break;
         case GLFW_KEY_PAGE_DOWN:
-            scene->set_view_half_extent_au(scene->view_half_extent_au() * Camera::kZoomFactor);
+            scene->zoom_out();
             break;
         case GLFW_KEY_B: {
             bool enabled = (mods == GLFW_MOD_SHIFT);
