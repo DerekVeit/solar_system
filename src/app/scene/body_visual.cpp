@@ -94,21 +94,9 @@ BodyVisual::BodyVisual(const core::BodyDefinition& body, BodyVisualSpec spec)
     , draws_orbit_trails_(body.elements.semi_major_axis_km > 0.0) {}
 
 float BodyVisual::drawn_radius_km(const ViewFrame& view) const {
-    const float half_extent_au = view.camera.half_extent_au();
     const float size_factor = view.body_scaling ? display_size_factor_ : 1.0f;
-    if (radius_km_ <= 0.0 || half_extent_au <= 0.0f || view.framebuffer_height <= 0 ||
-        size_factor <= 0.0f) {
-        return 0.0f;
-    }
-
-    float radius_km = static_cast<float>(radius_km_) * size_factor;
-
-    // Keep a ~2px screen diameter floor (same idea as the old point-sprite minimum).
-    // Ortho: full height is 2 * half_extent; diameter_px = radius * height / half_extent_km.
-    const float half_extent_km = half_extent_au * static_cast<float>(core::kAuKm);
-    const float min_radius_km =
-        (kMinScreenDiameterPx * half_extent_km) / static_cast<float>(view.framebuffer_height);
-    return std::max(radius_km, min_radius_km);
+    const float radius_km = static_cast<float>(radius_km_) * size_factor;
+    return std::max(radius_km, 0.0f);
 }
 
 void BodyVisual::append_draw(const sim::SolarSystem& simulation, const ViewFrame& view,
