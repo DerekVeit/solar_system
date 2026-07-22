@@ -14,7 +14,10 @@
       "name": "Sun",
       "surface": {
         "color": [1.0, 0.9, 0.3, 1.0],
-        "emission": 1.0
+        "emission": 1.0,
+        "textures": {
+          "diffuse": "textures/2k_sun.jpg"
+        }
       },
       "tail_duration_days": 0.0,
       "display_size_factor": 5.0
@@ -22,55 +25,83 @@
     {
       "name": "Mercury",
       "surface": {
-        "color": [0.65, 0.65, 0.7, 1.0]
+        "color": [0.65, 0.65, 0.7, 1.0],
+        "textures": {
+          "diffuse": "textures/2k_mercury.jpg"
+        }
       },
       "tail_duration_days": 20.0
     },
     {
       "name": "Venus",
       "surface": {
-        "color": [1.0, 0.85, 0.5, 1.0]
+        "color": [1.0, 0.85, 0.5, 1.0],
+        "textures": {
+          "diffuse": "textures/2k_venus_atmosphere.jpg"
+        }
       }
     },
     {
       "name": "Earth",
       "surface": {
-        "color": [0.45, 0.75, 1.0, 1.0]
+        "color": [0.45, 0.75, 1.0, 1.0],
+        "textures": {
+          "diffuse": "textures/2k_earth_daymap.jpg",
+          "night": "textures/2k_earth_nightmap.jpg",
+          "clouds": "textures/2k_earth_clouds.jpg",
+          "normal": "textures/2k_earth_normal_map.tif",
+          "specular": "textures/2k_earth_specular_map.tif"
+        }
       },
       "tail_duration_days": 45.0
     },
     {
       "name": "Mars",
       "surface": {
-        "color": [1.0, 0.4, 0.3, 1.0]
+        "color": [1.0, 0.4, 0.3, 1.0],
+        "textures": {
+          "diffuse": "textures/2k_mars.jpg"
+        }
       },
       "tail_duration_days": 60.0
     },
     {
       "name": "Jupiter",
       "surface": {
-        "color": [0.9, 0.7, 0.5, 1.0]
+        "color": [0.9, 0.7, 0.5, 1.0],
+        "textures": {
+          "diffuse": "textures/2k_jupiter.jpg"
+        }
       },
       "tail_duration_days": 120.0
     },
     {
       "name": "Saturn",
       "surface": {
-        "color": [0.95, 0.85, 0.6, 1.0]
+        "color": [0.95, 0.85, 0.6, 1.0],
+        "textures": {
+          "diffuse": "textures/2k_saturn.jpg"
+        }
       },
       "tail_duration_days": 180.0
     },
     {
       "name": "Uranus",
       "surface": {
-        "color": [0.55, 0.85, 0.9, 1.0]
+        "color": [0.55, 0.85, 0.9, 1.0],
+        "textures": {
+          "diffuse": "textures/2k_uranus.jpg"
+        }
       },
       "tail_duration_days": 240.0
     },
     {
       "name": "Neptune",
       "surface": {
-        "color": [0.3, 0.45, 0.9, 1.0]
+        "color": [0.3, 0.45, 0.9, 1.0],
+        "textures": {
+          "diffuse": "textures/2k_neptune.jpg"
+        }
       },
       "tail_duration_days": 300.0
     },
