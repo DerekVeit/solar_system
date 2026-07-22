@@ -3,9 +3,11 @@
 #include "core/constants.hpp"
 
 #include <cmath>
+#include <glm/ext/matrix_clip_space.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/trigonometric.hpp>
 
 namespace solar::app {
 
@@ -131,11 +133,11 @@ glm::mat4 Camera::view_matrix() const {
 }
 
 glm::mat4 Camera::projection_matrix() const {
-    const float half_height_km = half_extent_au_ * static_cast<float>(core::kAuKm);
-    const float half_width_km = half_height_km * aspect_ratio_;
-    const float depth_km = static_cast<float>(core::kAuKm) * 100.0f;
-    return glm::ortho(-half_width_km, half_width_km, -half_height_km, half_height_km, -depth_km,
-                      depth_km);
+    const float au_km = static_cast<float>(core::kAuKm);
+    const float near_km = 0.01f * au_km;
+    const float far_km = 100.0f * au_km;
+    const float fov = glm::radians(45.0f);
+    return glm::perspective(fov, aspect_ratio_, near_km, far_km);
 }
 
 } // namespace solar::app

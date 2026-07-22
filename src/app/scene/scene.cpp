@@ -140,9 +140,9 @@ void Scene::add_pitch(float delta_rad) { camera_.add_pitch(delta_rad); }
 
 void Scene::reset_orientation() { camera_.reset_orientation(); }
 
-void Scene::zoom_in() { set_view_half_extent_au(view_half_extent_au() / Camera::kZoomFactor); }
+void Scene::zoom_in() { camera_.set_radius_au(camera_.radius_au() / Camera::kZoomFactor); }
 
-void Scene::zoom_out() { set_view_half_extent_au(view_half_extent_au() * Camera::kZoomFactor); }
+void Scene::zoom_out() { camera_.set_radius_au(camera_.radius_au() * Camera::kZoomFactor); }
 
 void Scene::update_camera_from_follow(const sim::SolarSystem& simulation) {
     if (!followed_body_) {
