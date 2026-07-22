@@ -1,4 +1,5 @@
 #include "app/scene/body_visual_loader.hpp"
+#include "app/scene/body_visual_config.hpp"
 
 #include <fstream>
 #include <stdexcept>
@@ -32,6 +33,26 @@ void require_object(const nlohmann::json& json, const std::string& context) {
     }
 }
 
+void apply_textures(const nlohmann::json& json, BodySurfaceTextures& textures,
+                    const std::string& context) {
+    require_object(json, context);
+    if (json.contains("diffuse")) {
+        textures.diffuse = json.at("diffuse").get<std::string>();
+    }
+    if (json.contains("night")) {
+        textures.night = json.at("night").get<std::string>();
+    }
+    if (json.contains("clouds")) {
+        textures.clouds = json.at("clouds").get<std::string>();
+    }
+    if (json.contains("normal")) {
+        textures.normal = json.at("normal").get<std::string>();
+    }
+    if (json.contains("specular")) {
+        textures.specular = json.at("specular").get<std::string>();
+    }
+}
+
 void apply_surface_partial(const nlohmann::json& json, BodySurface& surface,
                            const std::string& context) {
     require_object(json, context);
@@ -43,6 +64,9 @@ void apply_surface_partial(const nlohmann::json& json, BodySurface& surface,
     }
     if (json.contains("emission")) {
         surface.emission = json.at("emission").get<float>();
+    }
+    if (json.contains("textures")) {
+        apply_textures(json.at("textures"), surface.textures, context + ".textures");
     }
 }
 

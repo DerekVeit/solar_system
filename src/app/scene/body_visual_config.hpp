@@ -7,11 +7,20 @@
 
 namespace solar::app {
 
+struct BodySurfaceTextures {
+    std::string diffuse;
+    std::string night;
+    std::string clouds;
+    std::string normal;
+    std::string specular;
+};
+
 /// Shading of a body's spherical surface (authored in body_visuals.json).
 struct BodySurface {
     Color color{};
     float ambient{};
     float emission{};
+    BodySurfaceTextures textures{};
 };
 
 /// Fully resolved visual parameters for one body (defaults merged with overrides).
