@@ -25,6 +25,12 @@ add_library(glad STATIC
 target_include_directories(glad PUBLIC ${CMAKE_SOURCE_DIR}/third_party/glad/include)
 target_link_libraries(glad PUBLIC ${CMAKE_DL_LIBS})
 
+# stb_image is a header-only library: one .cpp owns STB_IMAGE_IMPLEMENTATION.
+add_library(stb STATIC
+    ${CMAKE_SOURCE_DIR}/third_party/stb/stb_image.cpp
+)
+target_include_directories(stb PUBLIC ${CMAKE_SOURCE_DIR}/third_party/stb/include)
+
 add_executable(solar_system
     app/color.cpp
     app/files.cpp
@@ -48,6 +54,7 @@ target_link_libraries(solar_system
     PRIVATE
         solar_core
         glad
+        stb
         ${GLFW3_LIBRARIES}
 )
 
