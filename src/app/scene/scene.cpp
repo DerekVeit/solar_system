@@ -1,13 +1,30 @@
 #include "app/scene/scene.hpp"
 
 #include "app/logging.hpp"
+#include "app/scene/body_visual.hpp"
+#include "app/scene/texture.hpp"
 #include "core/constants.hpp"
 #include "core/ephemeris.hpp"
 
 #include <glm/vec3.hpp>
+#include <span>
+#include <string>
+#include <unordered_set>
 #include <utility>
 
 namespace solar::app {
+
+namespace {
+
+std::unordered_set<std::string> texture_paths_of_bodies(std::span<BodyVisual> bodies) {
+    std::unordered_set<std::string> paths{};
+    for (const BodyVisual& body : bodies) {
+        paths.merge(body.texture_paths());
+    }
+    return paths;
+}
+
+} // namespace
 
 Scene::Scene(std::unique_ptr<IRenderer> renderer)
     : renderer_(std::move(renderer)) {}
@@ -32,7 +49,19 @@ bool Scene::init() {
         .max_line_trail_vertices = trail_bodies * BodyVisual::kTailSamples,
         .max_line_loop_vertices = trail_bodies * BodyVisual::kOrbitSamples,
     };
-    return renderer_->init(capacity);
+    if (!renderer_->init(capacity)) {
+        return false;
+    }
+    std::unordered_set<std::string> texture_paths = texture_paths_of_bodies(bodies_);
+    for (std::string path : texture_paths) {
+        TextureImage image = image_from_path(path);
+        if (image.valid()) {
+            renderer_->upload_texture(path, image);
+        } else {
+            log("failed to get valid image from path {}", path);
+        }
+    }
+    return true;
 }
 
 void Scene::render(const sim::SolarSystem& simulation, float aspect_ratio, int framebuffer_height) {

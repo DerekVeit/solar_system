@@ -8,6 +8,7 @@
 #include <glm/geometric.hpp>
 
 #include <algorithm>
+#include <unordered_set>
 
 namespace solar::app {
 
@@ -139,6 +140,26 @@ void BodyVisual::append_draw(const sim::SolarSystem& simulation, const ViewFrame
     if (!tail_trail.vertices.empty()) {
         batch.line_trails.push_back(std::move(tail_trail));
     }
+}
+
+std::unordered_set<std::string> BodyVisual::texture_paths() const {
+    std::unordered_set<std::string> paths{};
+    if (!surface_.textures.diffuse.empty()) {
+        paths.insert(surface_.textures.diffuse);
+    }
+    if (!surface_.textures.night.empty()) {
+        paths.insert(surface_.textures.night);
+    }
+    if (!surface_.textures.clouds.empty()) {
+        paths.insert(surface_.textures.clouds);
+    }
+    if (!surface_.textures.normal.empty()) {
+        paths.insert(surface_.textures.normal);
+    }
+    if (!surface_.textures.specular.empty()) {
+        paths.insert(surface_.textures.specular);
+    }
+    return paths;
 }
 
 } // namespace solar::app

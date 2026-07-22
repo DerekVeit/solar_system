@@ -179,6 +179,10 @@ void GlRenderer::destroy() {
     max_line_vertices_ = 0;
     max_line_trail_vertices_ = 0;
     max_line_loop_vertices_ = 0;
+    for (auto item : textures_) {
+        glDeleteTextures(1, &item.second);
+    }
+    textures_.clear();
 }
 
 bool GlRenderer::init(const RenderCapacity& capacity) {
@@ -355,6 +359,21 @@ void GlRenderer::draw(const DrawBatch& batch, const glm::mat4& view, const glm::
                          projection);
     draw_line_primitives(GL_LINE_LOOP, batch.line_loops, max_line_loop_vertices_, view, projection);
     draw_line_primitives(GL_LINES, batch.lines, max_line_vertices_, view, projection);
+}
+
+void GlRenderer::upload_texture(const std::string& path, const TextureImage& image) {
+    GLuint id = 0;
+    glGenTextures(1, &id);
+    glBindTexture(GL_TEXTURE_2D, id);
+    // glTexParameteri();
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, image.width, image.height, 0, GL_RGBA,
+                 GL_UNSIGNED_BYTE, image.pixels);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    if (textures_.contains(path)) {
+        glDeleteTextures(1, &textures_[path]);
+    }
+    textures_[path] = id;
 }
 
 } // namespace solar::app

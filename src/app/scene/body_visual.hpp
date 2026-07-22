@@ -8,6 +8,7 @@
 #include "sim/solar_system.hpp"
 
 #include <string>
+#include <unordered_set>
 
 namespace solar::app {
 
@@ -28,6 +29,8 @@ class BodyVisual {
 
     void append_draw(const sim::SolarSystem& simulation, const ViewFrame& view,
                      DrawBatch& batch) const;
+
+    std::unordered_set<std::string> texture_paths() const;
 
   private:
     /// Drawn sphere radius in km (physical radius, display factor, min screen size).

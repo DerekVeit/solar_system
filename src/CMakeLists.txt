@@ -45,6 +45,7 @@ add_executable(solar_system
     app/scene/body_visual_loader.cpp
     app/scene/camera.cpp
     app/scene/scene.cpp
+    app/scene/texture.cpp
     app/window.cpp
 )
 

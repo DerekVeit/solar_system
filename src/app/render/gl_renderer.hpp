@@ -3,6 +3,7 @@
 #include "app/render/renderer.hpp"
 
 #include <span>
+#include <unordered_map>
 
 namespace solar::app {
 
@@ -18,6 +19,7 @@ class GlRenderer final : public IRenderer {
 
     bool init(const RenderCapacity& capacity) override;
     void draw(const DrawBatch& batch, const glm::mat4& view, const glm::mat4& projection) override;
+    void upload_texture(const std::string& path, const TextureImage& image) override;
 
   private:
     void destroy();
@@ -50,6 +52,7 @@ class GlRenderer final : public IRenderer {
     std::size_t max_line_vertices_{0};
     std::size_t max_line_trail_vertices_{0};
     std::size_t max_line_loop_vertices_{0};
+    std::unordered_map<std::string, unsigned int> textures_;
 };
 
 } // namespace solar::app
