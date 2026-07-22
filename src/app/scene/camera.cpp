@@ -23,6 +23,8 @@ float Camera::view_width_au() const { return 2.0f * half_extent_au_ * aspect_rat
 
 float Camera::view_height_au() const { return 2.0f * half_extent_au_; }
 
+void Camera::set_radius_au(float radius_au) { radius_au_ = radius_au; }
+
 void Camera::clamp_pitch() {
     if (pitch_rad_ > kPitchLimitRad) {
         pitch_rad_ = kPitchLimitRad;

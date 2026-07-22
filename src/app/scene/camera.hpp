@@ -36,6 +36,7 @@ class Camera {
     [[nodiscard]] float yaw_rad() const { return yaw_rad_; }
     [[nodiscard]] float pitch_rad() const { return pitch_rad_; }
     [[nodiscard]] float radius_au() const { return radius_au_; }
+    void set_radius_au(float radius_au);
 
     void add_yaw(float delta_rad);
     void add_pitch(float delta_rad);
