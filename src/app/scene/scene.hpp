@@ -42,6 +42,10 @@ class Scene {
     void add_yaw(float delta_rad);
     void add_pitch(float delta_rad);
     void reset_orientation();
+    void set_view_from_north();
+    void set_view_from_south();
+    void set_view_from_east();
+    void set_view_from_west();
     void zoom_in();
     void zoom_out();
 

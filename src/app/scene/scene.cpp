@@ -165,6 +165,14 @@ void Scene::add_pitch(float delta_rad) { camera_.add_pitch(delta_rad); }
 
 void Scene::reset_orientation() { camera_.reset_orientation(); }
 
+void Scene::set_view_from_north() { camera_.set_view_from_north(); }
+
+void Scene::set_view_from_south() { camera_.set_view_from_south(); }
+
+void Scene::set_view_from_east() { camera_.set_view_from_east(); }
+
+void Scene::set_view_from_west() { camera_.set_view_from_west(); }
+
 void Scene::zoom_in() { camera_.set_radius_au(camera_.radius_au() / Camera::kZoomFactor); }
 
 void Scene::zoom_out() { camera_.set_radius_au(camera_.radius_au() * Camera::kZoomFactor); }

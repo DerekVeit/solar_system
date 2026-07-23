@@ -108,6 +108,22 @@ void key_callback(GLFWwindow* glfw_window, int key, int /*scancode*/, int action
         case GLFW_KEY_D:
             scene->add_yaw(Camera::kYawPitchStepRad);
             break;
+        case GLFW_KEY_KP_8:
+            scene->set_view_from_north();
+            log("view from celestial north");
+            break;
+        case GLFW_KEY_KP_2:
+            scene->set_view_from_south();
+            log("view from celestial south");
+            break;
+        case GLFW_KEY_KP_6:
+            scene->set_view_from_east();
+            log("view from celestial east");
+            break;
+        case GLFW_KEY_KP_4:
+            scene->set_view_from_west();
+            log("view from celestial west");
+            break;
         case GLFW_KEY_LEFT:
             scene->pan_view_fraction(-Camera::kPanFraction, 0.0f);
             break;

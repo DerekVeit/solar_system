@@ -65,10 +65,14 @@ at the current wall-clock epoch.
 | **-** / **+** (or numpad) | Halve / double acceleration |
 | **Page Up** / **Page Down** | Zoom in / out |
 | **Arrow keys** | Pan camera (or offset while following) |
+| **W** / **S** | Pitch up / down |
+| **A** / **D** | Yaw left / right |
+| **Numpad 8 / 2 / 6 / 4** | View target from celestial N / S / E / W |
 | **Home** | Clear follow, center view on the Sun |
+| **End** | Reset camera orientation (keep target) |
 | **`** | Clear follow, but keep current view |
 | **0**–**9** | Follow Sun through Pluto (catalog order) |
-| **s** / **S** | Body size scaling off / on |
+| **B** / **Shift+B** | Body size scaling off / on |
 
 ## Data
 

@@ -19,11 +19,14 @@ class Camera {
   public:
     static constexpr float kDefaultRadiusAu = 5.0f;            // distance from target
     static constexpr float kDefaultYawRad = core::kPi / 2;     // π/2 = pointed at world +Y
-    static constexpr float kDefaultPitchRad = -core::kPi / 24; // -π/2 = pointed down, world -Z
+    static constexpr float kDefaultPitchRad = -core::kPi / 24; // slightly below the ecliptic
     static constexpr float kYawPitchStepRad = core::kPi / 360; // 0.5°
     static constexpr float kPitchLimitRad = core::kPi / 2; // no further than straight up or down
     static constexpr float kZoomFactor = 1.02f;
     static constexpr float kPanFraction = 0.005;
+
+    // Absolute orientations: look at the target from this celestial direction (ecliptic frame).
+    // North/south: ±Z. East/west: ±X with +Z up (pitch 0).
 
     [[nodiscard]] float half_extent_au() const { return half_extent_au_; }
     void set_half_extent_au(float half_extent_au);
@@ -42,6 +45,12 @@ class Camera {
     void add_yaw(float delta_rad);
     void add_pitch(float delta_rad);
     void reset_orientation();
+
+    /// Set yaw/pitch to view the look-at target from a fixed ecliptic direction.
+    void set_view_from_north();
+    void set_view_from_south();
+    void set_view_from_east();
+    void set_view_from_west();
 
     /// Pan the look-at target in AU (free camera).
     void pan_target_au(float delta_x_au, float delta_y_au, float delta_z_au);

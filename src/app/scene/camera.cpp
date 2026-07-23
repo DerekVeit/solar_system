@@ -48,6 +48,30 @@ void Camera::reset_orientation() {
     radius_au_ = kDefaultRadiusAu;
 }
 
+void Camera::set_view_from_north() {
+    // From +Z looking toward -Z (down onto the ecliptic).
+    yaw_rad_ = kDefaultYawRad;
+    pitch_rad_ = -kPitchLimitRad;
+}
+
+void Camera::set_view_from_south() {
+    // From -Z looking toward +Z.
+    yaw_rad_ = kDefaultYawRad;
+    pitch_rad_ = kPitchLimitRad;
+}
+
+void Camera::set_view_from_east() {
+    // From +X looking toward -X; +Z is up.
+    yaw_rad_ = core::kPi;
+    pitch_rad_ = 0.0f;
+}
+
+void Camera::set_view_from_west() {
+    // From -X looking toward +X; +Z is up.
+    yaw_rad_ = 0.0f;
+    pitch_rad_ = 0.0f;
+}
+
 void Camera::pan_target_au(float delta_x_au, float delta_y_au, float delta_z_au) {
     target_x_au_ += delta_x_au;
     target_y_au_ += delta_y_au;
