@@ -152,20 +152,20 @@ Owns:
 
 - `BodyVisual` list
 - `IRenderer`
-- View half-extent (zoom), body-scaling flag
-- Camera center in AU (`view_center_*`)
-- Optional follow target + pan offset while following
+- `Camera` (look-at target, orbit angles, radius / framing)
+- Body-scaling flag
+- Optional follow body name + pan offset while following
 
 Each `render` call:
 
-1. If following, set `view_center` from body position (km → AU) + offset
-2. Build `ViewFrame` (half extent, aspect, framebuffer height, scaling, center)
+1. If following, set camera look-at from body position (km → AU) + offset
+2. Build `ViewFrame` (camera snapshot, framebuffer height, scaling)
 3. Each `BodyVisual::append_draw` fills a `DrawBatch`
-4. `renderer_->draw(batch)`
+4. `renderer_->draw(batch, view, projection)`
 
-**Pan:** free camera moves `view_center`; while following, moves
-`follow_offset_*` instead. **Home:** clears follow, offset, and centers on the
-Sun (origin).
+**Pan:** free camera pans the look-at target; while following, moves
+`follow_offset_*` instead. **Unfollow:** leaves the look-at where it is.
+**Home:** clears follow and offset, resets camera to default (origin look-at).
 
 ### ViewFrame (`view_frame.hpp`)
 

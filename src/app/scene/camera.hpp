@@ -8,10 +8,11 @@
 
 namespace solar::app {
 
-/// Scene-owned camera: orbit look-at + yaw/pitch/radius, orthographic framing.
+/// Scene-owned camera: orbit look-at + yaw/pitch/radius.
 ///
-/// Free and follow both use a look-at target; eye = target - radius * forward(yaw, pitch).
-/// Follow updates the target from a body; free pans the target.
+/// Single look-at target; eye = target - radius * forward(yaw, pitch).
+/// Free pan moves the target; follow overwrites it each frame (body + offset).
+/// Unfollow leaves the target where it is.
 /// View basis: yaw sets a horizontal right, forward from yaw/pitch, up = right × forward.
 /// Geometry is eye-relative km.
 class Camera {
@@ -42,16 +43,11 @@ class Camera {
     void add_pitch(float delta_rad);
     void reset_orientation();
 
-    /// Free look-at target in AU (used when not following).
-    void pan_free_target_au(float delta_x_au, float delta_y_au, float delta_z_au);
+    /// Pan the look-at target in AU (free camera).
+    void pan_target_au(float delta_x_au, float delta_y_au, float delta_z_au);
 
-    /// Follow look-at point in AU (body + offset). Call each frame while following.
-    void set_follow_target_au(float x_au, float y_au, float z_au);
-    void clear_follow();
-    [[nodiscard]] bool following() const { return following_; }
-
-    /// Keep framing after releasing follow: free target becomes the current look-at.
-    void capture_free_target_from_resolved();
+    /// Set the look-at point in AU (e.g. each frame while following a body).
+    void set_target_au(float x_au, float y_au, float z_au);
 
     void reset_to_default_view();
 
@@ -81,14 +77,9 @@ class Camera {
     [[nodiscard]] Resolved resolve() const;
     void clamp_pitch();
 
-    float free_target_x_au_{0.0f};
-    float free_target_y_au_{0.0f};
-    float free_target_z_au_{0.0f};
-
-    float follow_target_x_au_{0.0f};
-    float follow_target_y_au_{0.0f};
-    float follow_target_z_au_{0.0f};
-    bool following_{false};
+    float target_x_au_{0.0f};
+    float target_y_au_{0.0f};
+    float target_z_au_{0.0f};
 
     float yaw_rad_{kDefaultYawRad};
     float pitch_rad_{kDefaultPitchRad};

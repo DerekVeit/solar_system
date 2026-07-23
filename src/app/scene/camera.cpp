@@ -48,37 +48,23 @@ void Camera::reset_orientation() {
     radius_au_ = kDefaultRadiusAu;
 }
 
-void Camera::pan_free_target_au(float delta_x_au, float delta_y_au, float delta_z_au) {
-    free_target_x_au_ += delta_x_au;
-    free_target_y_au_ += delta_y_au;
-    free_target_z_au_ += delta_z_au;
+void Camera::pan_target_au(float delta_x_au, float delta_y_au, float delta_z_au) {
+    target_x_au_ += delta_x_au;
+    target_y_au_ += delta_y_au;
+    target_z_au_ += delta_z_au;
 }
 
-void Camera::set_follow_target_au(float x_au, float y_au, float z_au) {
-    follow_target_x_au_ = x_au;
-    follow_target_y_au_ = y_au;
-    follow_target_z_au_ = z_au;
-    following_ = true;
-}
-
-void Camera::clear_follow() { following_ = false; }
-
-void Camera::capture_free_target_from_resolved() {
-    const Resolved resolved = resolve();
-    free_target_x_au_ = resolved.target_au.x;
-    free_target_y_au_ = resolved.target_au.y;
-    free_target_z_au_ = resolved.target_au.z;
+void Camera::set_target_au(float x_au, float y_au, float z_au) {
+    target_x_au_ = x_au;
+    target_y_au_ = y_au;
+    target_z_au_ = z_au;
 }
 
 void Camera::reset_to_default_view() {
-    following_ = false;
     reset_orientation();
-    free_target_x_au_ = 0.0f;
-    free_target_y_au_ = 0.0f;
-    free_target_z_au_ = 0.0f;
-    follow_target_x_au_ = 0.0f;
-    follow_target_y_au_ = 0.0f;
-    follow_target_z_au_ = 0.0f;
+    target_x_au_ = 0.0f;
+    target_y_au_ = 0.0f;
+    target_z_au_ = 0.0f;
 }
 
 glm::vec3 Camera::forward_from_angles() const {
@@ -98,12 +84,7 @@ Camera::Basis Camera::basis_from_angles() const {
 
 Camera::Resolved Camera::resolve() const {
     Resolved resolved;
-    if (following_) {
-        resolved.target_au =
-            glm::vec3{follow_target_x_au_, follow_target_y_au_, follow_target_z_au_};
-    } else {
-        resolved.target_au = glm::vec3{free_target_x_au_, free_target_y_au_, free_target_z_au_};
-    }
+    resolved.target_au = glm::vec3{target_x_au_, target_y_au_, target_z_au_};
     resolved.eye_au = resolved.target_au - forward_from_angles() * radius_au_;
     return resolved;
 }
