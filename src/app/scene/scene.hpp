@@ -44,6 +44,8 @@ class Scene {
     void reset_orientation();
     void set_view_from_north();
     void set_view_from_south();
+    void set_view_from_ypos();
+    void set_view_from_yneg();
     void set_view_from_east();
     void set_view_from_west();
     void zoom_in();

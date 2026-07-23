@@ -116,6 +116,14 @@ void key_callback(GLFWwindow* glfw_window, int key, int /*scancode*/, int action
             scene->set_view_from_south();
             log("view from celestial south");
             break;
+        case GLFW_KEY_KP_8:
+            scene->set_view_from_ypos();
+            log("view from celestial Y+");
+            break;
+        case GLFW_KEY_KP_2:
+            scene->set_view_from_yneg();
+            log("view from celestial Y-");
+            break;
         case GLFW_KEY_KP_6:
             scene->set_view_from_east();
             log("view from celestial east");

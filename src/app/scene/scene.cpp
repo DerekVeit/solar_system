@@ -169,6 +169,10 @@ void Scene::set_view_from_north() { camera_.set_view_from_north(); }
 
 void Scene::set_view_from_south() { camera_.set_view_from_south(); }
 
+void Scene::set_view_from_ypos() { camera_.set_view_from_ypos(); }
+
+void Scene::set_view_from_yneg() { camera_.set_view_from_yneg(); }
+
 void Scene::set_view_from_east() { camera_.set_view_from_east(); }
 
 void Scene::set_view_from_west() { camera_.set_view_from_west(); }

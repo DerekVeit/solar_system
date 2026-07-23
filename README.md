@@ -68,6 +68,7 @@ at the current wall-clock epoch.
 | **W** / **S** | Pitch up / down |
 | **A** / **D** | Yaw left / right |
 | **Numpad 9 / 1 / 6 / 4** | View target from celestial N / S / E / W |
+| **Numpad 8 / 2** | View target from celestial +Y / -Y |
 | **Home** | Clear follow, center view on the Sun |
 | **End** | Reset camera orientation (keep target) |
 | **`** | Clear follow, but keep current view |

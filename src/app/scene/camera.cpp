@@ -60,6 +60,18 @@ void Camera::set_view_from_south() {
     pitch_rad_ = kPitchLimitRad;
 }
 
+void Camera::set_view_from_ypos() {
+    // From +Y looking toward -Y; +Z is up.
+    yaw_rad_ = -core::kPi / 2;
+    pitch_rad_ = 0.0f;
+}
+
+void Camera::set_view_from_yneg() {
+    // From -Y looking toward +Y; +Z is up.
+    yaw_rad_ = core::kPi / 2;
+    pitch_rad_ = 0.0f;
+}
+
 void Camera::set_view_from_east() {
     // From +X looking toward -X; +Z is up.
     yaw_rad_ = core::kPi;

@@ -49,6 +49,8 @@ class Camera {
     /// Set yaw/pitch to view the look-at target from a fixed ecliptic direction.
     void set_view_from_north();
     void set_view_from_south();
+    void set_view_from_ypos();
+    void set_view_from_yneg();
     void set_view_from_east();
     void set_view_from_west();
 
