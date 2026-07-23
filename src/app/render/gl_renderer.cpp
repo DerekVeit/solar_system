@@ -27,21 +27,34 @@ uniform mat4 u_model;
 uniform mat4 u_view;
 uniform mat4 u_projection;
 
+out vec2 v_uv;
 out vec3 v_normal;
 
 void main() {
+    const float PI = 3.14159265;
+    // Body axial orientation and rotation are not yet represented.
+    // Equirectangular texture: u = longitude, v = latitude
+    // +Z is ecliptic normal (in lieu of body north for now).
+    // Texture coordinates are v=0 at top, +v is down, so Z is inverted below.
+    v_uv = vec2(
+        atan(a_pos.y, a_pos.x) / (2.0 * PI) + 0.5,
+        asin(clamp(-a_pos.z, -1.0, 1.0)) / PI + 0.5
+    );
     v_normal = normalize(mat3(u_model) * a_pos);
     gl_Position = u_projection * u_view * u_model * vec4(a_pos, 1.0);
 }
 )";
 
 constexpr std::string_view kSphereFragmentShader = R"(#version 460 core
+in vec2 v_uv;
 in vec3 v_normal;
 
 uniform vec4 u_color;
 uniform float u_ambient;
 uniform float u_emission;
 uniform vec3 u_light_dir;
+uniform sampler2D u_diffuse;
+uniform bool u_use_diffuse;
 
 out vec4 frag_color;
 
@@ -52,6 +65,9 @@ void main() {
     float ndotl = max(dot(N, L), 0.0);
 
     vec3 albedo = u_color.rgb;
+    if (u_use_diffuse) {
+        albedo *= texture(u_diffuse, v_uv).rgb;
+    }
     vec3 lit = albedo * (u_ambient + (1.0 - u_ambient) * ndotl);
     vec3 rgb = mix(lit, albedo, u_emission);
 
@@ -220,6 +236,8 @@ bool GlRenderer::init(const RenderCapacity& capacity) {
         sphere_ambient_loc_ = glGetUniformLocation(sphere_program_, "u_ambient");
         sphere_emission_loc_ = glGetUniformLocation(sphere_program_, "u_emission");
         sphere_light_dir_loc_ = glGetUniformLocation(sphere_program_, "u_light_dir");
+        sphere_diffuse_loc_ = glGetUniformLocation(sphere_program_, "u_diffuse");
+        sphere_use_diffuse_loc_ = glGetUniformLocation(sphere_program_, "u_use_diffuse");
 
         // % cache_line_uniforms()
         line_view_loc_ = glGetUniformLocation(line_program_, "u_view");
@@ -312,10 +330,29 @@ void GlRenderer::draw_spheres(std::span<const SphereInstance> spheres, const glm
         if (sphere_model_loc_ >= 0) {
             glUniformMatrix4fv(sphere_model_loc_, 1, GL_FALSE, glm::value_ptr(model));
         }
+
+        const bool using_diffuse_texture =
+            (!sphere.diffuse_path.empty() && textures_.contains(sphere.diffuse_path) &&
+             sphere_diffuse_loc_ >= 0 && sphere_use_diffuse_loc_ >= 0);
+
         if (sphere_color_loc_ >= 0) {
-            glUniform4f(sphere_color_loc_, sphere.color.r, sphere.color.g, sphere.color.b,
-                        sphere.color.a);
+            if (using_diffuse_texture) {
+                glUniform4f(sphere_color_loc_, 1.0f, 1.0f, 1.0f, sphere.color.a);
+            } else {
+                glUniform4f(sphere_color_loc_, sphere.color.r, sphere.color.g, sphere.color.b,
+                            sphere.color.a);
+            }
         }
+        if (using_diffuse_texture) {
+            auto diffuse_id = textures_[sphere.diffuse_path];
+            glUniform1i(sphere_use_diffuse_loc_, true);
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, diffuse_id);
+            glUniform1i(sphere_diffuse_loc_, 0);
+        } else {
+            glUniform1i(sphere_use_diffuse_loc_, false);
+        }
+
         if (sphere_ambient_loc_ >= 0) {
             glUniform1f(sphere_ambient_loc_, sphere.ambient);
         }
@@ -365,7 +402,10 @@ void GlRenderer::upload_texture(const std::string& path, const TextureImage& ima
     GLuint id = 0;
     glGenTextures(1, &id);
     glBindTexture(GL_TEXTURE_2D, id);
-    // glTexParameteri();
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, image.width, image.height, 0, GL_RGBA,
                  GL_UNSIGNED_BYTE, image.pixels);
     glGenerateMipmap(GL_TEXTURE_2D);

@@ -18,6 +18,7 @@ struct SphereInstance {
     float ambient{};
     float emission{};
     glm::vec3 light_dir{0.0f, 0.0f, 1.0f};
+    std::string diffuse_path{};
 };
 
 /// Line vertex in camera-relative km.

@@ -27,8 +27,9 @@ namespace {
                                                 const BodySurface& surface, glm::vec3 light_dir,
                                                 float radius_km, const ViewFrame& view) {
     const LineVertex vertex = to_line_vertex(position, surface.color, view);
-    return SphereInstance{vertex.x_km,   vertex.y_km,     vertex.z_km,      radius_km,
-                          surface.color, surface.ambient, surface.emission, light_dir};
+    return SphereInstance{vertex.x_km,      vertex.y_km,   vertex.z_km,
+                          radius_km,        surface.color, surface.ambient,
+                          surface.emission, light_dir,     surface.textures.diffuse};
 }
 
 void append_orbit_loop(const sim::SolarSystem& simulation, const core::BodyDefinition& body,
