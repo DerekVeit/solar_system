@@ -109,14 +109,14 @@ void generate_unit_sphere(std::vector<float>& positions, std::vector<unsigned in
     for (int stack = 0; stack <= kSphereStacks; ++stack) {
         const float v = static_cast<float>(stack) / static_cast<float>(kSphereStacks);
         const float phi = v * kPi;
-        const float y = std::cos(phi);
+        const float z = std::cos(phi);
         const float ring_radius = std::sin(phi);
 
         for (int slice = 0; slice <= kSphereSlices; ++slice) {
             const float u = static_cast<float>(slice) / static_cast<float>(kSphereSlices);
             const float theta = u * (2.0f * kPi);
             const float x = ring_radius * std::cos(theta);
-            const float z = ring_radius * std::sin(theta);
+            const float y = ring_radius * std::sin(theta);
             positions.push_back(x);
             positions.push_back(y);
             positions.push_back(z);
