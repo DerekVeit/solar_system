@@ -22,6 +22,7 @@ constexpr float kPi = std::numbers::pi_v<float>;
 
 constexpr std::string_view kSphereVertexShader = R"(#version 460 core
 layout(location = 0) in vec3 a_pos;
+layout(location = 1) in vec2 a_uv;
 
 uniform mat4 u_model;
 uniform mat4 u_view;
@@ -31,15 +32,8 @@ out vec2 v_uv;
 out vec3 v_normal;
 
 void main() {
+    v_uv = a_uv;
     const float PI = 3.14159265;
-    // Body axial orientation and rotation are not yet represented.
-    // Equirectangular texture: u = longitude, v = latitude
-    // +Z is ecliptic normal (in lieu of body north for now).
-    // Texture coordinates are v=0 at top, +v is down, so Z is inverted below.
-    v_uv = vec2(
-        atan(a_pos.y, a_pos.x) / (2.0 * PI) + 0.5,
-        asin(clamp(-a_pos.z, -1.0, 1.0)) / PI + 0.5
-    );
     v_normal = normalize(mat3(u_model) * a_pos);
     gl_Position = u_projection * u_view * u_model * vec4(a_pos, 1.0);
 }
@@ -106,6 +100,8 @@ void generate_unit_sphere(std::vector<float>& positions, std::vector<unsigned in
     positions.clear();
     indices.clear();
 
+    // Body axial orientation and rotation are not yet represented.
+    // u = longitude 0..1, v = latitude 0..1 (from top to bottom)
     for (int stack = 0; stack <= kSphereStacks; ++stack) {
         const float v = static_cast<float>(stack) / static_cast<float>(kSphereStacks);
         const float phi = v * kPi;
@@ -120,6 +116,8 @@ void generate_unit_sphere(std::vector<float>& positions, std::vector<unsigned in
             positions.push_back(x);
             positions.push_back(y);
             positions.push_back(z);
+            positions.push_back(u);
+            positions.push_back(v);
         }
     }
 
@@ -262,8 +260,11 @@ bool GlRenderer::init(const RenderCapacity& capacity) {
                      static_cast<GLsizeiptr>(sphere_indices.size() * sizeof(unsigned int)),
                      sphere_indices.data(), GL_STATIC_DRAW);
         glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
                               reinterpret_cast<void*>(0));
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
+                              reinterpret_cast<void*>(3 * sizeof(float)));
 
         // % create_line_buffers(capacity)
         glGenVertexArrays(1, &line_vao_);
