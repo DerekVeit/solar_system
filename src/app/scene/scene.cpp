@@ -177,9 +177,15 @@ void Scene::set_view_from_east() { camera_.set_view_from_east(); }
 
 void Scene::set_view_from_west() { camera_.set_view_from_west(); }
 
-void Scene::zoom_in() { camera_.set_radius_au(camera_.radius_au() / Camera::kZoomFactor); }
+void Scene::zoom_in() {
+    camera_.set_radius_au(camera_.radius_au() / Camera::kZoomFactor);
+    log("camera_radius_au: {}", camera_.radius_au());
+}
 
-void Scene::zoom_out() { camera_.set_radius_au(camera_.radius_au() * Camera::kZoomFactor); }
+void Scene::zoom_out() {
+    camera_.set_radius_au(camera_.radius_au() * Camera::kZoomFactor);
+    log("camera_radius_au: {}", camera_.radius_au());
+}
 
 void Scene::update_camera_from_follow(const sim::SolarSystem& simulation) {
     if (!followed_body_) {
