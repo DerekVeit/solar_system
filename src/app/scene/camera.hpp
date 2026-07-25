@@ -24,6 +24,7 @@ class Camera {
     static constexpr float kPitchLimitRad = core::kPi / 2; // no further than straight up or down
     static constexpr float kZoomFactor = 1.02f;
     static constexpr float kPanFraction = 0.005;
+    static constexpr float kFov = 45.0f; // field of view, degrees
 
     // Absolute orientations: look at the target from this celestial direction (ecliptic frame).
     // North/south: ±Z. East/west: ±X with +Z up (pitch 0).
