@@ -7,6 +7,7 @@
 #include "core/ephemeris.hpp"
 
 #include <glm/vec3.hpp>
+#include <optional>
 #include <span>
 #include <string>
 #include <unordered_set>
@@ -22,6 +23,16 @@ std::unordered_set<std::string> texture_paths_of_bodies(std::span<BodyVisual> bo
         paths.merge(body.texture_paths());
     }
     return paths;
+}
+
+const std::optional<BodyVisual> find_body_visual(std::span<BodyVisual> bodies,
+                                                 const std::string& name) {
+    for (const BodyVisual& body : bodies) {
+        if (body.name() == name) {
+            return body;
+        }
+    }
+    return std::nullopt;
 }
 
 } // namespace
