@@ -144,6 +144,9 @@ void key_callback(GLFWwindow* glfw_window, int key, int /*scancode*/, int action
         case GLFW_KEY_DOWN:
             scene->pan_view_fraction(0.0f, -Camera::kPanFraction);
             break;
+        case GLFW_KEY_INSERT:
+            scene->zoom_on_followed_body();
+            break;
         case GLFW_KEY_HOME:
             scene->reset_view_center();
             log("view centered on Sun");
