@@ -56,10 +56,11 @@ class Camera {
     void set_view_from_west();
 
     /// Pan the look-at target in AU (free camera).
-    void pan_target_au(float delta_x_au, float delta_y_au, float delta_z_au);
+    void pan_target_au(double delta_x_au, double delta_y_au, double delta_z_au);
 
     /// Set the look-at point in AU (e.g. each frame while following a body).
-    void set_target_au(float x_au, float y_au, float z_au);
+    /// Uses double so outer-system follow stays stable when zoomed in (float AU is too coarse).
+    void set_target_au(double x_au, double y_au, double z_au);
 
     void reset_to_default_view();
 
@@ -74,8 +75,8 @@ class Camera {
 
   private:
     struct Resolved {
-        glm::vec3 eye_au{0.0f, 0.0f, kDefaultRadiusAu};
-        glm::vec3 target_au{0.0f, 0.0f, 0.0f};
+        glm::dvec3 eye_au{0.0, 0.0, kDefaultRadiusAu};
+        glm::dvec3 target_au{0.0, 0.0, 0.0};
     };
 
     struct Basis {
@@ -89,9 +90,10 @@ class Camera {
     [[nodiscard]] Resolved resolve() const;
     void clamp_pitch();
 
-    float target_x_au_{0.0f};
-    float target_y_au_{0.0f};
-    float target_z_au_{0.0f};
+    // Double look-at: float lacks precision at ~tens of AU for close-up follow.
+    double target_x_au_{0.0};
+    double target_y_au_{0.0};
+    double target_z_au_{0.0};
 
     float yaw_rad_{kDefaultYawRad};
     float pitch_rad_{kDefaultPitchRad};

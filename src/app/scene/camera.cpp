@@ -84,13 +84,13 @@ void Camera::set_view_from_west() {
     pitch_rad_ = 0.0f;
 }
 
-void Camera::pan_target_au(float delta_x_au, float delta_y_au, float delta_z_au) {
+void Camera::pan_target_au(double delta_x_au, double delta_y_au, double delta_z_au) {
     target_x_au_ += delta_x_au;
     target_y_au_ += delta_y_au;
     target_z_au_ += delta_z_au;
 }
 
-void Camera::set_target_au(float x_au, float y_au, float z_au) {
+void Camera::set_target_au(double x_au, double y_au, double z_au) {
     target_x_au_ = x_au;
     target_y_au_ = y_au;
     target_z_au_ = z_au;
@@ -98,9 +98,9 @@ void Camera::set_target_au(float x_au, float y_au, float z_au) {
 
 void Camera::reset_to_default_view() {
     reset_orientation();
-    target_x_au_ = 0.0f;
-    target_y_au_ = 0.0f;
-    target_z_au_ = 0.0f;
+    target_x_au_ = 0.0;
+    target_y_au_ = 0.0;
+    target_z_au_ = 0.0;
 }
 
 glm::vec3 Camera::forward_from_angles() const {
@@ -120,20 +120,21 @@ Camera::Basis Camera::basis_from_angles() const {
 
 Camera::Resolved Camera::resolve() const {
     Resolved resolved;
-    resolved.target_au = glm::vec3{target_x_au_, target_y_au_, target_z_au_};
-    resolved.eye_au = resolved.target_au - forward_from_angles() * radius_au_;
+    resolved.target_au = glm::dvec3{target_x_au_, target_y_au_, target_z_au_};
+    const glm::dvec3 forward{forward_from_angles()};
+    resolved.eye_au = resolved.target_au - forward * static_cast<double>(radius_au_);
     return resolved;
 }
 
 void Camera::world_to_camera_relative(const core::Displacement& position, float& x_km, float& y_km,
                                       float& z_km) const {
+    // Subtract in double so eye-relative km stay smooth far from the Sun; cast only the result.
     const Resolved resolved = resolve();
-    const float eye_x_km = resolved.eye_au.x * static_cast<float>(core::kAuKm);
-    const float eye_y_km = resolved.eye_au.y * static_cast<float>(core::kAuKm);
-    const float eye_z_km = resolved.eye_au.z * static_cast<float>(core::kAuKm);
-    x_km = static_cast<float>(position.km.x) - eye_x_km;
-    y_km = static_cast<float>(position.km.y) - eye_y_km;
-    z_km = static_cast<float>(position.km.z) - eye_z_km;
+    const glm::dvec3 eye_km = resolved.eye_au * core::kAuKm;
+    const glm::dvec3 relative_km = position.km - eye_km;
+    x_km = static_cast<float>(relative_km.x);
+    y_km = static_cast<float>(relative_km.y);
+    z_km = static_cast<float>(relative_km.z);
 }
 
 void Camera::view_basis(glm::vec3& right_au, glm::vec3& up_au, glm::vec3& forward_au) const {
@@ -153,7 +154,7 @@ glm::mat4 Camera::projection_matrix() const {
     const float au_km = static_cast<float>(core::kAuKm);
     float near_km = 0.01f * au_km;
     if (radius_au_ < 1.0f) {
-        near_km = 0.01f * radius_au_ * au_km;
+        near_km = 0.1f * radius_au_ * au_km;
     }
     const float far_km = 150.0f * au_km;
     const float fov = glm::radians(kFov);

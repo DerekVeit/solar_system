@@ -231,9 +231,9 @@ void Scene::update_camera_from_follow(const sim::SolarSystem& simulation) {
     }
 
     const core::Displacement position = simulation.state(*followed_body_).position;
-    camera_.set_target_au(static_cast<float>(position.km.x / core::kAuKm) + follow_offset_x_au_,
-                          static_cast<float>(position.km.y / core::kAuKm) + follow_offset_y_au_,
-                          static_cast<float>(position.km.z / core::kAuKm) + follow_offset_z_au_);
+    camera_.set_target_au(position.km.x / core::kAuKm + follow_offset_x_au_,
+                          position.km.y / core::kAuKm + follow_offset_y_au_,
+                          position.km.z / core::kAuKm + follow_offset_z_au_);
 }
 
 } // namespace solar::app
