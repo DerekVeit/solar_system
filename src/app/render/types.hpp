@@ -1,6 +1,7 @@
 #pragma once
 
 #include "app/color.hpp"
+#include "app/scene/body_visual_config.hpp"
 
 #include <glm/vec3.hpp>
 
@@ -14,11 +15,8 @@ struct SphereInstance {
     float y_km{0.0f};
     float z_km{0.0f};
     float radius_km{1.0f};
-    Color color{};
-    float ambient{};
-    float emission{};
+    BodySurface surface{};
     glm::vec3 light_dir{0.0f, 0.0f, 1.0f};
-    std::string diffuse_path{};
 };
 
 /// Line vertex in camera-relative km.

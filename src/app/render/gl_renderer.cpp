@@ -324,6 +324,8 @@ void GlRenderer::draw_spheres(std::span<const SphereInstance> spheres, const glm
             continue;
         }
 
+        const BodySurface& surface = sphere.surface;
+
         const glm::mat4 model =
             glm::translate(glm::mat4{1.0f}, glm::vec3{sphere.x_km, sphere.y_km, sphere.z_km}) *
             glm::scale(glm::mat4{1.0f}, glm::vec3{sphere.radius_km});
@@ -333,19 +335,19 @@ void GlRenderer::draw_spheres(std::span<const SphereInstance> spheres, const glm
         }
 
         const bool using_diffuse_texture =
-            (!sphere.diffuse_path.empty() && textures_.contains(sphere.diffuse_path) &&
+            (!surface.textures.diffuse.empty() && textures_.contains(surface.textures.diffuse) &&
              sphere_diffuse_loc_ >= 0 && sphere_use_diffuse_loc_ >= 0);
 
         if (sphere_color_loc_ >= 0) {
             if (using_diffuse_texture) {
-                glUniform4f(sphere_color_loc_, 1.0f, 1.0f, 1.0f, sphere.color.a);
+                glUniform4f(sphere_color_loc_, 1.0f, 1.0f, 1.0f, surface.color.a);
             } else {
-                glUniform4f(sphere_color_loc_, sphere.color.r, sphere.color.g, sphere.color.b,
-                            sphere.color.a);
+                glUniform4f(sphere_color_loc_, surface.color.r, surface.color.g, surface.color.b,
+                            surface.color.a);
             }
         }
         if (using_diffuse_texture) {
-            auto diffuse_id = textures_[sphere.diffuse_path];
+            auto diffuse_id = textures_[surface.textures.diffuse];
             glUniform1i(sphere_use_diffuse_loc_, true);
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, diffuse_id);
@@ -355,10 +357,10 @@ void GlRenderer::draw_spheres(std::span<const SphereInstance> spheres, const glm
         }
 
         if (sphere_ambient_loc_ >= 0) {
-            glUniform1f(sphere_ambient_loc_, sphere.ambient);
+            glUniform1f(sphere_ambient_loc_, surface.ambient);
         }
         if (sphere_emission_loc_ >= 0) {
-            glUniform1f(sphere_emission_loc_, sphere.emission);
+            glUniform1f(sphere_emission_loc_, surface.emission);
         }
         if (sphere_light_dir_loc_ >= 0) {
             glUniform3fv(sphere_light_dir_loc_, 1, glm::value_ptr(sphere.light_dir));
