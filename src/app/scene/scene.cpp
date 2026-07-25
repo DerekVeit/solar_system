@@ -6,6 +6,7 @@
 #include "core/constants.hpp"
 #include "core/ephemeris.hpp"
 
+#include <cmath>
 #include <glm/vec3.hpp>
 #include <optional>
 #include <span>
@@ -187,6 +188,23 @@ void Scene::set_view_from_yneg() { camera_.set_view_from_yneg(); }
 void Scene::set_view_from_east() { camera_.set_view_from_east(); }
 
 void Scene::set_view_from_west() { camera_.set_view_from_west(); }
+
+void Scene::zoom_on_followed_body() {
+    if (!followed_body_) {
+        log("zoom_on_followed_body: not following any body");
+        return;
+    }
+    auto body = find_body_visual(bodies_, *followed_body_);
+    if (!body) {
+        log("zoom_on_followed_body: body not found in scene.bodies: {}", *followed_body_);
+        return;
+    }
+    const float body_radius_au = body->display_size_km(body_scaling_) / core::kAuKm;
+    const float camera_radius_au =
+        body_radius_au / std::sin(1.00f * glm::radians(Camera::kFov) / 2.0f);
+    camera_.set_radius_au(camera_radius_au);
+    log("camera_radius_au: {}", camera_.radius_au());
+}
 
 void Scene::zoom_in() {
     camera_.set_radius_au(camera_.radius_au() / Camera::kZoomFactor);

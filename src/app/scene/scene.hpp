@@ -48,6 +48,7 @@ class Scene {
     void set_view_from_yneg();
     void set_view_from_east();
     void set_view_from_west();
+    void zoom_on_followed_body();
     void zoom_in();
     void zoom_out();
 
