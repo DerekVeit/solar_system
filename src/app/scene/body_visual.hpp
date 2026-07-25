@@ -26,6 +26,9 @@ class BodyVisual {
 
     [[nodiscard]] const std::string& name() const { return name_; }
     [[nodiscard]] bool draws_orbit_trails() const { return draws_orbit_trails_; }
+    [[nodiscard]] float display_size_km(bool scaling) const {
+        return (scaling ? display_size_factor_ : 1.0f) * radius_km_;
+    }
 
     void append_draw(const sim::SolarSystem& simulation, const ViewFrame& view,
                      DrawBatch& batch) const;
