@@ -58,13 +58,13 @@ void main() {
 
     float ndotl = max(dot(N, L), 0.0);
 
-    vec3 albedo = u_color.rgb;
+    vec3 day_rgb = u_color.rgb;
     if (u_use_diffuse) {
-        albedo = texture(u_diffuse, v_uv).rgb;
+        day_rgb = texture(u_diffuse, v_uv).rgb;
     }
-    vec3 lit = mix(u_ambient * albedo, albedo, ndotl);
+    vec3 lit = mix(u_ambient * day_rgb, day_rgb, ndotl);
 
-    vec3 rgb = mix(lit, albedo, u_emission);
+    vec3 rgb = mix(lit, day_rgb, u_emission);
 
     frag_color = vec4(rgb, u_color.a);
 }
