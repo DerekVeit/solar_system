@@ -59,10 +59,12 @@ void main() {
     float ndotl = max(dot(N, L), 0.0);
 
     vec3 day_rgb = u_color.rgb;
+    vec3 night_rgb = u_ambient * day_rgb;
     if (u_use_diffuse) {
         day_rgb = texture(u_diffuse, v_uv).rgb;
+        night_rgb = u_ambient * day_rgb;
     }
-    vec3 lit = mix(u_ambient * day_rgb, day_rgb, ndotl);
+    vec3 lit = mix(night_rgb, day_rgb, ndotl);
 
     vec3 rgb = mix(lit, day_rgb, u_emission);
 
