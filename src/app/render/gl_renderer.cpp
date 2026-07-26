@@ -62,7 +62,8 @@ void main() {
     if (u_use_diffuse) {
         albedo = texture(u_diffuse, v_uv).rgb;
     }
-    vec3 lit = albedo * (u_ambient + (1.0 - u_ambient) * ndotl);
+    vec3 lit = mix(u_ambient * albedo, albedo, ndotl);
+
     vec3 rgb = mix(lit, albedo, u_emission);
 
     frag_color = vec4(rgb, u_color.a);
