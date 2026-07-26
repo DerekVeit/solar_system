@@ -60,7 +60,7 @@ void main() {
 
     vec3 albedo = u_color.rgb;
     if (u_use_diffuse) {
-        albedo *= texture(u_diffuse, v_uv).rgb;
+        albedo = texture(u_diffuse, v_uv).rgb;
     }
     vec3 lit = albedo * (u_ambient + (1.0 - u_ambient) * ndotl);
     vec3 rgb = mix(lit, albedo, u_emission);
@@ -339,12 +339,8 @@ void GlRenderer::draw_spheres(std::span<const SphereInstance> spheres, const glm
              sphere_diffuse_loc_ >= 0 && sphere_use_diffuse_loc_ >= 0);
 
         if (sphere_color_loc_ >= 0) {
-            if (using_diffuse_texture) {
-                glUniform4f(sphere_color_loc_, 1.0f, 1.0f, 1.0f, surface.color.a);
-            } else {
-                glUniform4f(sphere_color_loc_, surface.color.r, surface.color.g, surface.color.b,
-                            surface.color.a);
-            }
+            glUniform4f(sphere_color_loc_, surface.color.r, surface.color.g, surface.color.b,
+                        surface.color.a);
         }
         if (using_diffuse_texture) {
             auto diffuse_id = textures_[surface.textures.diffuse];
