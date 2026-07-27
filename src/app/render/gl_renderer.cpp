@@ -54,6 +54,14 @@ uniform bool u_use_night;
 
 out vec4 frag_color;
 
+float proximity_to_degree(float fraction, float degree, float limit) {
+    float degrees = fraction * 360.0;
+    float offset = 180.0 - degree;
+    float distance = abs(180.0 - mod(degrees + offset, 360.0));
+    if (distance > limit) return 0.0;
+    return 1 - distance / limit;
+}
+
 void main() {
     vec3 N = normalize(v_normal);
     vec3 L = normalize(u_light_dir);
@@ -75,6 +83,9 @@ void main() {
     vec3 lit = mix(night_glow, day_lit, ndotl);
 
     vec3 rgb = mix(lit, day_rgb, u_emission);
+
+    vec3 red = {1.0, 0.0, 0.0};
+    rgb = mix(rgb, red, proximity_to_degree(v_uv.x, 0.0, 0.5));
 
     frag_color = vec4(rgb, u_color.a);
 }
