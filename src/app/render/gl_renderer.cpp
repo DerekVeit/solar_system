@@ -48,7 +48,9 @@ uniform float u_ambient;
 uniform float u_emission;
 uniform vec3 u_light_dir;
 uniform sampler2D u_diffuse;
+uniform sampler2D u_night;
 uniform bool u_use_diffuse;
+uniform bool u_use_night;
 
 out vec4 frag_color;
 
@@ -63,6 +65,9 @@ void main() {
     if (u_use_diffuse) {
         day_rgb = texture(u_diffuse, v_uv).rgb;
         night_rgb = u_ambient * day_rgb;
+        if (u_use_night) {
+            night_rgb = texture(u_night, v_uv).rgb;
+        }
     }
     vec3 lit = mix(night_rgb, day_rgb, ndotl);
 
@@ -239,6 +244,8 @@ bool GlRenderer::init(const RenderCapacity& capacity) {
         sphere_light_dir_loc_ = glGetUniformLocation(sphere_program_, "u_light_dir");
         sphere_diffuse_loc_ = glGetUniformLocation(sphere_program_, "u_diffuse");
         sphere_use_diffuse_loc_ = glGetUniformLocation(sphere_program_, "u_use_diffuse");
+        sphere_night_loc_ = glGetUniformLocation(sphere_program_, "u_night");
+        sphere_use_night_loc_ = glGetUniformLocation(sphere_program_, "u_use_night");
 
         // % cache_line_uniforms()
         line_view_loc_ = glGetUniformLocation(line_program_, "u_view");
@@ -341,18 +348,33 @@ void GlRenderer::draw_spheres(std::span<const SphereInstance> spheres, const glm
             (!surface.textures.diffuse.empty() && textures_.contains(surface.textures.diffuse) &&
              sphere_diffuse_loc_ >= 0 && sphere_use_diffuse_loc_ >= 0);
 
+        const bool using_night_texture =
+            (!surface.textures.night.empty() && textures_.contains(surface.textures.night) &&
+             sphere_night_loc_ >= 0 && sphere_use_night_loc_ >= 0);
+
         if (sphere_color_loc_ >= 0) {
             glUniform4f(sphere_color_loc_, surface.color.r, surface.color.g, surface.color.b,
                         surface.color.a);
         }
+
         if (using_diffuse_texture) {
-            auto diffuse_id = textures_[surface.textures.diffuse];
-            glUniform1i(sphere_use_diffuse_loc_, true);
+            const auto diffuse_id = textures_[surface.textures.diffuse];
+            glUniform1i(sphere_use_diffuse_loc_, 1);
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, diffuse_id);
             glUniform1i(sphere_diffuse_loc_, 0);
         } else {
-            glUniform1i(sphere_use_diffuse_loc_, false);
+            glUniform1i(sphere_use_diffuse_loc_, 0);
+        }
+
+        if (using_night_texture) {
+            const auto night_id = textures_[surface.textures.night];
+            glUniform1i(sphere_use_night_loc_, 1);
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, night_id);
+            glUniform1i(sphere_night_loc_, 1);
+        } else {
+            glUniform1i(sphere_use_night_loc_, 0);
         }
 
         if (sphere_ambient_loc_ >= 0) {
