@@ -54,12 +54,13 @@ uniform bool u_use_night;
 
 out vec4 frag_color;
 
-float proximity_to_degree(float fraction, float degree, float limit) {
-    float degrees = fraction * 360.0;
-    float offset = 180.0 - degree;
-    float distance = abs(180.0 - mod(degrees + offset, 360.0));
+float proximity_to_cycle(float fraction, float scale, float target, float limit, float cycle) {
+    float actual = fraction * scale;
+    float half_scale = scale / 2.0;
+    float offset = half_scale - target;
+    float distance = abs(mod(half_scale, cycle) - mod(actual + offset, cycle));
     if (distance > limit) return 0.0;
-    return 1 - distance / limit;
+    return 1.0 - distance / limit;
 }
 
 void main() {
@@ -85,7 +86,7 @@ void main() {
     vec3 rgb = mix(lit, day_rgb, u_emission);
 
     vec3 red = {1.0, 0.0, 0.0};
-    rgb = mix(rgb, red, proximity_to_degree(v_uv.x, 0.0, 0.5));
+    rgb = mix(rgb, red, proximity_to_cycle(v_uv.x, 360.0, 0.0, 0.5, 90.0));
 
     frag_color = vec4(rgb, u_color.a);
 }
