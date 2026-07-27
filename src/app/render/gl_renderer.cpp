@@ -86,7 +86,11 @@ void main() {
     vec3 rgb = mix(lit, day_rgb, u_emission);
 
     vec3 red = {1.0, 0.0, 0.0};
-    rgb = mix(rgb, red, proximity_to_cycle(v_uv.x, 360.0, 0.0, 0.5, 90.0));
+    vec3 white = {1.0, 1.0, 1.0};
+    vec3 blue = {0.0, 0.0, 1.0};
+    rgb = mix(rgb, white, proximity_to_cycle(v_uv.x, 360.0, 90.0, 0.5, 180.0));
+    rgb = mix(rgb, blue, proximity_to_cycle(v_uv.x, 360.0, 180.0, 0.5, 360.0));
+    rgb = mix(rgb, red, proximity_to_cycle(v_uv.x, 360.0, 0.0, 0.5, 360.0));
 
     frag_color = vec4(rgb, u_color.a);
 }
