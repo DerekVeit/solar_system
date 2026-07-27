@@ -59,6 +59,7 @@ void main() {
     vec3 L = normalize(u_light_dir);
 
     float ndotl = max(dot(N, L), 0.0);
+    float andotl = 1 - min(dot(N, L), 0.0);
 
     vec3 day_rgb = u_color.rgb;
     vec3 night_rgb = u_ambient * day_rgb;
@@ -69,7 +70,9 @@ void main() {
             night_rgb = texture(u_night, v_uv).rgb;
         }
     }
-    vec3 lit = mix(night_rgb, day_rgb, ndotl);
+    vec3 day_lit = mix(day_rgb * u_ambient, day_rgb, ndotl);
+    vec3 night_glow = night_rgb * andotl;
+    vec3 lit = mix(night_glow, day_lit, ndotl);
 
     vec3 rgb = mix(lit, day_rgb, u_emission);
 
