@@ -114,6 +114,8 @@ void main() {
     rgb = mix(rgb, gray, proximity_to_cycle(v_uv.x, 360.0, 0.0, 0.5, 15.0) / 24);
     rgb = mix(rgb, gray, proximity_to_cycle(v_uv.y, 180.0, 0.0, 0.5, 10.0) / 24);
 
+    rgb = mix(rgb, red, proximity_to_cycle(v_uv.y, 180.0, 90.0, 0.5, 0.0) / 4);
+
     rgb = mix(rgb, cyan, proximity_to_cycle(abs(dot(N, L)), 1.0, 0.0, 0.005, 0.0) / 4);
 
     frag_color = vec4(rgb, u_color.a);
