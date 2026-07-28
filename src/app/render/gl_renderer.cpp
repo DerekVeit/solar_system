@@ -73,8 +73,8 @@ void main() {
     vec3 L = normalize(u_light_dir);
 
     float ndotl = dot(N, L);
-    float andotl = 1 - min(dot(N, L), 0.0);
     float sun_facing = max(ndotl, 0.0);
+    float sun_long_deg = degrees(asin(ndotl));
 
     vec3 day_rgb = u_color.rgb;
     vec3 night_rgb = u_ambient * day_rgb;
@@ -85,9 +85,19 @@ void main() {
             night_rgb = texture(u_night, v_uv).rgb;
         }
     }
-    vec3 day_lit = mix(day_rgb * u_ambient, day_rgb, sun_facing);
-    vec3 night_glow = night_rgb * andotl;
-    vec3 lit = mix(night_glow, day_lit, sun_facing);
+    vec3 unlit = day_rgb * u_ambient;
+    vec3 day_lit = mix(unlit, day_rgb, sun_facing);
+
+    float nightness = 0;
+    float offset = 10.0;
+    if (-90.0 < sun_long_deg && sun_long_deg < -offset) {
+        nightness = 1.0;
+    } else if (-offset < sun_long_deg && sun_long_deg < offset) {
+        nightness = (offset - sun_long_deg) / (2 * offset);
+    }
+    vec3 night_lit = mix(unlit, night_rgb, nightness);
+
+    vec3 lit = mix(day_lit, night_lit, nightness);
 
     vec3 rgb = mix(lit, day_rgb, u_emission);
 
