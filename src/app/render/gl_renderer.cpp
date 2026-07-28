@@ -103,12 +103,16 @@ void main() {
 
     vec3 red = {1.0, 0.0, 0.0};
     vec3 white = {1.0, 1.0, 1.0};
+    vec3 gray = {0.5, 0.5, 0.5};
     vec3 blue = {0.0, 0.0, 1.0};
     vec3 cyan = {0.0, 1.0, 1.0};
 
     rgb = mix(rgb, white, proximity_to_cycle(v_uv.x, 360.0, 90.0, 0.5, 180.0) / 4);
     rgb = mix(rgb, blue, proximity_to_cycle(v_uv.x, 360.0, 180.0, 0.5, 360.0) / 4);
     rgb = mix(rgb, red, proximity_to_cycle(v_uv.x, 360.0, 0.0, 0.5, 360.0) / 4);
+
+    rgb = mix(rgb, gray, proximity_to_cycle(v_uv.x, 360.0, 0.0, 0.5, 15.0) / 24);
+    rgb = mix(rgb, gray, proximity_to_cycle(v_uv.y, 180.0, 0.0, 0.5, 10.0) / 24);
 
     rgb = mix(rgb, cyan, proximity_to_cycle(abs(dot(N, L)), 1.0, 0.0, 0.005, 0.0) / 4);
 
