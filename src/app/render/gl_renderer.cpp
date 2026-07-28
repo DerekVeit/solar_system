@@ -58,7 +58,12 @@ float proximity_to_cycle(float fraction, float scale, float target, float limit,
     float actual = fraction * scale;
     float half_scale = scale / 2.0;
     float offset = half_scale - target;
-    float distance = abs(mod(half_scale, cycle) - mod(actual + offset, cycle));
+    float distance = 0.0;
+    if (cycle > 0.0) {
+        distance = abs(mod(half_scale, cycle) - mod(actual + offset, cycle));
+    } else {
+        distance = abs(half_scale - (actual + offset));
+    }
     if (distance > limit) return 0.0;
     return 1.0 - distance / limit;
 }
