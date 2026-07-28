@@ -95,11 +95,11 @@ void main() {
     vec3 blue = {0.0, 0.0, 1.0};
     vec3 cyan = {0.0, 1.0, 1.0};
 
-    rgb = mix(rgb, white, proximity_to_cycle(v_uv.x, 360.0, 90.0, 0.5, 180.0));
-    rgb = mix(rgb, blue, proximity_to_cycle(v_uv.x, 360.0, 180.0, 0.5, 360.0));
-    rgb = mix(rgb, red, proximity_to_cycle(v_uv.x, 360.0, 0.0, 0.5, 360.0));
+    rgb = mix(rgb, white, proximity_to_cycle(v_uv.x, 360.0, 90.0, 0.5, 180.0) / 4);
+    rgb = mix(rgb, blue, proximity_to_cycle(v_uv.x, 360.0, 180.0, 0.5, 360.0) / 4);
+    rgb = mix(rgb, red, proximity_to_cycle(v_uv.x, 360.0, 0.0, 0.5, 360.0) / 4);
 
-    rgb = mix(rgb, cyan, proximity_to_cycle(abs(dot(N, L)), 1.0, 0.0, 0.005, 0.0));
+    rgb = mix(rgb, cyan, proximity_to_cycle(abs(dot(N, L)), 1.0, 0.0, 0.005, 0.0) / 4);
 
     frag_color = vec4(rgb, u_color.a);
 }
