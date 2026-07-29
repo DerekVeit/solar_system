@@ -179,6 +179,10 @@ void generate_unit_sphere(std::vector<float>& positions, std::vector<unsigned in
     const int stride = kSphereSlices + 1;
     for (int stack = 0; stack < kSphereStacks; ++stack) {
         for (int slice = 0; slice < kSphereSlices; ++slice) {
+            //  i0 --- i0+1
+            //   |   /  |
+            //   |  /   |
+            //  i1 --- i1+1
             const unsigned int i0 = static_cast<unsigned int>(stack * stride + slice);
             const unsigned int i1 = i0 + static_cast<unsigned int>(stride);
             indices.push_back(i0);
