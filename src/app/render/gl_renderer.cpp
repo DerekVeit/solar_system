@@ -155,7 +155,6 @@ void generate_unit_sphere(std::vector<float>& positions, std::vector<unsigned in
     positions.clear();
     indices.clear();
 
-    // Body axial orientation and rotation are not yet represented.
     // u = longitude 0..1, v = latitude 0..1 (from top to bottom)
     for (int stack = 0; stack <= kSphereStacks; ++stack) {
         const float v = static_cast<float>(stack) / static_cast<float>(kSphereStacks);
