@@ -26,10 +26,10 @@ namespace {
 [[nodiscard]] SphereInstance to_sphere_instance(const core::Displacement& position,
                                                 const BodySurface& surface, glm::vec3 light_dir,
                                                 float radius_km, float obliquity_deg,
-                                                const ViewFrame& view) {
+                                                float rotation, const ViewFrame& view) {
     const LineVertex vertex = to_line_vertex(position, surface.color, view);
     return SphereInstance{vertex.x_km,   vertex.y_km, vertex.z_km, radius_km,
-                          obliquity_deg, surface,     light_dir};
+                          obliquity_deg, rotation,    surface,     light_dir};
 }
 
 void append_orbit_loop(const sim::SolarSystem& simulation, const core::BodyDefinition& body,
@@ -115,8 +115,9 @@ void BodyVisual::append_draw(const sim::SolarSystem& simulation, const ViewFrame
             light_dir = glm::vec3(glm::normalize(delta));
         }
     }
-    batch.spheres.push_back(
-        to_sphere_instance(position, surface_, light_dir, radius_km, obliquity_deg_, view));
+    const float rotation_deg = simulation.rotation_deg(name_);
+    batch.spheres.push_back(to_sphere_instance(position, surface_, light_dir, radius_km,
+                                               obliquity_deg_, rotation_deg, view));
 
     if (!draws_orbit_trails_) {
         return;

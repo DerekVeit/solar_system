@@ -1,11 +1,19 @@
 #include "core/kepler_ephemeris.hpp"
 
+#include "core/ephemeris.hpp"
 #include "core/kepler.hpp"
+#include "core/types.hpp"
 
 #include <stdexcept>
 #include <string>
 
 namespace solar::core {
+
+namespace {
+
+double modulo(double a, double b) { return !b ? a : a - b * floor(a / b); }
+
+} // namespace
 
 KeplerEphemeris::KeplerEphemeris(std::vector<BodyDefinition> bodies)
     : bodies_(std::move(bodies)) {}
@@ -25,6 +33,17 @@ StateVector KeplerEphemeris::state(const std::string& body_name, Epoch epoch) co
         return StateVector{};
     }
     return state_from_kepler(central_mu, body->elements, epoch);
+}
+
+double KeplerEphemeris::rotation_deg(const std::string& body_name, Epoch epoch) const {
+    const BodyDefinition* body = find_body(*this, body_name);
+    const BodyRotation rotation = body->rotation;
+    if (!rotation.period_s) {
+        return rotation.prime_meridian_deg_at_epoch;
+    }
+    const Duration elapsed{(epoch.jd - rotation.epoch.jd) * kSecondsPerDay};
+    const double rotations = elapsed.count() / rotation.period_s;
+    return modulo((rotation.prime_meridian_deg_at_epoch + 360 * rotations), 360.0);
 }
 
 } // namespace solar::core

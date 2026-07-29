@@ -1,6 +1,7 @@
 #include "core/json_loader.hpp"
 
 #include "core/constants.hpp"
+#include "core/types.hpp"
 
 #include <nlohmann/json.hpp>
 
@@ -12,6 +13,18 @@ namespace solar::core {
 namespace {
 
 double degrees_to_radians(double degrees) { return degrees * kDegToRad; }
+
+BodyRotation parse_rotation(const nlohmann::json& json) {
+    if (!json.contains("rotation")) {
+        return BodyRotation{};
+    }
+    const auto& rotation = json.at("rotation");
+    return BodyRotation{
+        .period_s = rotation.at("period_s").get<double>(),
+        .prime_meridian_deg_at_epoch = rotation.at("prime_meridian_deg_at_epoch").get<double>(),
+        .epoch = Epoch{rotation.at("epoch_jd").get<double>()},
+    };
+}
 
 KeplerianElements parse_elements(const nlohmann::json& json) {
     const auto& kepler = json.at("kepler");
@@ -44,6 +57,7 @@ std::vector<BodyDefinition> load_bodies(const std::filesystem::path& path) {
             .gravitational_parameter_km3_s2 = entry.at("mu_km3_s2").get<double>(),
             .radius_km = entry.at("radius_km").get<double>(),
             .obliquity_deg = entry.at("obliquity_deg").get<float>(),
+            .rotation = parse_rotation(entry),
             .elements = parse_elements(entry),
         });
     }

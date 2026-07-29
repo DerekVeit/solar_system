@@ -89,6 +89,12 @@ struct StateVector {
     }
 };
 
+struct BodyRotation {
+    double period_s{};
+    double prime_meridian_deg_at_epoch{};
+    Epoch epoch{};
+};
+
 struct KeplerianElements {
     double semi_major_axis_km{};
     double eccentricity{};

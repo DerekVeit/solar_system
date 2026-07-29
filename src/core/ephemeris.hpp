@@ -13,6 +13,7 @@ struct BodyDefinition {
     double gravitational_parameter_km3_s2{};
     double radius_km{};
     float obliquity_deg{};
+    BodyRotation rotation{};
     KeplerianElements elements{};
 };
 
@@ -21,6 +22,7 @@ class EphemerisProvider {
     virtual ~EphemerisProvider() = default;
 
     [[nodiscard]] virtual StateVector state(const std::string& body_name, Epoch epoch) const = 0;
+    [[nodiscard]] virtual double rotation_deg(const std::string& body_name, Epoch epoch) const = 0;
     [[nodiscard]] virtual const std::vector<BodyDefinition>& bodies() const = 0;
 };
 

@@ -392,6 +392,8 @@ void GlRenderer::draw_spheres(std::span<const SphereInstance> spheres, const glm
             glm::translate(glm::mat4{1.0f}, glm::vec3{sphere.x_km, sphere.y_km, sphere.z_km}) *
             glm::rotate(glm::mat4{1.0f}, glm::radians(sphere.obliquity_deg),
                         glm::vec3{-1.0f, 0.0f, 0.0f}) *
+            glm::rotate(glm::mat4{1.0f}, glm::radians(sphere.rotation_deg),
+                        glm::normalize(glm::vec3{0.0f, 0.0f, 1.0f})) *
             glm::scale(glm::mat4{1.0f}, glm::vec3{sphere.radius_km});
 
         if (sphere_model_loc_ >= 0) {

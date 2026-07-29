@@ -12,4 +12,8 @@ core::StateVector SolarSystem::state(const std::string& body_name) const {
     return ephemeris_->state(body_name, clock_.epoch());
 }
 
+double SolarSystem::rotation_deg(const std::string& body_name) const {
+    return ephemeris_->rotation_deg(body_name, clock_.epoch());
+}
+
 } // namespace solar::sim
