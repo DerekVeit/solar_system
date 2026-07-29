@@ -37,6 +37,9 @@ StateVector KeplerEphemeris::state(const std::string& body_name, Epoch epoch) co
 
 double KeplerEphemeris::rotation_deg(const std::string& body_name, Epoch epoch) const {
     const BodyDefinition* body = find_body(*this, body_name);
+    if (body == nullptr) {
+        throw std::invalid_argument("unknown body: " + body_name);
+    }
     const BodyRotation rotation = body->rotation;
     if (!rotation.period_s) {
         return rotation.prime_meridian_deg_at_epoch;
