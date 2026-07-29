@@ -8,6 +8,7 @@
 namespace solar::app {
 
 struct BodySurfaceTextures {
+    float longitude_offset_deg{0.0f};
     std::string diffuse;
     std::string night;
     std::string clouds;

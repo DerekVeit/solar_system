@@ -45,6 +45,7 @@ class GlRenderer final : public IRenderer {
     int sphere_ambient_loc_{-1};
     int sphere_emission_loc_{-1};
     int sphere_light_dir_loc_{-1};
+    int sphere_texture_offset_loc_{-1};
     int sphere_diffuse_loc_{-1};
     int sphere_night_loc_{-1};
     int sphere_use_diffuse_loc_{-1};

@@ -47,6 +47,7 @@ uniform vec4 u_color;
 uniform float u_ambient;
 uniform float u_emission;
 uniform vec3 u_light_dir;
+uniform float u_texture_offset;
 uniform sampler2D u_diffuse;
 uniform sampler2D u_night;
 uniform bool u_use_diffuse;
@@ -69,6 +70,7 @@ float proximity_to_cycle(float fraction, float scale, float target, float limit,
 }
 
 void main() {
+    vec2 texture_uv = vec2(fract(v_uv.x + u_texture_offset / 360), v_uv.y);
     vec3 N = normalize(v_normal);
     vec3 L = normalize(u_light_dir);
 
@@ -79,10 +81,10 @@ void main() {
     vec3 day_rgb = u_color.rgb;
     vec3 night_rgb = u_ambient * day_rgb;
     if (u_use_diffuse) {
-        day_rgb = texture(u_diffuse, v_uv).rgb;
+        day_rgb = texture(u_diffuse, texture_uv).rgb;
         night_rgb = u_ambient * day_rgb;
         if (u_use_night) {
-            night_rgb = texture(u_night, v_uv).rgb;
+            night_rgb = texture(u_night, texture_uv).rgb;
         }
     }
     vec3 unlit = day_rgb * u_ambient;
@@ -287,6 +289,7 @@ bool GlRenderer::init(const RenderCapacity& capacity) {
         sphere_ambient_loc_ = glGetUniformLocation(sphere_program_, "u_ambient");
         sphere_emission_loc_ = glGetUniformLocation(sphere_program_, "u_emission");
         sphere_light_dir_loc_ = glGetUniformLocation(sphere_program_, "u_light_dir");
+        sphere_texture_offset_loc_ = glGetUniformLocation(sphere_program_, "u_texture_offset");
         sphere_diffuse_loc_ = glGetUniformLocation(sphere_program_, "u_diffuse");
         sphere_use_diffuse_loc_ = glGetUniformLocation(sphere_program_, "u_use_diffuse");
         sphere_night_loc_ = glGetUniformLocation(sphere_program_, "u_night");
@@ -389,6 +392,10 @@ void GlRenderer::draw_spheres(std::span<const SphereInstance> spheres, const glm
 
         if (sphere_model_loc_ >= 0) {
             glUniformMatrix4fv(sphere_model_loc_, 1, GL_FALSE, glm::value_ptr(model));
+        }
+
+        if (sphere_texture_offset_loc_ >= 0) {
+            glUniform1f(sphere_texture_offset_loc_, surface.textures.longitude_offset_deg);
         }
 
         const bool using_diffuse_texture =

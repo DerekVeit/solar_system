@@ -3,7 +3,10 @@
     "surface": {
       "color": [0.7, 0.7, 0.8, 1.0],
       "ambient": 0.2,
-      "emission": 0.0
+      "emission": 0.0,
+      "textures": {
+        "longitude_offset_deg": 180.0
+      }
     },
     "tail_duration_days": 30.0,
     "display_size_factor": 500.0,

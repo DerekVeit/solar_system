@@ -36,6 +36,9 @@ void require_object(const nlohmann::json& json, const std::string& context) {
 void apply_textures(const nlohmann::json& json, BodySurfaceTextures& textures,
                     const std::string& context) {
     require_object(json, context);
+    if (json.contains("longitude_offset_deg")) {
+        textures.longitude_offset_deg = json.at("longitude_offset_deg").get<float>();
+    }
     if (json.contains("diffuse")) {
         textures.diffuse = json.at("diffuse").get<std::string>();
     }
