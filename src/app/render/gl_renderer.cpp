@@ -70,7 +70,11 @@ float proximity_to_cycle(float fraction, float scale, float target, float limit,
 }
 
 void main() {
+    // The mesh and `v_uv` are considered aligned with the geographic coordinate system.
+    // The `texture_uv` is for aligning the texture map 0° to the mesh 0°.
+
     vec2 texture_uv = vec2(fract(v_uv.x + u_texture_offset / 360), v_uv.y);
+
     vec3 N = normalize(v_normal);
     vec3 L = normalize(u_light_dir);
 
