@@ -42,6 +42,7 @@ class BodyVisual {
     std::string name_;
     BodySurface surface_{};
     double radius_km_{0.0};
+    float obliquity_deg_{0.0f};
     double tail_duration_seconds_{0.0};
     float display_size_factor_{1.0f};
     bool draws_orbit_trails_{false};

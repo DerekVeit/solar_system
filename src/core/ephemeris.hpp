@@ -12,6 +12,7 @@ struct BodyDefinition {
     std::string name{};
     double gravitational_parameter_km3_s2{};
     double radius_km{};
+    float obliquity_deg{};
     KeplerianElements elements{};
 };
 
