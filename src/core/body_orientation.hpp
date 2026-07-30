@@ -1,4 +1,9 @@
+#pragma once
+
 #include "core/ephemeris.hpp"
+#include "core/types.hpp"
+
+#include <glm/ext/matrix_double3x3.hpp>
 
 namespace solar::core {
 
