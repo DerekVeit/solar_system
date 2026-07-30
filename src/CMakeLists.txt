@@ -1,4 +1,5 @@
 add_library(solar_core STATIC
+    core/body_orientation.cpp
     core/ephemeris.cpp
     core/kepler.cpp
     core/kepler_ephemeris.cpp

@@ -1,5 +1,6 @@
 #include "core/kepler_ephemeris.hpp"
 
+#include "core/body_orientation.hpp"
 #include "core/ephemeris.hpp"
 #include "core/kepler.hpp"
 #include "core/types.hpp"
@@ -8,12 +9,6 @@
 #include <string>
 
 namespace solar::core {
-
-namespace {
-
-double modulo(double a, double b) { return !b ? a : a - b * floor(a / b); }
-
-} // namespace
 
 KeplerEphemeris::KeplerEphemeris(std::vector<BodyDefinition> bodies)
     : bodies_(std::move(bodies)) {}
@@ -40,13 +35,7 @@ double KeplerEphemeris::rotation_deg(const std::string& body_name, Epoch epoch) 
     if (body == nullptr) {
         throw std::invalid_argument("unknown body: " + body_name);
     }
-    const BodyRotation rotation = body->rotation;
-    if (!rotation.period_s) {
-        return rotation.prime_meridian_deg_at_epoch;
-    }
-    const Duration elapsed{(epoch.jd - rotation.epoch.jd) * kSecondsPerDay};
-    const double rotations = elapsed.count() / rotation.period_s;
-    return modulo((rotation.prime_meridian_deg_at_epoch + 360 * rotations), 360.0);
+    return rotation_deg_at_epoch(*body, epoch);
 }
 
 } // namespace solar::core
