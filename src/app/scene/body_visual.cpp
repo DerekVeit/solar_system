@@ -92,7 +92,6 @@ BodyVisual::BodyVisual(const core::BodyDefinition& body, BodyVisualSpec spec)
     : name_(body.name)
     , surface_(spec.surface)
     , radius_km_(body.radius_km)
-    , obliquity_deg_(body.obliquity_deg)
     , tail_duration_seconds_(spec.tail_duration_days * core::kSecondsPerDay)
     , display_size_factor_(spec.display_size_factor)
     , draws_orbit_trails_(body.elements.semi_major_axis_km > 0.0) {}
