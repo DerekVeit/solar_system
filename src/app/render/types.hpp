@@ -3,6 +3,7 @@
 #include "app/color.hpp"
 #include "app/scene/body_visual_config.hpp"
 
+#include <glm/ext/matrix_double3x3.hpp>
 #include <glm/vec3.hpp>
 
 #include <vector>
@@ -15,8 +16,7 @@ struct SphereInstance {
     float y_km{0.0f};
     float z_km{0.0f};
     float radius_km{1.0f};
-    float obliquity_deg{0.0f};
-    float rotation_deg{0.0f};
+    glm::dmat3 rotation{};
     BodySurface surface{};
     glm::vec3 light_dir{0.0f, 0.0f, 1.0f};
 };

@@ -1,5 +1,6 @@
 #include "sim/solar_system.hpp"
 
+#include "core/body_orientation.hpp"
 #include "core/ephemeris.hpp"
 
 namespace solar::sim {
@@ -10,6 +11,13 @@ SolarSystem::SolarSystem(core::EphemerisProviderPtr ephemeris, SimulationClock c
 
 core::StateVector SolarSystem::state(const std::string& body_name) const {
     return ephemeris_->state(body_name, clock_.epoch());
+}
+glm::dmat3 SolarSystem::orientation(const std::string& body_name) const {
+    const core::BodyDefinition* body = core::find_body(*ephemeris_, body_name);
+    if (body == nullptr) {
+        throw std::invalid_argument("unknown body: " + body_name);
+    }
+    return body_orientation_matrix(*body, clock_.epoch());
 }
 
 double SolarSystem::rotation_deg(const std::string& body_name) const {

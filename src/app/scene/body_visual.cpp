@@ -5,6 +5,7 @@
 #include "core/kepler.hpp"
 #include "core/types.hpp"
 
+#include <glm/ext/matrix_double3x3.hpp>
 #include <glm/geometric.hpp>
 
 #include <algorithm>
@@ -25,11 +26,11 @@ namespace {
 
 [[nodiscard]] SphereInstance to_sphere_instance(const core::Displacement& position,
                                                 const BodySurface& surface, glm::vec3 light_dir,
-                                                float radius_km, float obliquity_deg,
-                                                float rotation, const ViewFrame& view) {
+                                                float radius_km, glm::dmat3 rotation,
+                                                const ViewFrame& view) {
     const LineVertex vertex = to_line_vertex(position, surface.color, view);
-    return SphereInstance{vertex.x_km,   vertex.y_km, vertex.z_km, radius_km,
-                          obliquity_deg, rotation,    surface,     light_dir};
+    return SphereInstance{vertex.x_km, vertex.y_km, vertex.z_km, radius_km,
+                          rotation,    surface,     light_dir};
 }
 
 void append_orbit_loop(const sim::SolarSystem& simulation, const core::BodyDefinition& body,
@@ -115,9 +116,10 @@ void BodyVisual::append_draw(const sim::SolarSystem& simulation, const ViewFrame
             light_dir = glm::vec3(glm::normalize(delta));
         }
     }
-    const float rotation_deg = simulation.rotation_deg(name_);
-    batch.spheres.push_back(to_sphere_instance(position, surface_, light_dir, radius_km,
-                                               obliquity_deg_, rotation_deg, view));
+    const glm::dmat3 rotation = simulation.orientation(name_);
+
+    batch.spheres.push_back(
+        to_sphere_instance(position, surface_, light_dir, radius_km, rotation, view));
 
     if (!draws_orbit_trails_) {
         return;

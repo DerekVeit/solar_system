@@ -4,4 +4,6 @@ namespace solar::core {
 
 [[nodiscard]] double rotation_deg_at_epoch(const BodyDefinition& body, Epoch epoch);
 
+[[nodiscard]] glm::dmat3 body_orientation_matrix(const BodyDefinition& body, Epoch epoch);
+
 } // namespace solar::core
