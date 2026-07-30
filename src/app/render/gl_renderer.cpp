@@ -391,10 +391,10 @@ void GlRenderer::draw_spheres(std::span<const SphereInstance> spheres, const glm
 
         const BodySurface& surface = sphere.surface;
 
-        const glm::dmat4 T =
+        const glm::mat4 T =
             glm::translate(glm::mat4{1.0f}, glm::vec3{sphere.x_km, sphere.y_km, sphere.z_km});
-        const glm::dmat4 R = glm::mat4(sphere.rotation);
-        const glm::dmat4 S = glm::scale(glm::mat4{1.0f}, glm::vec3{sphere.radius_km});
+        const glm::mat4 R = glm::mat4(sphere.rotation);
+        const glm::mat4 S = glm::scale(glm::mat4{1.0f}, glm::vec3{sphere.radius_km});
         const glm::mat4 model = T * R * S;
 
         if (sphere_model_loc_ >= 0) {

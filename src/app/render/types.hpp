@@ -16,7 +16,7 @@ struct SphereInstance {
     float y_km{0.0f};
     float z_km{0.0f};
     float radius_km{1.0f};
-    glm::dmat3 rotation{1.0};
+    glm::mat3 rotation{1.0};
     BodySurface surface{};
     glm::vec3 light_dir{0.0f, 0.0f, 1.0f};
 };

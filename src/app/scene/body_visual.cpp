@@ -26,7 +26,7 @@ namespace {
 
 [[nodiscard]] SphereInstance to_sphere_instance(const core::Displacement& position,
                                                 const BodySurface& surface, glm::vec3 light_dir,
-                                                float radius_km, glm::dmat3 rotation,
+                                                float radius_km, glm::mat3 rotation,
                                                 const ViewFrame& view) {
     const LineVertex vertex = to_line_vertex(position, surface.color, view);
     return SphereInstance{vertex.x_km, vertex.y_km, vertex.z_km, radius_km,
@@ -115,7 +115,8 @@ void BodyVisual::append_draw(const sim::SolarSystem& simulation, const ViewFrame
             light_dir = glm::vec3(glm::normalize(delta));
         }
     }
-    const glm::dmat3 rotation = simulation.orientation(name_);
+    // narrowing the base type from double to float (dmat3 → mat3) here for rendering
+    const glm::mat3 rotation = simulation.orientation(name_);
 
     batch.spheres.push_back(
         to_sphere_instance(position, surface_, light_dir, radius_km, rotation, view));
