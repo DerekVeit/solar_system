@@ -34,7 +34,7 @@ TEST_CASE("rotation_deg_at_epoch: zero rotation ", "[body_orientation]") {
     double angle = solar::core::rotation_deg_at_epoch(body, epoch);
 
     double expected_angle = body.rotation.prime_meridian_deg_at_epoch;
-    CHECK(angle == Approx(expected_angle).margin(0.01));
+    CHECK(angle == Approx(expected_angle).margin(1e-5));
 }
 
 TEST_CASE("rotation_deg_at_epoch: Earth approx. 1 rotation in a solar day", "[body_orientation]") {
@@ -56,7 +56,7 @@ TEST_CASE("rotation_deg_at_epoch: Earth 1 rotation in a sidereal day", "[body_or
     double angle = solar::core::rotation_deg_at_epoch(body, epoch);
 
     double expected_angle = body.rotation.prime_meridian_deg_at_epoch;
-    CHECK(angle == Approx(expected_angle).margin(0.001));
+    CHECK(angle == Approx(expected_angle).margin(1e-5));
 }
 
 TEST_CASE("body_orientation_matrix result tilts Earth Z 23.44°", "[body_orientation]") {
@@ -89,6 +89,6 @@ TEST_CASE("body_orientation_matrix result rotates Earth once in a sidereal day",
     const glm::dvec3 point_1 = matrix_1 * point;
     const glm::dvec3 point_2 = matrix_2 * point;
 
-    CHECK(glm::dot(point_0, point_1) == Approx(1.0).margin(0.001));
-    CHECK(glm::dot(point_0, point_2) == Approx(0.0).margin(0.001));
+    CHECK(glm::dot(point_0, point_1) == Approx(1.0).margin(1e-5));
+    CHECK(glm::dot(point_0, point_2) == Approx(0.0).margin(1e-5));
 }
