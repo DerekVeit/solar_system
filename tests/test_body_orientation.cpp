@@ -68,8 +68,8 @@ TEST_CASE("body_orientation_matrix result tilts Earth Z 23.44°", "[body_orienta
     const glm::dvec3 point{0.0, 0.0, 1.0};
     const glm::dvec3 point_after = matrix * point;
 
-    // crudely assuming the tilt is purely about the X axis
-    CHECK(glm::degrees(glm::asin(point_after.y)) == Approx(23.44).margin(0.0001));
+    const double cos_tilt = glm::dot(point_after, glm::dvec3{0.0, 0.0, 1.0});
+    CHECK(cos_tilt == Approx(std::cos(glm::radians(23.44))).margin(1e-5));
 }
 
 TEST_CASE("body_orientation_matrix result rotates Earth once in a sidereal day",
