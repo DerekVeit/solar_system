@@ -8,6 +8,7 @@
 
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/generators/catch_generators.hpp>
 #include <glm/ext/quaternion_geometric.hpp>
 #include <glm/ext/vector_double3.hpp>
 
@@ -57,6 +58,35 @@ TEST_CASE("rotation_deg_at_epoch: Earth 1 rotation in a sidereal day", "[body_or
 
     double expected_angle = body.rotation.prime_meridian_deg_at_epoch;
     CHECK(angle == Approx(expected_angle).margin(1e-5));
+}
+
+struct EpochOffsetRotation {
+    std::string label;
+    double offset{0};
+    glm::dvec3 expected_point{1, 0, 0};
+};
+
+TEST_CASE("body_orientation_matrix with synthetic body", "[body_orientation]") {
+    const EpochOffsetRotation test_case = GENERATE(EpochOffsetRotation{"t0 + 0", 0.0, {1, 0, 0}},
+                                                   EpochOffsetRotation{"t0 + P/4", 0.25, {0, 1, 0}},
+                                                   EpochOffsetRotation{"t0 + P/2", 0.5, {-1, 0, 0}},
+                                                   EpochOffsetRotation{"t0 + P", 1.0, {1, 0, 0}});
+    INFO(test_case.label);
+
+    solar::core::BodyDefinition body{};
+    body.obliquity_deg = 0.0;
+    const double t0 = solar::core::kJ2000Jd;
+    body.rotation = {
+        .period_s = solar::core::kSecondsPerDay, .prime_meridian_deg_at_epoch = 0.0, .epoch = {t0}};
+
+    const glm::dmat3 matrix = solar::core::body_orientation_matrix(body, {t0 + test_case.offset});
+
+    const glm::dvec3 point{1.0, 0.0, 0.0};
+    const glm::dvec3 point_after = matrix * point;
+
+    CHECK(point_after.x == Approx(test_case.expected_point.x).margin(1e-5));
+    CHECK(point_after.y == Approx(test_case.expected_point.y).margin(1e-5));
+    CHECK(point_after.z == Approx(test_case.expected_point.z).margin(1e-5));
 }
 
 TEST_CASE("body_orientation_matrix result tilts Earth Z 23.44°", "[body_orientation]") {
