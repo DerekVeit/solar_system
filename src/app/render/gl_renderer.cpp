@@ -52,6 +52,7 @@ uniform sampler2D u_diffuse;
 uniform sampler2D u_night;
 uniform bool u_use_diffuse;
 uniform bool u_use_night;
+uniform bool u_show_graticules;
 
 out vec4 frag_color;
 
@@ -113,16 +114,18 @@ void main() {
     vec3 blue = {0.0, 0.0, 1.0};
     vec3 cyan = {0.0, 1.0, 1.0};
 
-    rgb = mix(rgb, white, proximity_to_cycle(v_uv.x, 360.0, 90.0, 0.5, 180.0) / 4);
-    rgb = mix(rgb, blue, proximity_to_cycle(v_uv.x, 360.0, 180.0, 0.5, 360.0) / 4);
-    rgb = mix(rgb, red, proximity_to_cycle(v_uv.x, 360.0, 0.0, 0.5, 360.0) / 4);
+    if (u_show_graticules) {
+        rgb = mix(rgb, white, proximity_to_cycle(v_uv.x, 360.0, 90.0, 0.5, 180.0) / 4);
+        rgb = mix(rgb, blue, proximity_to_cycle(v_uv.x, 360.0, 180.0, 0.5, 360.0) / 4);
+        rgb = mix(rgb, red, proximity_to_cycle(v_uv.x, 360.0, 0.0, 0.5, 360.0) / 4);
 
-    rgb = mix(rgb, gray, proximity_to_cycle(v_uv.x, 360.0, 0.0, 0.5, 15.0) / 24);
-    rgb = mix(rgb, gray, proximity_to_cycle(v_uv.y, 180.0, 0.0, 0.5, 10.0) / 24);
+        rgb = mix(rgb, gray, proximity_to_cycle(v_uv.x, 360.0, 0.0, 0.5, 15.0) / 24);
+        rgb = mix(rgb, gray, proximity_to_cycle(v_uv.y, 180.0, 0.0, 0.5, 10.0) / 24);
 
-    rgb = mix(rgb, red, proximity_to_cycle(v_uv.y, 180.0, 90.0, 0.5, 0.0) / 4);
+        rgb = mix(rgb, red, proximity_to_cycle(v_uv.y, 180.0, 90.0, 0.5, 0.0) / 4);
 
-    rgb = mix(rgb, cyan, proximity_to_cycle(abs(dot(N, L)), 1.0, 0.0, 0.005, 0.0) / 4);
+        rgb = mix(rgb, cyan, proximity_to_cycle(abs(dot(N, L)), 1.0, 0.0, 0.005, 0.0) / 4);
+    }
 
     frag_color = vec4(rgb, u_color.a);
 }
@@ -301,6 +304,7 @@ bool GlRenderer::init(const RenderCapacity& capacity) {
         sphere_use_diffuse_loc_ = glGetUniformLocation(sphere_program_, "u_use_diffuse");
         sphere_night_loc_ = glGetUniformLocation(sphere_program_, "u_night");
         sphere_use_night_loc_ = glGetUniformLocation(sphere_program_, "u_use_night");
+        sphere_show_graticules_loc_ = glGetUniformLocation(sphere_program_, "u_show_graticules");
 
         // % cache_line_uniforms()
         line_view_loc_ = glGetUniformLocation(line_program_, "u_view");
@@ -436,6 +440,10 @@ void GlRenderer::draw_spheres(std::span<const SphereInstance> spheres, const glm
             glUniform1i(sphere_night_loc_, 1);
         } else {
             glUniform1i(sphere_use_night_loc_, 0);
+        }
+
+        if (sphere_show_graticules_loc_ >= 0) {
+            glUniform1i(sphere_show_graticules_loc_, static_cast<int>(sphere.show_graticules));
         }
 
         if (sphere_ambient_loc_ >= 0) {

@@ -26,11 +26,11 @@ namespace {
 
 [[nodiscard]] SphereInstance to_sphere_instance(const core::Displacement& position,
                                                 const BodySurface& surface, glm::vec3 light_dir,
-                                                float radius_km, glm::mat3 rotation,
-                                                const ViewFrame& view) {
+                                                bool show_graticules, float radius_km,
+                                                glm::mat3 rotation, const ViewFrame& view) {
     const LineVertex vertex = to_line_vertex(position, surface.color, view);
     return SphereInstance{vertex.x_km, vertex.y_km, vertex.z_km, radius_km,
-                          rotation,    surface,     light_dir};
+                          rotation,    surface,     light_dir,   show_graticules};
 }
 
 void append_orbit_loop(const sim::SolarSystem& simulation, const core::BodyDefinition& body,
@@ -103,7 +103,7 @@ float BodyVisual::drawn_radius_km(const ViewFrame& view) const {
 }
 
 void BodyVisual::append_draw(const sim::SolarSystem& simulation, const ViewFrame& view,
-                             DrawBatch& batch) const {
+                             DrawBatch& batch, bool show_graticules) const {
     const float radius_km = drawn_radius_km(view);
     const core::Displacement position = simulation.state(name_).position;
     glm::vec3 light_dir{0.0f, 0.0f, 1.0f};
@@ -118,8 +118,8 @@ void BodyVisual::append_draw(const sim::SolarSystem& simulation, const ViewFrame
     // narrowing the base type from double to float (dmat3 → mat3) here for rendering
     const glm::mat3 rotation = simulation.orientation(name_);
 
-    batch.spheres.push_back(
-        to_sphere_instance(position, surface_, light_dir, radius_km, rotation, view));
+    batch.spheres.push_back(to_sphere_instance(position, surface_, light_dir, show_graticules,
+                                               radius_km, rotation, view));
 
     if (!draws_orbit_trails_) {
         return;

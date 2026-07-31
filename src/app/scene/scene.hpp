@@ -28,6 +28,10 @@ class Scene {
     void set_view_half_extent_au(float half_extent_au);
 
     void body_scaling(bool enabled);
+    bool toggle_graticules() {
+        graticules_ = !graticules_;
+        return graticules_;
+    };
 
     /// Pan by fractions of the current view width and height (screen-aligned).
     void pan_view_fraction(float delta_x_fraction, float delta_y_fraction);
@@ -59,6 +63,7 @@ class Scene {
     std::vector<BodyVisual> bodies_;
     Camera camera_;
     bool body_scaling_{true};
+    bool graticules_{true};
     std::optional<std::string> followed_body_;
     float follow_offset_x_au_{0.0f};
     float follow_offset_y_au_{0.0f};

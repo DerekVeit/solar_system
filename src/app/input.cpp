@@ -162,6 +162,11 @@ void key_callback(GLFWwindow* glfw_window, int key, int /*scancode*/, int action
             }
             break;
         }
+        case GLFW_KEY_BACKSLASH: {
+            bool showing = scene->toggle_graticules();
+            log("toggled graticules: now {}", showing);
+            break;
+        }
         default:
             if (key >= GLFW_KEY_0 && key <= GLFW_KEY_9) {
                 const std::size_t index = static_cast<std::size_t>(key - GLFW_KEY_0);

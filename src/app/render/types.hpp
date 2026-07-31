@@ -19,6 +19,7 @@ struct SphereInstance {
     glm::mat3 rotation{1.0};
     BodySurface surface{};
     glm::vec3 light_dir{0.0f, 0.0f, 1.0f};
+    bool show_graticules{true};
 };
 
 /// Line vertex in camera-relative km.

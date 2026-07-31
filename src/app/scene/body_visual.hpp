@@ -30,8 +30,8 @@ class BodyVisual {
         return (scaling ? display_size_factor_ : 1.0f) * radius_km_;
     }
 
-    void append_draw(const sim::SolarSystem& simulation, const ViewFrame& view,
-                     DrawBatch& batch) const;
+    void append_draw(const sim::SolarSystem& simulation, const ViewFrame& view, DrawBatch& batch,
+                     bool show_graticules) const;
 
     std::unordered_set<std::string> texture_paths() const;
 

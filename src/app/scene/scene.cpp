@@ -96,7 +96,7 @@ void Scene::render(const sim::SolarSystem& simulation, float aspect_ratio, int f
     };
 
     for (const BodyVisual& body : bodies_) {
-        body.append_draw(simulation, view, batch);
+        body.append_draw(simulation, view, batch, graticules_);
     }
     renderer_->draw(batch, camera_.view_matrix(), camera_.projection_matrix());
 }
