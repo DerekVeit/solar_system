@@ -72,6 +72,7 @@ class GlRenderer final : public IRenderer {
     int ring_light_dir_loc_{-1};
     int ring_map_loc_{-1};
     int ring_use_map_loc_{-1};
+    int ring_inner_fraction_loc_{-1};
     int ring_index_count_{0};
 };
 

@@ -159,14 +159,16 @@ in vec3 v_normal;
 uniform vec3 u_light_dir;
 uniform sampler2D u_map;
 uniform bool u_use_map;
+uniform float u_inner_fraction;
 
 out vec4 frag_color;
 
 void main() {
     vec4 texel = vec4(0.75, 0.7, 0.55, 1.0);
     if (u_use_map) {
-        // Radial strip: u = distance from planet, v fixed mid-row.
-        texel = texture(u_map, vec2(v_radial, 0.5));
+        // Radial strip: u = distance from inner edge of ring, v fixed mid-row.
+        float u = max(0.0, (v_radial - u_inner_fraction) / (1 - u_inner_fraction));
+        texel = texture(u_map, vec2(u, 0.5));
     }
     if (texel.a < 0.02) {
         discard;
@@ -360,6 +362,7 @@ void GlRenderer::destroy() {
     ring_light_dir_loc_ = -1;
     ring_map_loc_ = -1;
     ring_use_map_loc_ = -1;
+    ring_inner_fraction_loc_ = -1;
     sphere_index_count_ = 0;
     ring_index_count_ = 0;
     max_spheres_ = 0;
@@ -427,6 +430,7 @@ bool GlRenderer::init(const RenderCapacity& capacity) {
         ring_light_dir_loc_ = glGetUniformLocation(ring_program_, "u_light_dir");
         ring_map_loc_ = glGetUniformLocation(ring_program_, "u_map");
         ring_use_map_loc_ = glGetUniformLocation(ring_program_, "u_use_map");
+        ring_inner_fraction_loc_ = glGetUniformLocation(ring_program_, "u_inner_fraction");
 
         // % cache_line_uniforms()
         line_view_loc_ = glGetUniformLocation(line_program_, "u_view");
@@ -656,6 +660,11 @@ void GlRenderer::draw_rings(std::span<const RingInstance> rings, const glm::mat4
             glUniform1i(ring_map_loc_, 0);
         } else if (ring_use_map_loc_ >= 0) {
             glUniform1i(ring_use_map_loc_, 0);
+        }
+
+        if (ring_inner_fraction_loc_ >= 0) {
+            glUniform1f(ring_inner_fraction_loc_,
+                        static_cast<float>(ring.inner_radius_km / ring.outer_radius_km));
         }
 
         glDrawElements(GL_TRIANGLES, ring_index_count_, GL_UNSIGNED_INT, nullptr);
