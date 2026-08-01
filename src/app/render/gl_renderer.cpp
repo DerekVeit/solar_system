@@ -251,6 +251,12 @@ void GlRenderer::destroy() {
     sphere_ambient_loc_ = -1;
     sphere_emission_loc_ = -1;
     sphere_light_dir_loc_ = -1;
+    sphere_texture_offset_loc_ = -1;
+    sphere_diffuse_loc_ = -1;
+    sphere_night_loc_ = -1;
+    sphere_use_diffuse_loc_ = -1;
+    sphere_use_night_loc_ = -1;
+    sphere_show_graticules_loc_ = -1;
     line_view_loc_ = -1;
     line_projection_loc_ = -1;
     sphere_index_count_ = 0;
