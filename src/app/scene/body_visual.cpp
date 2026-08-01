@@ -1,5 +1,8 @@
 #include "app/scene/body_visual.hpp"
 
+#include "app/render/types.hpp"
+#include "app/scene/body_visual_config.hpp"
+#include "app/scene/view_frame.hpp"
 #include "core/constants.hpp"
 #include "core/ephemeris.hpp"
 #include "core/kepler.hpp"
@@ -31,6 +34,21 @@ namespace {
     const LineVertex vertex = to_line_vertex(position, surface.color, view);
     return SphereInstance{vertex.x_km, vertex.y_km, vertex.z_km, radius_km,
                           rotation,    surface,     light_dir,   show_graticules};
+}
+
+[[nodiscard]] RingInstance to_ring_instance(const core::Displacement& position, glm::vec3 light_dir,
+                                            const RingSpec& spec, float size_factor,
+                                            glm::mat3 rotation, const ViewFrame& view) {
+    const LineVertex vertex = to_line_vertex(position, Color{0, 0, 0, 1}, view);
+    const float factor = size_factor > 0.0f ? size_factor : 1.0f;
+    return RingInstance{vertex.x_km,
+                        vertex.y_km,
+                        vertex.z_km,
+                        static_cast<float>(spec.inner_radius_km * factor),
+                        static_cast<float>(spec.outer_radius_km * factor),
+                        rotation,
+                        spec.map,
+                        light_dir};
 }
 
 void append_orbit_loop(const sim::SolarSystem& simulation, const core::BodyDefinition& body,
@@ -91,6 +109,7 @@ void append_tail(const sim::SolarSystem& simulation, const core::BodyDefinition&
 BodyVisual::BodyVisual(const core::BodyDefinition& body, BodyVisualSpec spec)
     : name_(body.name)
     , surface_(spec.surface)
+    , rings_(spec.rings)
     , radius_km_(body.radius_km)
     , tail_duration_seconds_(spec.tail_duration_days * core::kSecondsPerDay)
     , display_size_factor_(spec.display_size_factor)
@@ -120,6 +139,12 @@ void BodyVisual::append_draw(const sim::SolarSystem& simulation, const ViewFrame
 
     batch.spheres.push_back(to_sphere_instance(position, surface_, light_dir, show_graticules,
                                                radius_km, rotation, view));
+
+    const float size_factor = view.body_scaling ? display_size_factor_ : 1.0f;
+    for (const RingSpec& spec : rings_) {
+        batch.rings.push_back(
+            to_ring_instance(position, light_dir, spec, size_factor, rotation, view));
+    }
 
     if (!draws_orbit_trails_) {
         return;
@@ -164,6 +189,11 @@ std::unordered_set<std::string> BodyVisual::texture_paths() const {
     }
     if (!surface_.textures.specular.empty()) {
         paths.insert(surface_.textures.specular);
+    }
+    for (const RingSpec& ring : rings_) {
+        if (!ring.map.empty()) {
+            paths.insert(ring.map);
+        }
     }
     return paths;
 }

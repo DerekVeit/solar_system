@@ -4,6 +4,7 @@
 
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 namespace solar::app {
 
@@ -24,9 +25,16 @@ struct BodySurface {
     BodySurfaceTextures textures{};
 };
 
+struct RingSpec {
+    std::string map;
+    double inner_radius_km;
+    double outer_radius_km;
+};
+
 /// Fully resolved visual parameters for one body (defaults merged with overrides).
 struct BodyVisualSpec {
     BodySurface surface{};
+    std::vector<RingSpec> rings{};
     double tail_duration_days{};
     float display_size_factor{};
     bool visible{};

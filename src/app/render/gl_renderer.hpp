@@ -27,6 +27,8 @@ class GlRenderer final : public IRenderer {
                              const glm::mat4& view, const glm::mat4& projection) const;
     void draw_spheres(std::span<const SphereInstance> spheres, const glm::mat4& view,
                       const glm::mat4& projection);
+    void draw_rings(std::span<const RingInstance> rings, const glm::mat4& view,
+                    const glm::mat4& projection);
     void draw_line_primitives(unsigned int mode, std::span<const LinePrimitive> primitives,
                               std::size_t max_vertices, const glm::mat4& view,
                               const glm::mat4& projection);
@@ -59,6 +61,18 @@ class GlRenderer final : public IRenderer {
     std::size_t max_line_trail_vertices_{0};
     std::size_t max_line_loop_vertices_{0};
     std::unordered_map<std::string, unsigned int> textures_;
+
+    unsigned int ring_program_{0};
+    unsigned int ring_vao_{0};
+    unsigned int ring_vbo_{0};
+    unsigned int ring_ebo_{0};
+    int ring_view_loc_{-1};
+    int ring_projection_loc_{-1};
+    int ring_model_loc_{-1};
+    int ring_light_dir_loc_{-1};
+    int ring_map_loc_{-1};
+    int ring_use_map_loc_{-1};
+    int ring_index_count_{0};
 };
 
 } // namespace solar::app

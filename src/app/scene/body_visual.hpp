@@ -41,6 +41,7 @@ class BodyVisual {
 
     std::string name_;
     BodySurface surface_{};
+    std::vector<RingSpec> rings_{};
     double radius_km_{0.0};
     double tail_duration_seconds_{0.0};
     float display_size_factor_{1.0f};

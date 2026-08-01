@@ -33,6 +33,12 @@ void require_object(const nlohmann::json& json, const std::string& context) {
     }
 }
 
+void require_array(const nlohmann::json& json, const std::string& context) {
+    if (!json.is_array()) {
+        throw std::runtime_error(path_message(context, "expected a JSON array"));
+    }
+}
+
 void apply_textures(const nlohmann::json& json, BodySurfaceTextures& textures,
                     const std::string& context) {
     require_object(json, context);
@@ -85,11 +91,40 @@ BodySurface parse_surface_required(const nlohmann::json& json, const std::string
     return surface;
 }
 
+void apply_rings(const nlohmann::json& json, std::vector<RingSpec>& rings,
+                 const std::string& context) {
+    require_array(json, context);
+    for (std::size_t i = 0; i < json.size(); ++i) {
+        const std::string item_context = context + ": json[" + std::to_string(i) + "]";
+        const nlohmann::json& item = json.at(i);
+
+        if (!item.contains("map")) {
+            throw std::runtime_error(path_message(item_context, "map is required"));
+        }
+        const std::string map = item.at("map").get<std::string>();
+
+        if (!item.contains("inner_radius_km")) {
+            throw std::runtime_error(path_message(item_context, "inner_radius_km is required"));
+        }
+        const double inner_radius_km = item.at("inner_radius_km").get<double>();
+
+        if (!item.contains("outer_radius_km")) {
+            throw std::runtime_error(path_message(item_context, "outer_radius_km is required"));
+        }
+        const double outer_radius_km = item.at("outer_radius_km").get<double>();
+
+        rings.push_back(RingSpec{map, inner_radius_km, outer_radius_km});
+    }
+}
+
 void apply_spec_partial(const nlohmann::json& json, BodyVisualSpec& spec,
                         const std::string& context) {
     require_object(json, context);
     if (json.contains("surface")) {
         apply_surface_partial(json.at("surface"), spec.surface, context + ".surface");
+    }
+    if (json.contains("rings")) {
+        apply_rings(json.at("rings"), spec.rings, context + ".rings");
     }
     if (json.contains("tail_duration_days")) {
         spec.tail_duration_days = json.at("tail_duration_days").get<double>();
@@ -111,6 +146,9 @@ BodyVisualSpec parse_spec_required(const nlohmann::json& json, const std::string
     }
     BodyVisualSpec spec{};
     spec.surface = parse_surface_required(json.at("surface"), context + ".surface");
+    if (json.contains("rings")) {
+        apply_rings(json.at("rings"), spec.rings, context + ".rings");
+    }
     spec.tail_duration_days = json.at("tail_duration_days").get<double>();
     spec.display_size_factor = json.at("display_size_factor").get<float>();
     spec.visible = json.at("visible").get<bool>();

@@ -86,6 +86,13 @@
           "diffuse": "textures/2k_saturn.jpg"
         }
       },
+      "rings": [
+        {
+          "map": "textures/2k_saturn_ring_alpha.png",
+          "inner_radius_km": 0.0,
+          "outer_radius_km": 140000.0
+        }
+      ],
       "tail_duration_days": 180.0
     },
     {

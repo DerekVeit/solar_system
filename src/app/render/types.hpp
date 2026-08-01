@@ -22,6 +22,17 @@ struct SphereInstance {
     bool show_graticules{true};
 };
 
+struct RingInstance {
+    float x_km{0.0f};
+    float y_km{0.0f};
+    float z_km{0.0f};
+    float inner_radius_km{1.0f};
+    float outer_radius_km{1.0f};
+    glm::mat3 rotation{1.0};
+    std::string map{};
+    glm::vec3 light_dir{0.0f, 0.0f, 1.0f};
+};
+
 /// Line vertex in camera-relative km.
 struct LineVertex {
     float x_km{0.0f};
@@ -37,6 +48,7 @@ struct LinePrimitive {
 /// Per-frame geometry collected by the scene and consumed by the renderer.
 struct DrawBatch {
     std::vector<SphereInstance> spheres;
+    std::vector<RingInstance> rings;
     std::vector<LinePrimitive> lines;
     std::vector<LinePrimitive> line_trails;
     std::vector<LinePrimitive> line_loops;
