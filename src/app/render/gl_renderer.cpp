@@ -263,21 +263,6 @@ bool GlRenderer::init(const RenderCapacity& capacity) {
         glDeleteShader(line_vertex_shader);
         glDeleteShader(line_fragment_shader);
 
-        // % cache_sphere_uniforms()
-        sphere_.view_loc = glGetUniformLocation(sphere_.program, "u_view");
-        sphere_.projection_loc = glGetUniformLocation(sphere_.program, "u_projection");
-        sphere_.model_loc = glGetUniformLocation(sphere_.program, "u_model");
-        sphere_.color_loc = glGetUniformLocation(sphere_.program, "u_color");
-        sphere_.ambient_loc = glGetUniformLocation(sphere_.program, "u_ambient");
-        sphere_.emission_loc = glGetUniformLocation(sphere_.program, "u_emission");
-        sphere_.light_dir_loc = glGetUniformLocation(sphere_.program, "u_light_dir");
-        sphere_.texture_offset_loc = glGetUniformLocation(sphere_.program, "u_texture_offset");
-        sphere_.diffuse_loc = glGetUniformLocation(sphere_.program, "u_diffuse");
-        sphere_.use_diffuse_loc = glGetUniformLocation(sphere_.program, "u_use_diffuse");
-        sphere_.night_loc = glGetUniformLocation(sphere_.program, "u_night");
-        sphere_.use_night_loc = glGetUniformLocation(sphere_.program, "u_use_night");
-        sphere_.show_graticules_loc = glGetUniformLocation(sphere_.program, "u_show_graticules");
-
         ring_view_loc_ = glGetUniformLocation(ring_program_, "u_view");
         ring_projection_loc_ = glGetUniformLocation(ring_program_, "u_projection");
         ring_model_loc_ = glGetUniformLocation(ring_program_, "u_model");
