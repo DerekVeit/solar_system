@@ -32,6 +32,9 @@ void SpherePipeline::create() {
     glDeleteShader(vertex_shader);
     glDeleteShader(fragment_shader);
     cache_uniforms();
+    const MeshData mesh = generate_unit_sphere(48, 24);
+    index_count = mesh.index_count;
+    upload_mesh(mesh);
 }
 
 void SpherePipeline::cache_uniforms() {
@@ -48,6 +51,25 @@ void SpherePipeline::cache_uniforms() {
     cache_uniform(program, night_loc, "u_night");
     cache_uniform(program, use_night_loc, "u_use_night");
     cache_uniform(program, show_graticules_loc, "u_show_graticules");
+}
+
+void SpherePipeline::upload_mesh(MeshData mesh) {
+    glGenVertexArrays(1, &vao);
+    glGenBuffers(1, &vbo);
+    glGenBuffers(1, &ebo);
+    glBindVertexArray(vao);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(mesh.interleaved.size() * sizeof(float)),
+                 mesh.interleaved.data(), GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+                 static_cast<GLsizeiptr>(mesh.indices.size() * sizeof(unsigned int)),
+                 mesh.indices.data(), GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), reinterpret_cast<void*>(0));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
+                          reinterpret_cast<void*>(3 * sizeof(float)));
 }
 
 } // namespace solar::app

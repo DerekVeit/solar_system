@@ -1,5 +1,7 @@
 #pragma once
 
+#include "app/render/mesh_gen.hpp"
+
 #include <glad/gl.h>
 
 namespace solar::app {
@@ -17,6 +19,7 @@ struct SpherePipeline : GlMeshProgram {
     int texture_offset_loc{-1}, show_graticules_loc{-1};
     void create();
     void cache_uniforms();
+    void upload_mesh(MeshData mesh);
     void destroy() {
         if (program != 0) {
             glDeleteProgram(program);

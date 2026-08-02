@@ -95,53 +95,6 @@ void main() {
 }
 )";
 
-// Low-poly unit sphere: enough to read as a ball at solar-system zoom levels.
-constexpr int kSphereSlices = 48;
-constexpr int kSphereStacks = 24;
-
-void generate_unit_sphere(std::vector<float>& positions, std::vector<unsigned int>& indices) {
-    positions.clear();
-    indices.clear();
-
-    // u = longitude 0..1, v = latitude 0..1 (from top to bottom)
-    for (int stack = 0; stack <= kSphereStacks; ++stack) {
-        const float v = static_cast<float>(stack) / static_cast<float>(kSphereStacks);
-        const float phi = v * kPi;
-        const float z = std::cos(phi);
-        const float ring_radius = std::sin(phi);
-
-        for (int slice = 0; slice <= kSphereSlices; ++slice) {
-            const float u = static_cast<float>(slice) / static_cast<float>(kSphereSlices);
-            const float theta = u * (2.0f * kPi);
-            const float x = ring_radius * std::cos(theta);
-            const float y = ring_radius * std::sin(theta);
-            positions.push_back(x);
-            positions.push_back(y);
-            positions.push_back(z);
-            positions.push_back(u);
-            positions.push_back(v);
-        }
-    }
-
-    const int stride = kSphereSlices + 1;
-    for (int stack = 0; stack < kSphereStacks; ++stack) {
-        for (int slice = 0; slice < kSphereSlices; ++slice) {
-            //  i0 --- i0+1
-            //   |   /  |
-            //   |  /   |
-            //  i1 --- i1+1
-            const unsigned int i0 = static_cast<unsigned int>(stack * stride + slice);
-            const unsigned int i1 = i0 + static_cast<unsigned int>(stride);
-            indices.push_back(i0);
-            indices.push_back(i1);
-            indices.push_back(i0 + 1);
-            indices.push_back(i0 + 1);
-            indices.push_back(i1);
-            indices.push_back(i1 + 1);
-        }
-    }
-}
-
 // Unit disc in XY: interleaved x, y, z, radial (0 center … 1 rim). Fan from center.
 constexpr int kRingSlices = 64;
 
@@ -274,31 +227,6 @@ bool GlRenderer::init(const RenderCapacity& capacity) {
         // % cache_line_uniforms()
         line_view_loc_ = glGetUniformLocation(line_program_, "u_view");
         line_projection_loc_ = glGetUniformLocation(line_program_, "u_projection");
-
-        // % create_sphere_mesh_gpu()
-        std::vector<float> sphere_positions;
-        std::vector<unsigned int> sphere_indices;
-        generate_unit_sphere(sphere_positions, sphere_indices);
-        sphere_.index_count = static_cast<int>(sphere_indices.size());
-
-        glGenVertexArrays(1, &sphere_.vao);
-        glGenBuffers(1, &sphere_.vbo);
-        glGenBuffers(1, &sphere_.ebo);
-        glBindVertexArray(sphere_.vao);
-        glBindBuffer(GL_ARRAY_BUFFER, sphere_.vbo);
-        glBufferData(GL_ARRAY_BUFFER,
-                     static_cast<GLsizeiptr>(sphere_positions.size() * sizeof(float)),
-                     sphere_positions.data(), GL_STATIC_DRAW);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sphere_.ebo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-                     static_cast<GLsizeiptr>(sphere_indices.size() * sizeof(unsigned int)),
-                     sphere_indices.data(), GL_STATIC_DRAW);
-        glEnableVertexAttribArray(0);
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
-                              reinterpret_cast<void*>(0));
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
-                              reinterpret_cast<void*>(3 * sizeof(float)));
 
         // Unit disc for rings: x,y,z,radial
         std::vector<float> ring_vertices;

@@ -41,6 +41,7 @@ add_executable(solar_system
     app/render/gl_pipeline.cpp
     app/render/gl_renderer.cpp
     app/render/gl_shader.cpp
+    app/render/mesh_gen.cpp
     app/run.cpp
     app/scene/body_visual.cpp
     app/scene/body_visual_catalog.cpp
