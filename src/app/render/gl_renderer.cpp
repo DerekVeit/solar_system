@@ -1,5 +1,6 @@
 #include "app/render/gl_renderer.hpp"
 
+#include "app/logging.hpp"
 #include "app/render/gl_shader.hpp"
 #include "app/render/types.hpp"
 
@@ -476,7 +477,9 @@ bool GlRenderer::init(const RenderCapacity& capacity) {
         max_line_trail_vertices_ = capacity.max_line_trail_vertices;
         max_line_loop_vertices_ = capacity.max_line_loop_vertices;
         return true;
-    } catch (const std::exception&) {
+    } catch (const std::exception& e) {
+        const std::string msg = e.what();
+        solar::app::log("msg: {}", msg);
         destroy();
         return false;
     }
