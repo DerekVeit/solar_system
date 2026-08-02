@@ -2,6 +2,8 @@
 
 #include "app/render/renderer.hpp"
 
+#include "app/render/gl_pipeline.hpp"
+
 #include <span>
 #include <unordered_map>
 
