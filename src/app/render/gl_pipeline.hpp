@@ -15,6 +15,7 @@ struct SpherePipeline : GlMeshProgram {
     int color_loc{-1}, ambient_loc{-1}, emission_loc{-1}, light_dir_loc{-1};
     int diffuse_loc{-1}, use_diffuse_loc{-1}, night_loc{-1}, use_night_loc{-1};
     int texture_offset_loc{-1}, show_graticules_loc{-1};
+    void create();
     void destroy() {
         if (program != 0) {
             glDeleteProgram(program);

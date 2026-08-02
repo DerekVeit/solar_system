@@ -38,6 +38,7 @@ add_executable(solar_system
     app/input.cpp
     app/logging.cpp
     app/main.cpp
+    app/render/gl_pipeline.cpp
     app/render/gl_renderer.cpp
     app/render/gl_shader.cpp
     app/run.cpp

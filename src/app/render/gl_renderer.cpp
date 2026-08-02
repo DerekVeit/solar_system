@@ -1,6 +1,5 @@
 #include "app/render/gl_renderer.hpp"
 
-#include "app/files.hpp"
 #include "app/logging.hpp"
 #include "app/render/gl_shader.hpp"
 #include "app/render/types.hpp"
@@ -21,14 +20,6 @@ namespace solar::app {
 namespace {
 
 constexpr float kPi = std::numbers::pi_v<float>;
-
-std::string shader_source(std::string filename) {
-    std::string src = read_text_file(asset_path("shaders/" + filename));
-    if (src.empty() || !src.starts_with("#version ")) {
-        throw std::runtime_error("failed to get the shader source of " + filename);
-    }
-    return src;
-}
 
 // Unit disc in body XY (equatorial plane). a_radial is 0 at center, 1 at rim.
 // Scope ring strip maps radius → texture u (v unused / mid-row).
@@ -255,14 +246,7 @@ bool GlRenderer::init(const RenderCapacity& capacity) {
     try {
         // % = potential extraction soon
 
-        // % sphere_program_ = create_program(kSphereVertexShader, kSphereFragmentShader)
-        std::string vs_src = shader_source("sphere.vert");
-        std::string fs_src = shader_source("sphere.frag");
-        const unsigned int sphere_vertex_shader = compile_shader(GL_VERTEX_SHADER, vs_src);
-        const unsigned int sphere_fragment_shader = compile_shader(GL_FRAGMENT_SHADER, fs_src);
-        sphere_.program = link_program(sphere_vertex_shader, sphere_fragment_shader);
-        glDeleteShader(sphere_vertex_shader);
-        glDeleteShader(sphere_fragment_shader);
+        sphere_.create();
 
         const unsigned int ring_vertex_shader = compile_shader(GL_VERTEX_SHADER, kRingVertexShader);
         const unsigned int ring_fragment_shader =
