@@ -297,25 +297,10 @@ void setup_line_vertex_layout() {
 GlRenderer::~GlRenderer() { destroy(); }
 
 void GlRenderer::destroy() {
-    if (sphere_program_ != 0) {
-        glDeleteProgram(sphere_program_);
-        sphere_program_ = 0;
-    }
+    sphere_.destroy();
     if (line_program_ != 0) {
         glDeleteProgram(line_program_);
         line_program_ = 0;
-    }
-    if (sphere_vbo_ != 0) {
-        glDeleteBuffers(1, &sphere_vbo_);
-        sphere_vbo_ = 0;
-    }
-    if (sphere_ebo_ != 0) {
-        glDeleteBuffers(1, &sphere_ebo_);
-        sphere_ebo_ = 0;
-    }
-    if (sphere_vao_ != 0) {
-        glDeleteVertexArrays(1, &sphere_vao_);
-        sphere_vao_ = 0;
     }
     if (line_vbo_ != 0) {
         glDeleteBuffers(1, &line_vbo_);
@@ -341,19 +326,6 @@ void GlRenderer::destroy() {
         glDeleteVertexArrays(1, &ring_vao_);
         ring_vao_ = 0;
     }
-    sphere_view_loc_ = -1;
-    sphere_projection_loc_ = -1;
-    sphere_model_loc_ = -1;
-    sphere_color_loc_ = -1;
-    sphere_ambient_loc_ = -1;
-    sphere_emission_loc_ = -1;
-    sphere_light_dir_loc_ = -1;
-    sphere_texture_offset_loc_ = -1;
-    sphere_diffuse_loc_ = -1;
-    sphere_night_loc_ = -1;
-    sphere_use_diffuse_loc_ = -1;
-    sphere_use_night_loc_ = -1;
-    sphere_show_graticules_loc_ = -1;
     line_view_loc_ = -1;
     line_projection_loc_ = -1;
     ring_view_loc_ = -1;
@@ -363,7 +335,6 @@ void GlRenderer::destroy() {
     ring_map_loc_ = -1;
     ring_use_map_loc_ = -1;
     ring_inner_fraction_loc_ = -1;
-    sphere_index_count_ = 0;
     ring_index_count_ = 0;
     max_spheres_ = 0;
     max_line_vertices_ = 0;
@@ -390,7 +361,7 @@ bool GlRenderer::init(const RenderCapacity& capacity) {
             compile_shader(GL_VERTEX_SHADER, kSphereVertexShader);
         const unsigned int sphere_fragment_shader =
             compile_shader(GL_FRAGMENT_SHADER, kSphereFragmentShader);
-        sphere_program_ = link_program(sphere_vertex_shader, sphere_fragment_shader);
+        sphere_.program = link_program(sphere_vertex_shader, sphere_fragment_shader);
         glDeleteShader(sphere_vertex_shader);
         glDeleteShader(sphere_fragment_shader);
 
@@ -410,19 +381,19 @@ bool GlRenderer::init(const RenderCapacity& capacity) {
         glDeleteShader(line_fragment_shader);
 
         // % cache_sphere_uniforms()
-        sphere_view_loc_ = glGetUniformLocation(sphere_program_, "u_view");
-        sphere_projection_loc_ = glGetUniformLocation(sphere_program_, "u_projection");
-        sphere_model_loc_ = glGetUniformLocation(sphere_program_, "u_model");
-        sphere_color_loc_ = glGetUniformLocation(sphere_program_, "u_color");
-        sphere_ambient_loc_ = glGetUniformLocation(sphere_program_, "u_ambient");
-        sphere_emission_loc_ = glGetUniformLocation(sphere_program_, "u_emission");
-        sphere_light_dir_loc_ = glGetUniformLocation(sphere_program_, "u_light_dir");
-        sphere_texture_offset_loc_ = glGetUniformLocation(sphere_program_, "u_texture_offset");
-        sphere_diffuse_loc_ = glGetUniformLocation(sphere_program_, "u_diffuse");
-        sphere_use_diffuse_loc_ = glGetUniformLocation(sphere_program_, "u_use_diffuse");
-        sphere_night_loc_ = glGetUniformLocation(sphere_program_, "u_night");
-        sphere_use_night_loc_ = glGetUniformLocation(sphere_program_, "u_use_night");
-        sphere_show_graticules_loc_ = glGetUniformLocation(sphere_program_, "u_show_graticules");
+        sphere_.view_loc = glGetUniformLocation(sphere_.program, "u_view");
+        sphere_.projection_loc = glGetUniformLocation(sphere_.program, "u_projection");
+        sphere_.model_loc = glGetUniformLocation(sphere_.program, "u_model");
+        sphere_.color_loc = glGetUniformLocation(sphere_.program, "u_color");
+        sphere_.ambient_loc = glGetUniformLocation(sphere_.program, "u_ambient");
+        sphere_.emission_loc = glGetUniformLocation(sphere_.program, "u_emission");
+        sphere_.light_dir_loc = glGetUniformLocation(sphere_.program, "u_light_dir");
+        sphere_.texture_offset_loc = glGetUniformLocation(sphere_.program, "u_texture_offset");
+        sphere_.diffuse_loc = glGetUniformLocation(sphere_.program, "u_diffuse");
+        sphere_.use_diffuse_loc = glGetUniformLocation(sphere_.program, "u_use_diffuse");
+        sphere_.night_loc = glGetUniformLocation(sphere_.program, "u_night");
+        sphere_.use_night_loc = glGetUniformLocation(sphere_.program, "u_use_night");
+        sphere_.show_graticules_loc = glGetUniformLocation(sphere_.program, "u_show_graticules");
 
         ring_view_loc_ = glGetUniformLocation(ring_program_, "u_view");
         ring_projection_loc_ = glGetUniformLocation(ring_program_, "u_projection");
@@ -440,17 +411,17 @@ bool GlRenderer::init(const RenderCapacity& capacity) {
         std::vector<float> sphere_positions;
         std::vector<unsigned int> sphere_indices;
         generate_unit_sphere(sphere_positions, sphere_indices);
-        sphere_index_count_ = static_cast<int>(sphere_indices.size());
+        sphere_.index_count = static_cast<int>(sphere_indices.size());
 
-        glGenVertexArrays(1, &sphere_vao_);
-        glGenBuffers(1, &sphere_vbo_);
-        glGenBuffers(1, &sphere_ebo_);
-        glBindVertexArray(sphere_vao_);
-        glBindBuffer(GL_ARRAY_BUFFER, sphere_vbo_);
+        glGenVertexArrays(1, &sphere_.vao);
+        glGenBuffers(1, &sphere_.vbo);
+        glGenBuffers(1, &sphere_.ebo);
+        glBindVertexArray(sphere_.vao);
+        glBindBuffer(GL_ARRAY_BUFFER, sphere_.vbo);
         glBufferData(GL_ARRAY_BUFFER,
                      static_cast<GLsizeiptr>(sphere_positions.size() * sizeof(float)),
                      sphere_positions.data(), GL_STATIC_DRAW);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sphere_ebo_);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sphere_.ebo);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER,
                      static_cast<GLsizeiptr>(sphere_indices.size() * sizeof(unsigned int)),
                      sphere_indices.data(), GL_STATIC_DRAW);
@@ -524,7 +495,7 @@ void GlRenderer::set_camera_uniforms(unsigned int program, int view_loc, int pro
 
 void GlRenderer::draw_spheres(std::span<const SphereInstance> spheres, const glm::mat4& view,
                               const glm::mat4& projection) {
-    if (sphere_program_ == 0 || sphere_vao_ == 0 || sphere_index_count_ <= 0) {
+    if (sphere_.program == 0 || sphere_.vao == 0 || sphere_.index_count <= 0) {
         return;
     }
 
@@ -533,9 +504,9 @@ void GlRenderer::draw_spheres(std::span<const SphereInstance> spheres, const glm
         return;
     }
 
-    set_camera_uniforms(sphere_program_, sphere_view_loc_, sphere_projection_loc_, view,
+    set_camera_uniforms(sphere_.program, sphere_.view_loc, sphere_.projection_loc, view,
                         projection);
-    glBindVertexArray(sphere_vao_);
+    glBindVertexArray(sphere_.vao);
 
     for (std::size_t i = 0; i < count; ++i) {
         const SphereInstance& sphere = spheres[i];
@@ -551,61 +522,61 @@ void GlRenderer::draw_spheres(std::span<const SphereInstance> spheres, const glm
         const glm::mat4 S = glm::scale(glm::mat4{1.0f}, glm::vec3{sphere.radius_km});
         const glm::mat4 model = T * R * S;
 
-        if (sphere_model_loc_ >= 0) {
-            glUniformMatrix4fv(sphere_model_loc_, 1, GL_FALSE, glm::value_ptr(model));
+        if (sphere_.model_loc >= 0) {
+            glUniformMatrix4fv(sphere_.model_loc, 1, GL_FALSE, glm::value_ptr(model));
         }
 
-        if (sphere_texture_offset_loc_ >= 0) {
-            glUniform1f(sphere_texture_offset_loc_, surface.textures.longitude_offset_deg);
+        if (sphere_.texture_offset_loc >= 0) {
+            glUniform1f(sphere_.texture_offset_loc, surface.textures.longitude_offset_deg);
         }
 
         const bool using_diffuse_texture =
             (!surface.textures.diffuse.empty() && textures_.contains(surface.textures.diffuse) &&
-             sphere_diffuse_loc_ >= 0 && sphere_use_diffuse_loc_ >= 0);
+             sphere_.diffuse_loc >= 0 && sphere_.use_diffuse_loc >= 0);
 
         const bool using_night_texture =
             (!surface.textures.night.empty() && textures_.contains(surface.textures.night) &&
-             sphere_night_loc_ >= 0 && sphere_use_night_loc_ >= 0);
+             sphere_.night_loc >= 0 && sphere_.use_night_loc >= 0);
 
-        if (sphere_color_loc_ >= 0) {
-            glUniform4f(sphere_color_loc_, surface.color.r, surface.color.g, surface.color.b,
+        if (sphere_.color_loc >= 0) {
+            glUniform4f(sphere_.color_loc, surface.color.r, surface.color.g, surface.color.b,
                         surface.color.a);
         }
 
         if (using_diffuse_texture) {
             const auto diffuse_id = textures_[surface.textures.diffuse];
-            glUniform1i(sphere_use_diffuse_loc_, 1);
+            glUniform1i(sphere_.use_diffuse_loc, 1);
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, diffuse_id);
-            glUniform1i(sphere_diffuse_loc_, 0);
+            glUniform1i(sphere_.diffuse_loc, 0);
         } else {
-            glUniform1i(sphere_use_diffuse_loc_, 0);
+            glUniform1i(sphere_.use_diffuse_loc, 0);
         }
 
         if (using_night_texture) {
             const auto night_id = textures_[surface.textures.night];
-            glUniform1i(sphere_use_night_loc_, 1);
+            glUniform1i(sphere_.use_night_loc, 1);
             glActiveTexture(GL_TEXTURE1);
             glBindTexture(GL_TEXTURE_2D, night_id);
-            glUniform1i(sphere_night_loc_, 1);
+            glUniform1i(sphere_.night_loc, 1);
         } else {
-            glUniform1i(sphere_use_night_loc_, 0);
+            glUniform1i(sphere_.use_night_loc, 0);
         }
 
-        if (sphere_show_graticules_loc_ >= 0) {
-            glUniform1i(sphere_show_graticules_loc_, static_cast<int>(sphere.show_graticules));
+        if (sphere_.show_graticules_loc >= 0) {
+            glUniform1i(sphere_.show_graticules_loc, static_cast<int>(sphere.show_graticules));
         }
 
-        if (sphere_ambient_loc_ >= 0) {
-            glUniform1f(sphere_ambient_loc_, surface.ambient);
+        if (sphere_.ambient_loc >= 0) {
+            glUniform1f(sphere_.ambient_loc, surface.ambient);
         }
-        if (sphere_emission_loc_ >= 0) {
-            glUniform1f(sphere_emission_loc_, surface.emission);
+        if (sphere_.emission_loc >= 0) {
+            glUniform1f(sphere_.emission_loc, surface.emission);
         }
-        if (sphere_light_dir_loc_ >= 0) {
-            glUniform3fv(sphere_light_dir_loc_, 1, glm::value_ptr(sphere.light_dir));
+        if (sphere_.light_dir_loc >= 0) {
+            glUniform3fv(sphere_.light_dir_loc, 1, glm::value_ptr(sphere.light_dir));
         }
-        glDrawElements(GL_TRIANGLES, sphere_index_count_, GL_UNSIGNED_INT, nullptr);
+        glDrawElements(GL_TRIANGLES, sphere_.index_count, GL_UNSIGNED_INT, nullptr);
     }
 }
 
