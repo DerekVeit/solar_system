@@ -34,7 +34,7 @@ void prepare_buffer(unsigned& id, GLenum type, GLsizeiptr size_bytes, const void
 
 struct VertItemSpec {
     int count{};     // components (1-4)
-    int type{};      // e.g.GL_FLOAT
+    GLenum type{};   // e.g.GL_FLOAT
     int type_size{}; // bytes per component, e.g. sizeof(float)
 };
 
