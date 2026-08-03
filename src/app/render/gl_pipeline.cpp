@@ -21,6 +21,12 @@ void cache_uniform(unsigned program, int& loc, const char* name) {
     loc = glGetUniformLocation(program, name);
 }
 
+void prepare_buffer(unsigned& id, int type, int size_bytes, const void* start) {
+    glGenBuffers(1, &id);
+    glBindBuffer(type, id);
+    glBufferData(type, static_cast<GLsizeiptr>(size_bytes), start, GL_STATIC_DRAW);
+}
+
 } // namespace
 
 void SpherePipeline::create() {
@@ -55,16 +61,14 @@ void SpherePipeline::cache_uniforms() {
 
 void SpherePipeline::upload_mesh(MeshData mesh) {
     glGenVertexArrays(1, &vao);
-    glGenBuffers(1, &vbo);
-    glGenBuffers(1, &ebo);
     glBindVertexArray(vao);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(mesh.interleaved.size() * sizeof(float)),
-                 mesh.interleaved.data(), GL_STATIC_DRAW);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-                 static_cast<GLsizeiptr>(mesh.indices.size() * sizeof(unsigned int)),
-                 mesh.indices.data(), GL_STATIC_DRAW);
+
+    prepare_buffer(vbo, GL_ARRAY_BUFFER, mesh.interleaved.size() * sizeof(float),
+                   mesh.interleaved.data());
+
+    prepare_buffer(ebo, GL_ELEMENT_ARRAY_BUFFER, mesh.indices.size() * sizeof(unsigned),
+                   mesh.indices.data());
+
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), reinterpret_cast<void*>(0));
