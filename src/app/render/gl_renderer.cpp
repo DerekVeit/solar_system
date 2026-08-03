@@ -16,29 +16,6 @@ namespace solar::app {
 
 namespace {
 
-constexpr std::string_view kLineVertexShader = R"(#version 460 core
-layout(location = 0) in vec3 a_pos;
-layout(location = 1) in vec4 a_color;
-
-uniform mat4 u_view;
-uniform mat4 u_projection;
-
-out vec4 v_color;
-
-void main() {
-    gl_Position = u_projection * u_view * vec4(a_pos, 1.0);
-    v_color = a_color;
-}
-)";
-
-constexpr std::string_view kLineFragmentShader = R"(#version 460 core
-in vec4 v_color;
-out vec4 frag_color;
-void main() {
-    frag_color = v_color;
-}
-)";
-
 void setup_line_vertex_layout() {
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(LineVertex),
@@ -56,10 +33,7 @@ GlRenderer::~GlRenderer() { destroy(); }
 void GlRenderer::destroy() {
     sphere_.destroy();
     ring_.destroy();
-    if (line_program_ != 0) {
-        glDeleteProgram(line_program_);
-        line_program_ = 0;
-    }
+    line_.destroy();
     if (line_vbo_ != 0) {
         glDeleteBuffers(1, &line_vbo_);
         line_vbo_ = 0;
@@ -91,23 +65,18 @@ bool GlRenderer::init(const RenderCapacity& capacity) {
         sphere_.create();
         ring_.create();
 
-        const unsigned int line_vertex_shader = compile_shader(GL_VERTEX_SHADER, kLineVertexShader);
-        const unsigned int line_fragment_shader =
-            compile_shader(GL_FRAGMENT_SHADER, kLineFragmentShader);
-        line_program_ = link_program(line_vertex_shader, line_fragment_shader);
-        glDeleteShader(line_vertex_shader);
-        glDeleteShader(line_fragment_shader);
+        const std::size_t line_buffer_capacity = capacity.max_line_vertices +
+                                                 capacity.max_line_trail_vertices +
+                                                 capacity.max_line_loop_vertices;
+        line_.create();
 
-        line_view_loc_ = glGetUniformLocation(line_program_, "u_view");
-        line_projection_loc_ = glGetUniformLocation(line_program_, "u_projection");
+        line_view_loc_ = glGetUniformLocation(line_.program, "u_view");
+        line_projection_loc_ = glGetUniformLocation(line_.program, "u_projection");
 
         glGenVertexArrays(1, &line_vao_);
         glGenBuffers(1, &line_vbo_);
         glBindVertexArray(line_vao_);
         glBindBuffer(GL_ARRAY_BUFFER, line_vbo_);
-        const std::size_t line_buffer_capacity = capacity.max_line_vertices +
-                                                 capacity.max_line_trail_vertices +
-                                                 capacity.max_line_loop_vertices;
         glBufferData(GL_ARRAY_BUFFER,
                      static_cast<GLsizeiptr>(line_buffer_capacity * sizeof(LineVertex)), nullptr,
                      GL_DYNAMIC_DRAW);
@@ -299,11 +268,11 @@ void GlRenderer::draw_rings(std::span<const RingInstance> rings, const glm::mat4
 void GlRenderer::draw_line_primitives(unsigned int mode, std::span<const LinePrimitive> primitives,
                                       std::size_t max_vertices, const glm::mat4& view,
                                       const glm::mat4& projection) {
-    if (line_program_ == 0 || line_vao_ == 0 || line_vbo_ == 0) {
+    if (line_.program == 0 || line_vao_ == 0 || line_vbo_ == 0) {
         return;
     }
 
-    set_camera_uniforms(line_program_, line_view_loc_, line_projection_loc_, view, projection);
+    set_camera_uniforms(line_.program, line_view_loc_, line_projection_loc_, view, projection);
     glBindVertexArray(line_vao_);
     glBindBuffer(GL_ARRAY_BUFFER, line_vbo_);
 

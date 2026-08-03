@@ -82,6 +82,12 @@ void GlProgram::destroy_program() {
     projection_loc = -1;
 }
 
+void StreamPipeline::create() {
+    link_program_from_files(program, "line.vert", "line.frag");
+}
+
+void StreamPipeline::destroy() { destroy_program(); }
+
 void GlMeshProgram::destroy_mesh_and_program() {
     destroy_program();
     if (ebo != 0) {

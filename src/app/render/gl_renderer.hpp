@@ -36,8 +36,8 @@ class GlRenderer final : public IRenderer {
 
     SpherePipeline sphere_{};
     RingPipeline ring_{};
+    StreamPipeline line_{};
 
-    unsigned int line_program_{0};
     unsigned int line_vao_{0};
     unsigned int line_vbo_{0};
     int line_view_loc_{-1};

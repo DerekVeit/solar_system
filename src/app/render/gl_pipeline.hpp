@@ -13,6 +13,11 @@ struct GlProgram {
     void destroy_program();
 };
 
+struct StreamPipeline : GlProgram {
+    void create();
+    void destroy();
+};
+
 struct GlMeshProgram : GlProgram {
     unsigned ebo{0};
     int index_count{0};
