@@ -6,11 +6,17 @@
 
 namespace solar::app {
 
-struct GlMeshProgram {
+struct GlProgram {
     unsigned program{0};
-    unsigned vao{0}, vbo{0}, ebo{0};
+    unsigned vao{0}, vbo{0};
+    int view_loc{-1}, projection_loc{-1};
+    void destroy_program();
+};
+
+struct GlMeshProgram : GlProgram {
+    unsigned ebo{0};
     int index_count{0};
-    int model_loc{-1}, view_loc{-1}, projection_loc{-1};
+    int model_loc{-1};
 
     void destroy_mesh_and_program();
 };

@@ -65,7 +65,7 @@ void link_program_from_files(unsigned& program, const char* vert_name, const cha
 
 } // namespace
 
-void GlMeshProgram::destroy_mesh_and_program() {
+void GlProgram::destroy_program() {
     if (program != 0) {
         glDeleteProgram(program);
         program = 0;
@@ -74,16 +74,20 @@ void GlMeshProgram::destroy_mesh_and_program() {
         glDeleteBuffers(1, &vbo);
         vbo = 0;
     }
-    if (ebo != 0) {
-        glDeleteBuffers(1, &ebo);
-        ebo = 0;
-    }
     if (vao != 0) {
         glDeleteVertexArrays(1, &vao);
         vao = 0;
     }
     view_loc = -1;
     projection_loc = -1;
+}
+
+void GlMeshProgram::destroy_mesh_and_program() {
+    destroy_program();
+    if (ebo != 0) {
+        glDeleteBuffers(1, &ebo);
+        ebo = 0;
+    }
     model_loc = -1;
     index_count = 0;
 }
