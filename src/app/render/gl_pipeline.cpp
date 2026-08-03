@@ -5,6 +5,7 @@
 
 #include <glad/gl.h>
 
+#include <filesystem>
 #include <stdexcept>
 #include <vector>
 
@@ -13,9 +14,10 @@ namespace solar::app {
 namespace {
 
 std::string shader_source(std::string filename) {
-    std::string src = read_text_file(asset_path("shaders/" + filename));
+    std::filesystem::path path = asset_path("shaders/" + filename);
+    std::string src = read_text_file(path);
     if (src.empty() || !src.starts_with("#version ")) {
-        throw std::runtime_error("failed to get the shader source of " + filename);
+        throw std::runtime_error("failed to get the shader source of " + path.string());
     }
     return src;
 }
