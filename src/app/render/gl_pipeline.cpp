@@ -38,9 +38,12 @@ void prepare_vertex_array_attribs(int stride, std::vector<VertItemSpec> specs) {
     for (unsigned i = 0; i < specs.size(); ++i) {
         VertItemSpec spec = specs[i];
         glEnableVertexAttribArray(i);
-        glVertexAttribPointer(i, spec.count, GL_FLOAT, GL_FALSE, stride,
+        glVertexAttribPointer(i, spec.count, spec.type, GL_FALSE, stride,
                               reinterpret_cast<void*>(offset));
-        unsigned type_size = sizeof(float);
+        unsigned type_size;
+        if (spec.type == GL_FLOAT) {
+            type_size = sizeof(float);
+        }
         offset += spec.count * type_size;
     }
 }
