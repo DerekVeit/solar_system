@@ -77,7 +77,7 @@ void SpherePipeline::cache_uniforms() {
     cache_uniform(program, show_graticules_loc, "u_show_graticules");
 }
 
-void SpherePipeline::upload_mesh(MeshData mesh) {
+void SpherePipeline::upload_mesh(const MeshData& mesh) {
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
 
