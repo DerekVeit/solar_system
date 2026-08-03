@@ -12,7 +12,6 @@ out vec3 v_normal;
 
 void main() {
     v_uv = a_uv;
-    const float PI = 3.14159265;
     v_normal = normalize(mat3(u_model) * a_pos);
     gl_Position = u_projection * u_view * u_model * vec4(a_pos, 1.0);
 }
