@@ -3,6 +3,8 @@
 #include "app/files.hpp"
 #include "app/render/gl_shader.hpp"
 
+#include <glad/gl.h>
+
 #include <stdexcept>
 #include <vector>
 
@@ -22,10 +24,10 @@ void cache_uniform(unsigned program, int& loc, const char* name) {
     loc = glGetUniformLocation(program, name);
 }
 
-void prepare_buffer(unsigned& id, int type, int size_bytes, const void* start) {
+void prepare_buffer(unsigned& id, GLenum type, GLsizeiptr size_bytes, const void* start) {
     glGenBuffers(1, &id);
     glBindBuffer(type, id);
-    glBufferData(type, static_cast<GLsizeiptr>(size_bytes), start, GL_STATIC_DRAW);
+    glBufferData(type, size_bytes, start, GL_STATIC_DRAW);
 }
 
 struct VertItemSpec {
