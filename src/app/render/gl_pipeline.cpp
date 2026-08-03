@@ -1,4 +1,4 @@
-#include "gl_pipeline.hpp"
+#include "app/render/gl_pipeline.hpp"
 
 #include "app/files.hpp"
 #include "app/render/gl_shader.hpp"
@@ -34,7 +34,7 @@ void prepare_buffer(unsigned& id, GLenum type, GLsizeiptr size_bytes, const void
 
 struct VertItemSpec {
     int count{};     // components (1-4)
-    GLenum type{};   // e.g.GL_FLOAT
+    GLenum type{};   // e.g. GL_FLOAT
     int type_size{}; // bytes per component, e.g. sizeof(float)
 };
 
@@ -45,24 +45,51 @@ constexpr VertItemSpec floats(int count) {
 void prepare_vertex_array_attribs(int stride, std::vector<VertItemSpec> specs) {
     unsigned offset = 0;
     for (unsigned i = 0; i < specs.size(); ++i) {
-        VertItemSpec spec = specs[i];
+        const VertItemSpec spec = specs[i];
         glEnableVertexAttribArray(i);
         glVertexAttribPointer(i, spec.count, spec.type, GL_FALSE, stride,
-                              reinterpret_cast<void*>(offset));
+                              reinterpret_cast<void*>(static_cast<uintptr_t>(offset)));
         offset += static_cast<unsigned>(spec.count * spec.type_size);
     }
 }
 
-} // namespace
-
-void SpherePipeline::create() {
-    std::string vs_src = shader_source("sphere.vert");
-    std::string fs_src = shader_source("sphere.frag");
+void link_program_from_files(unsigned& program, const char* vert_name, const char* frag_name) {
+    const std::string vs_src = shader_source(vert_name);
+    const std::string fs_src = shader_source(frag_name);
     const unsigned int vertex_shader = compile_shader(GL_VERTEX_SHADER, vs_src);
     const unsigned int fragment_shader = compile_shader(GL_FRAGMENT_SHADER, fs_src);
     program = link_program(vertex_shader, fragment_shader);
     glDeleteShader(vertex_shader);
     glDeleteShader(fragment_shader);
+}
+
+} // namespace
+
+void GlMeshProgram::destroy_mesh_and_program() {
+    if (program != 0) {
+        glDeleteProgram(program);
+        program = 0;
+    }
+    if (vbo != 0) {
+        glDeleteBuffers(1, &vbo);
+        vbo = 0;
+    }
+    if (ebo != 0) {
+        glDeleteBuffers(1, &ebo);
+        ebo = 0;
+    }
+    if (vao != 0) {
+        glDeleteVertexArrays(1, &vao);
+        vao = 0;
+    }
+    view_loc = -1;
+    projection_loc = -1;
+    model_loc = -1;
+    index_count = 0;
+}
+
+void SpherePipeline::create() {
+    link_program_from_files(program, "sphere.vert", "sphere.frag");
     cache_uniforms();
     const MeshData mesh = generate_unit_sphere(48, 24);
     index_count = mesh.index_count;
@@ -89,13 +116,70 @@ void SpherePipeline::upload_mesh(const MeshData& mesh) {
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
 
-    prepare_buffer(vbo, GL_ARRAY_BUFFER, mesh.interleaved.size() * sizeof(float),
+    prepare_buffer(vbo, GL_ARRAY_BUFFER,
+                   static_cast<GLsizeiptr>(mesh.interleaved.size() * sizeof(float)),
                    mesh.interleaved.data());
 
-    prepare_buffer(ebo, GL_ELEMENT_ARRAY_BUFFER, mesh.indices.size() * sizeof(unsigned),
+    prepare_buffer(ebo, GL_ELEMENT_ARRAY_BUFFER,
+                   static_cast<GLsizeiptr>(mesh.indices.size() * sizeof(unsigned)),
                    mesh.indices.data());
 
     prepare_vertex_array_attribs(mesh.stride, {floats(3), floats(2)});
+}
+
+void SpherePipeline::destroy() {
+    destroy_mesh_and_program();
+    color_loc = -1;
+    ambient_loc = -1;
+    emission_loc = -1;
+    light_dir_loc = -1;
+    texture_offset_loc = -1;
+    diffuse_loc = -1;
+    night_loc = -1;
+    use_diffuse_loc = -1;
+    use_night_loc = -1;
+    show_graticules_loc = -1;
+}
+
+void RingPipeline::create() {
+    link_program_from_files(program, "ring.vert", "ring.frag");
+    cache_uniforms();
+    const MeshData mesh = generate_ring_disc(64);
+    index_count = mesh.index_count;
+    upload_mesh(mesh);
+}
+
+void RingPipeline::cache_uniforms() {
+    cache_uniform(program, view_loc, "u_view");
+    cache_uniform(program, projection_loc, "u_projection");
+    cache_uniform(program, model_loc, "u_model");
+    cache_uniform(program, light_dir_loc, "u_light_dir");
+    cache_uniform(program, map_loc, "u_map");
+    cache_uniform(program, use_map_loc, "u_use_map");
+    cache_uniform(program, inner_fraction_loc, "u_inner_fraction");
+}
+
+void RingPipeline::upload_mesh(const MeshData& mesh) {
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
+
+    prepare_buffer(vbo, GL_ARRAY_BUFFER,
+                   static_cast<GLsizeiptr>(mesh.interleaved.size() * sizeof(float)),
+                   mesh.interleaved.data());
+
+    prepare_buffer(ebo, GL_ELEMENT_ARRAY_BUFFER,
+                   static_cast<GLsizeiptr>(mesh.indices.size() * sizeof(unsigned)),
+                   mesh.indices.data());
+
+    prepare_vertex_array_attribs(mesh.stride, {floats(3), floats(1)});
+}
+
+void RingPipeline::destroy() {
+    destroy_mesh_and_program();
+    light_dir_loc = -1;
+    map_loc = -1;
+    use_map_loc = -1;
+    inner_fraction_loc = -1;
 }
 
 } // namespace solar::app
