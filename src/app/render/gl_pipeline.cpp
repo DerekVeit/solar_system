@@ -4,6 +4,7 @@
 #include "app/render/gl_shader.hpp"
 
 #include <stdexcept>
+#include <vector>
 
 namespace solar::app {
 
@@ -25,6 +26,23 @@ void prepare_buffer(unsigned& id, int type, int size_bytes, const void* start) {
     glGenBuffers(1, &id);
     glBindBuffer(type, id);
     glBufferData(type, static_cast<GLsizeiptr>(size_bytes), start, GL_STATIC_DRAW);
+}
+
+struct VertItemSpec {
+    int count;
+    int type;
+};
+
+void prepare_vertex_array_attribs(int stride, std::vector<VertItemSpec> specs) {
+    unsigned offset = 0;
+    for (unsigned i = 0; i < specs.size(); ++i) {
+        VertItemSpec spec = specs[i];
+        glEnableVertexAttribArray(i);
+        glVertexAttribPointer(i, spec.count, GL_FLOAT, GL_FALSE, stride,
+                              reinterpret_cast<void*>(offset));
+        unsigned type_size = sizeof(float);
+        offset += spec.count * type_size;
+    }
 }
 
 } // namespace
@@ -69,11 +87,10 @@ void SpherePipeline::upload_mesh(MeshData mesh) {
     prepare_buffer(ebo, GL_ELEMENT_ARRAY_BUFFER, mesh.indices.size() * sizeof(unsigned),
                    mesh.indices.data());
 
-    glEnableVertexAttribArray(0);
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), reinterpret_cast<void*>(0));
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
-                          reinterpret_cast<void*>(3 * sizeof(float)));
+    prepare_vertex_array_attribs(mesh.stride, {
+                                                  {3, GL_FLOAT},
+                                                  {2, GL_FLOAT},
+                                              });
 }
 
 } // namespace solar::app
