@@ -29,9 +29,14 @@ void prepare_buffer(unsigned& id, int type, int size_bytes, const void* start) {
 }
 
 struct VertItemSpec {
-    int count;
-    int type;
+    int count{};     // components (1-4)
+    int type{};      // e.g.GL_FLOAT
+    int type_size{}; // bytes per component, e.g. sizeof(float)
 };
+
+constexpr VertItemSpec floats(int count) {
+    return VertItemSpec{count, GL_FLOAT, static_cast<int>(sizeof(float))};
+}
 
 void prepare_vertex_array_attribs(int stride, std::vector<VertItemSpec> specs) {
     unsigned offset = 0;
@@ -40,11 +45,7 @@ void prepare_vertex_array_attribs(int stride, std::vector<VertItemSpec> specs) {
         glEnableVertexAttribArray(i);
         glVertexAttribPointer(i, spec.count, spec.type, GL_FALSE, stride,
                               reinterpret_cast<void*>(offset));
-        unsigned type_size;
-        if (spec.type == GL_FLOAT) {
-            type_size = sizeof(float);
-        }
-        offset += spec.count * type_size;
+        offset += static_cast<unsigned>(spec.count * spec.type_size);
     }
 }
 
@@ -90,10 +91,7 @@ void SpherePipeline::upload_mesh(const MeshData& mesh) {
     prepare_buffer(ebo, GL_ELEMENT_ARRAY_BUFFER, mesh.indices.size() * sizeof(unsigned),
                    mesh.indices.data());
 
-    prepare_vertex_array_attribs(mesh.stride, {
-                                                  {3, GL_FLOAT},
-                                                  {2, GL_FLOAT},
-                                              });
+    prepare_vertex_array_attribs(mesh.stride, {floats(3), floats(2)});
 }
 
 } // namespace solar::app
