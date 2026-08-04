@@ -26,10 +26,11 @@ void cache_uniform(unsigned program, int& loc, const char* name) {
     loc = glGetUniformLocation(program, name);
 }
 
-void prepare_buffer(unsigned& id, GLenum type, GLsizeiptr size_bytes, const void* start) {
+void prepare_buffer(unsigned& id, GLenum type, GLenum usage, GLsizeiptr size_bytes,
+                    const void* start) {
     glGenBuffers(1, &id);
     glBindBuffer(type, id);
-    glBufferData(type, size_bytes, start, GL_STATIC_DRAW);
+    glBufferData(type, size_bytes, start, usage);
 }
 
 struct VertItemSpec {
@@ -126,11 +127,11 @@ void SpherePipeline::upload_mesh(const MeshData& mesh) {
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
 
-    prepare_buffer(vbo, GL_ARRAY_BUFFER,
+    prepare_buffer(vbo, GL_ARRAY_BUFFER, GL_STATIC_DRAW,
                    static_cast<GLsizeiptr>(mesh.interleaved.size() * sizeof(float)),
                    mesh.interleaved.data());
 
-    prepare_buffer(ebo, GL_ELEMENT_ARRAY_BUFFER,
+    prepare_buffer(ebo, GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW,
                    static_cast<GLsizeiptr>(mesh.indices.size() * sizeof(unsigned)),
                    mesh.indices.data());
 
@@ -173,11 +174,11 @@ void RingPipeline::upload_mesh(const MeshData& mesh) {
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
 
-    prepare_buffer(vbo, GL_ARRAY_BUFFER,
+    prepare_buffer(vbo, GL_ARRAY_BUFFER, GL_STATIC_DRAW,
                    static_cast<GLsizeiptr>(mesh.interleaved.size() * sizeof(float)),
                    mesh.interleaved.data());
 
-    prepare_buffer(ebo, GL_ELEMENT_ARRAY_BUFFER,
+    prepare_buffer(ebo, GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW,
                    static_cast<GLsizeiptr>(mesh.indices.size() * sizeof(unsigned)),
                    mesh.indices.data());
 
