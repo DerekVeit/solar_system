@@ -92,6 +92,7 @@ void StreamPipeline::create(int vertex_capacity) {
     glBindVertexArray(vao);
     prepare_buffer(vbo, GL_ARRAY_BUFFER, GL_DYNAMIC_DRAW,
                    static_cast<GLsizeiptr>(capacity * sizeof(LineVertex)), nullptr);
+    prepare_vertex_array_attribs(sizeof(LineVertex), {floats(3), floats(4)});
 }
 
 void StreamPipeline::cache_uniforms() {

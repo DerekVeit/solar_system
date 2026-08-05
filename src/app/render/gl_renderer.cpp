@@ -12,20 +12,6 @@
 
 namespace solar::app {
 
-namespace {
-
-void setup_line_vertex_layout() {
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(LineVertex),
-                          reinterpret_cast<void*>(offsetof(LineVertex, x_km)));
-
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(LineVertex),
-                          reinterpret_cast<void*>(offsetof(LineVertex, color)));
-}
-
-} // namespace
-
 GlRenderer::~GlRenderer() { destroy(); }
 
 void GlRenderer::destroy() {
@@ -57,8 +43,6 @@ bool GlRenderer::init(const RenderCapacity& capacity) {
                                                  capacity.max_line_trail_vertices +
                                                  capacity.max_line_loop_vertices;
         line_.create(line_buffer_capacity);
-
-        setup_line_vertex_layout();
 
         glBindVertexArray(0);
 
