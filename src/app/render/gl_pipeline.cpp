@@ -2,6 +2,7 @@
 
 #include "app/files.hpp"
 #include "app/render/gl_shader.hpp"
+#include "app/render/types.hpp"
 
 #include <glad/gl.h>
 
@@ -83,8 +84,19 @@ void GlProgram::destroy_program() {
     projection_loc = -1;
 }
 
-void StreamPipeline::create() {
+void StreamPipeline::create(int vertex_capacity) {
+    capacity = vertex_capacity;
     link_program_from_files(program, "line.vert", "line.frag");
+    cache_uniforms();
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
+    prepare_buffer(vbo, GL_ARRAY_BUFFER, GL_DYNAMIC_DRAW,
+                   static_cast<GLsizeiptr>(capacity * sizeof(LineVertex)), nullptr);
+}
+
+void StreamPipeline::cache_uniforms() {
+    cache_uniform(program, view_loc, "u_view");
+    cache_uniform(program, projection_loc, "u_projection");
 }
 
 void StreamPipeline::destroy() { destroy_program(); }

@@ -38,10 +38,6 @@ class GlRenderer final : public IRenderer {
     RingPipeline ring_{};
     StreamPipeline line_{};
 
-    unsigned int line_vao_{0};
-    unsigned int line_vbo_{0};
-    int line_view_loc_{-1};
-    int line_projection_loc_{-1};
     std::size_t max_spheres_{0};
     std::size_t max_line_vertices_{0};
     std::size_t max_line_trail_vertices_{0};

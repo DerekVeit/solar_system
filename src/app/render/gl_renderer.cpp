@@ -1,7 +1,6 @@
 #include "app/render/gl_renderer.hpp"
 
 #include "app/logging.hpp"
-#include "app/render/gl_shader.hpp"
 #include "app/render/types.hpp"
 
 #include <glad/gl.h>
@@ -10,7 +9,6 @@
 #include <glm/vec3.hpp>
 
 #include <cstddef>
-#include <string_view>
 
 namespace solar::app {
 
@@ -34,16 +32,6 @@ void GlRenderer::destroy() {
     sphere_.destroy();
     ring_.destroy();
     line_.destroy();
-    if (line_vbo_ != 0) {
-        glDeleteBuffers(1, &line_vbo_);
-        line_vbo_ = 0;
-    }
-    if (line_vao_ != 0) {
-        glDeleteVertexArrays(1, &line_vao_);
-        line_vao_ = 0;
-    }
-    line_view_loc_ = -1;
-    line_projection_loc_ = -1;
     max_spheres_ = 0;
     max_line_vertices_ = 0;
     max_line_trail_vertices_ = 0;
@@ -68,18 +56,8 @@ bool GlRenderer::init(const RenderCapacity& capacity) {
         const std::size_t line_buffer_capacity = capacity.max_line_vertices +
                                                  capacity.max_line_trail_vertices +
                                                  capacity.max_line_loop_vertices;
-        line_.create();
+        line_.create(line_buffer_capacity);
 
-        line_view_loc_ = glGetUniformLocation(line_.program, "u_view");
-        line_projection_loc_ = glGetUniformLocation(line_.program, "u_projection");
-
-        glGenVertexArrays(1, &line_vao_);
-        glGenBuffers(1, &line_vbo_);
-        glBindVertexArray(line_vao_);
-        glBindBuffer(GL_ARRAY_BUFFER, line_vbo_);
-        glBufferData(GL_ARRAY_BUFFER,
-                     static_cast<GLsizeiptr>(line_buffer_capacity * sizeof(LineVertex)), nullptr,
-                     GL_DYNAMIC_DRAW);
         setup_line_vertex_layout();
 
         glBindVertexArray(0);
@@ -268,13 +246,13 @@ void GlRenderer::draw_rings(std::span<const RingInstance> rings, const glm::mat4
 void GlRenderer::draw_line_primitives(unsigned int mode, std::span<const LinePrimitive> primitives,
                                       std::size_t max_vertices, const glm::mat4& view,
                                       const glm::mat4& projection) {
-    if (line_.program == 0 || line_vao_ == 0 || line_vbo_ == 0) {
+    if (line_.program == 0 || line_.vao == 0 || line_.vbo == 0) {
         return;
     }
 
-    set_camera_uniforms(line_.program, line_view_loc_, line_projection_loc_, view, projection);
-    glBindVertexArray(line_vao_);
-    glBindBuffer(GL_ARRAY_BUFFER, line_vbo_);
+    set_camera_uniforms(line_.program, line_.view_loc, line_.projection_loc, view, projection);
+    glBindVertexArray(line_.vao);
+    glBindBuffer(GL_ARRAY_BUFFER, line_.vbo);
 
     for (const LinePrimitive& primitive : primitives) {
         const std::size_t count =

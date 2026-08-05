@@ -14,7 +14,10 @@ struct GlProgram {
 };
 
 struct StreamPipeline : GlProgram {
-    void create();
+    int capacity; // max vertices
+
+    void create(int capacity);
+    void cache_uniforms();
     void destroy();
 };
 
