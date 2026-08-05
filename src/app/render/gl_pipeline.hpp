@@ -3,6 +3,7 @@
 #include "app/render/mesh_gen.hpp"
 
 #include <glad/gl.h>
+#include <glm/ext/matrix_float4x4.hpp>
 
 namespace solar::app {
 
@@ -10,6 +11,7 @@ struct GlProgram {
     unsigned program{0};
     unsigned vao{0}, vbo{0};
     int view_loc{-1}, projection_loc{-1};
+    void set_camera_uniforms(const glm::mat4& view, const glm::mat4& projection) const;
     void destroy_program();
 };
 

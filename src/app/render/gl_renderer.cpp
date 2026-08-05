@@ -58,17 +58,6 @@ bool GlRenderer::init(const RenderCapacity& capacity) {
     }
 }
 
-void GlRenderer::set_camera_uniforms(unsigned int program, int view_loc, int projection_loc,
-                                     const glm::mat4& view, const glm::mat4& projection) const {
-    glUseProgram(program);
-    if (view_loc >= 0) {
-        glUniformMatrix4fv(view_loc, 1, GL_FALSE, glm::value_ptr(view));
-    }
-    if (projection_loc >= 0) {
-        glUniformMatrix4fv(projection_loc, 1, GL_FALSE, glm::value_ptr(projection));
-    }
-}
-
 void GlRenderer::draw_spheres(std::span<const SphereInstance> spheres, const glm::mat4& view,
                               const glm::mat4& projection) {
     if (sphere_.program == 0 || sphere_.vao == 0 || sphere_.index_count <= 0) {
@@ -80,8 +69,7 @@ void GlRenderer::draw_spheres(std::span<const SphereInstance> spheres, const glm
         return;
     }
 
-    set_camera_uniforms(sphere_.program, sphere_.view_loc, sphere_.projection_loc, view,
-                        projection);
+    sphere_.set_camera_uniforms(view, projection);
     glBindVertexArray(sphere_.vao);
 
     for (std::size_t i = 0; i < count; ++i) {
@@ -165,7 +153,7 @@ void GlRenderer::draw_rings(std::span<const RingInstance> rings, const glm::mat4
         return;
     }
 
-    set_camera_uniforms(ring_.program, ring_.view_loc, ring_.projection_loc, view, projection);
+    ring_.set_camera_uniforms(view, projection);
     glBindVertexArray(ring_.vao);
 
     const GLboolean was_blend = glIsEnabled(GL_BLEND);
@@ -234,7 +222,7 @@ void GlRenderer::draw_line_primitives(unsigned int mode, std::span<const LinePri
         return;
     }
 
-    set_camera_uniforms(line_.program, line_.view_loc, line_.projection_loc, view, projection);
+    line_.set_camera_uniforms(view, projection);
     glBindVertexArray(line_.vao);
     glBindBuffer(GL_ARRAY_BUFFER, line_.vbo);
 

@@ -5,6 +5,7 @@
 #include "app/render/types.hpp"
 
 #include <glad/gl.h>
+#include <glm/gtc/type_ptr.hpp>
 
 #include <filesystem>
 #include <stdexcept>
@@ -82,6 +83,16 @@ void GlProgram::destroy_program() {
     }
     view_loc = -1;
     projection_loc = -1;
+}
+
+void GlProgram::set_camera_uniforms(const glm::mat4& view, const glm::mat4& projection) const {
+    glUseProgram(program);
+    if (view_loc >= 0) {
+        glUniformMatrix4fv(view_loc, 1, GL_FALSE, glm::value_ptr(view));
+    }
+    if (projection_loc >= 0) {
+        glUniformMatrix4fv(projection_loc, 1, GL_FALSE, glm::value_ptr(projection));
+    }
 }
 
 void StreamPipeline::create(int vertex_capacity) {

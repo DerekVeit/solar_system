@@ -24,8 +24,6 @@ class GlRenderer final : public IRenderer {
 
   private:
     void destroy();
-    void set_camera_uniforms(unsigned int program, int view_loc, int projection_loc,
-                             const glm::mat4& view, const glm::mat4& projection) const;
     void draw_spheres(std::span<const SphereInstance> spheres, const glm::mat4& view,
                       const glm::mat4& projection);
     void draw_rings(std::span<const RingInstance> rings, const glm::mat4& view,
