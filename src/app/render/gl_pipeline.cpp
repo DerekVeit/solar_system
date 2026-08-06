@@ -162,6 +162,93 @@ void SpherePipeline::upload_mesh(const MeshData& mesh) {
     prepare_vertex_array_attribs(mesh.stride, {floats(3), floats(2)});
 }
 
+void SpherePipeline::draw(std::span<const SphereInstance> spheres, std::size_t max_spheres,
+                          std::unordered_map<std::string, unsigned int>& textures,
+                          const glm::mat4& view, const glm::mat4& projection) {
+    if (program == 0 || vao == 0 || index_count <= 0) {
+        return;
+    }
+
+    const std::size_t count = spheres.size() < max_spheres ? spheres.size() : max_spheres;
+    if (count == 0) {
+        return;
+    }
+
+    set_camera_uniforms(view, projection);
+    glBindVertexArray(vao);
+
+    for (std::size_t i = 0; i < count; ++i) {
+        const SphereInstance& sphere = spheres[i];
+        if (sphere.radius_km <= 0.0f) {
+            continue;
+        }
+
+        const BodySurface& surface = sphere.surface;
+
+        const glm::mat4 T =
+            glm::translate(glm::mat4{1.0f}, glm::vec3{sphere.x_km, sphere.y_km, sphere.z_km});
+        const glm::mat4 R = glm::mat4(sphere.rotation);
+        const glm::mat4 S = glm::scale(glm::mat4{1.0f}, glm::vec3{sphere.radius_km});
+        const glm::mat4 model = T * R * S;
+
+        if (model_loc >= 0) {
+            glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));
+        }
+
+        if (texture_offset_loc >= 0) {
+            glUniform1f(texture_offset_loc, surface.textures.longitude_offset_deg);
+        }
+
+        const bool using_diffuse_texture =
+            (!surface.textures.diffuse.empty() && textures.contains(surface.textures.diffuse) &&
+             diffuse_loc >= 0 && use_diffuse_loc >= 0);
+
+        const bool using_night_texture =
+            (!surface.textures.night.empty() && textures.contains(surface.textures.night) &&
+             night_loc >= 0 && use_night_loc >= 0);
+
+        if (color_loc >= 0) {
+            glUniform4f(color_loc, surface.color.r, surface.color.g, surface.color.b,
+                        surface.color.a);
+        }
+
+        if (using_diffuse_texture) {
+            const auto diffuse_id = textures[surface.textures.diffuse];
+            glUniform1i(use_diffuse_loc, 1);
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, diffuse_id);
+            glUniform1i(diffuse_loc, 0);
+        } else {
+            glUniform1i(use_diffuse_loc, 0);
+        }
+
+        if (using_night_texture) {
+            const auto night_id = textures[surface.textures.night];
+            glUniform1i(use_night_loc, 1);
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, night_id);
+            glUniform1i(night_loc, 1);
+        } else {
+            glUniform1i(use_night_loc, 0);
+        }
+
+        if (show_graticules_loc >= 0) {
+            glUniform1i(show_graticules_loc, static_cast<int>(sphere.show_graticules));
+        }
+
+        if (ambient_loc >= 0) {
+            glUniform1f(ambient_loc, surface.ambient);
+        }
+        if (emission_loc >= 0) {
+            glUniform1f(emission_loc, surface.emission);
+        }
+        if (light_dir_loc >= 0) {
+            glUniform3fv(light_dir_loc, 1, glm::value_ptr(sphere.light_dir));
+        }
+        glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, nullptr);
+    }
+}
+
 void SpherePipeline::destroy() {
     destroy_mesh_and_program();
     color_loc = -1;

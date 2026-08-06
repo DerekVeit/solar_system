@@ -1,9 +1,12 @@
 #pragma once
 
 #include "app/render/mesh_gen.hpp"
+#include "app/render/types.hpp"
 
 #include <glad/gl.h>
 #include <glm/ext/matrix_float4x4.hpp>
+
+#include <span>
 
 namespace solar::app {
 
@@ -40,6 +43,9 @@ struct SpherePipeline : GlMeshProgram {
     void cache_uniforms();
     void upload_mesh(const MeshData& mesh);
     void destroy();
+    void draw(std::span<const SphereInstance> spheres, std::size_t max_spheres,
+              std::unordered_map<std::string, unsigned int>& textures, const glm::mat4& view,
+              const glm::mat4& projection);
 };
 
 struct RingPipeline : GlMeshProgram {

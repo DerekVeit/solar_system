@@ -58,92 +58,6 @@ bool GlRenderer::init(const RenderCapacity& capacity) {
     }
 }
 
-void GlRenderer::draw_spheres(std::span<const SphereInstance> spheres, const glm::mat4& view,
-                              const glm::mat4& projection) {
-    if (sphere_.program == 0 || sphere_.vao == 0 || sphere_.index_count <= 0) {
-        return;
-    }
-
-    const std::size_t count = spheres.size() < max_spheres_ ? spheres.size() : max_spheres_;
-    if (count == 0) {
-        return;
-    }
-
-    sphere_.set_camera_uniforms(view, projection);
-    glBindVertexArray(sphere_.vao);
-
-    for (std::size_t i = 0; i < count; ++i) {
-        const SphereInstance& sphere = spheres[i];
-        if (sphere.radius_km <= 0.0f) {
-            continue;
-        }
-
-        const BodySurface& surface = sphere.surface;
-
-        const glm::mat4 T =
-            glm::translate(glm::mat4{1.0f}, glm::vec3{sphere.x_km, sphere.y_km, sphere.z_km});
-        const glm::mat4 R = glm::mat4(sphere.rotation);
-        const glm::mat4 S = glm::scale(glm::mat4{1.0f}, glm::vec3{sphere.radius_km});
-        const glm::mat4 model = T * R * S;
-
-        if (sphere_.model_loc >= 0) {
-            glUniformMatrix4fv(sphere_.model_loc, 1, GL_FALSE, glm::value_ptr(model));
-        }
-
-        if (sphere_.texture_offset_loc >= 0) {
-            glUniform1f(sphere_.texture_offset_loc, surface.textures.longitude_offset_deg);
-        }
-
-        const bool using_diffuse_texture =
-            (!surface.textures.diffuse.empty() && textures_.contains(surface.textures.diffuse) &&
-             sphere_.diffuse_loc >= 0 && sphere_.use_diffuse_loc >= 0);
-
-        const bool using_night_texture =
-            (!surface.textures.night.empty() && textures_.contains(surface.textures.night) &&
-             sphere_.night_loc >= 0 && sphere_.use_night_loc >= 0);
-
-        if (sphere_.color_loc >= 0) {
-            glUniform4f(sphere_.color_loc, surface.color.r, surface.color.g, surface.color.b,
-                        surface.color.a);
-        }
-
-        if (using_diffuse_texture) {
-            const auto diffuse_id = textures_[surface.textures.diffuse];
-            glUniform1i(sphere_.use_diffuse_loc, 1);
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, diffuse_id);
-            glUniform1i(sphere_.diffuse_loc, 0);
-        } else {
-            glUniform1i(sphere_.use_diffuse_loc, 0);
-        }
-
-        if (using_night_texture) {
-            const auto night_id = textures_[surface.textures.night];
-            glUniform1i(sphere_.use_night_loc, 1);
-            glActiveTexture(GL_TEXTURE1);
-            glBindTexture(GL_TEXTURE_2D, night_id);
-            glUniform1i(sphere_.night_loc, 1);
-        } else {
-            glUniform1i(sphere_.use_night_loc, 0);
-        }
-
-        if (sphere_.show_graticules_loc >= 0) {
-            glUniform1i(sphere_.show_graticules_loc, static_cast<int>(sphere.show_graticules));
-        }
-
-        if (sphere_.ambient_loc >= 0) {
-            glUniform1f(sphere_.ambient_loc, surface.ambient);
-        }
-        if (sphere_.emission_loc >= 0) {
-            glUniform1f(sphere_.emission_loc, surface.emission);
-        }
-        if (sphere_.light_dir_loc >= 0) {
-            glUniform3fv(sphere_.light_dir_loc, 1, glm::value_ptr(sphere.light_dir));
-        }
-        glDrawElements(GL_TRIANGLES, sphere_.index_count, GL_UNSIGNED_INT, nullptr);
-    }
-}
-
 void GlRenderer::draw_rings(std::span<const RingInstance> rings, const glm::mat4& view,
                             const glm::mat4& projection) {
     if (ring_.program == 0 || ring_.vao == 0 || ring_.index_count <= 0) {
@@ -240,7 +154,7 @@ void GlRenderer::draw_line_primitives(unsigned int mode, std::span<const LinePri
 }
 
 void GlRenderer::draw(const DrawBatch& batch, const glm::mat4& view, const glm::mat4& projection) {
-    draw_spheres(batch.spheres, view, projection);
+    sphere_.draw(batch.spheres, max_spheres_, textures_, view, projection);
     draw_rings(batch.rings, view, projection);
     draw_line_primitives(GL_LINE_STRIP, batch.line_trails, max_line_trail_vertices_, view,
                          projection);
