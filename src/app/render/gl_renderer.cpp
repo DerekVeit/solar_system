@@ -58,37 +58,12 @@ bool GlRenderer::init(const RenderCapacity& capacity) {
     }
 }
 
-void GlRenderer::draw_line_primitives(unsigned int mode, std::span<const LinePrimitive> primitives,
-                                      std::size_t max_vertices, const glm::mat4& view,
-                                      const glm::mat4& projection) {
-    if (line_.program == 0 || line_.vao == 0 || line_.vbo == 0) {
-        return;
-    }
-
-    line_.set_camera_uniforms(view, projection);
-    glBindVertexArray(line_.vao);
-    glBindBuffer(GL_ARRAY_BUFFER, line_.vbo);
-
-    for (const LinePrimitive& primitive : primitives) {
-        const std::size_t count =
-            primitive.vertices.size() < max_vertices ? primitive.vertices.size() : max_vertices;
-        if (count < 2) {
-            continue;
-        }
-
-        glBufferSubData(GL_ARRAY_BUFFER, 0, static_cast<GLsizeiptr>(count * sizeof(LineVertex)),
-                        primitive.vertices.data());
-        glDrawArrays(mode, 0, static_cast<GLsizei>(count));
-    }
-}
-
 void GlRenderer::draw(const DrawBatch& batch, const glm::mat4& view, const glm::mat4& projection) {
     sphere_.draw(batch.spheres, max_spheres_, textures_, view, projection);
     ring_.draw(batch.rings, textures_, view, projection);
-    draw_line_primitives(GL_LINE_STRIP, batch.line_trails, max_line_trail_vertices_, view,
-                         projection);
-    draw_line_primitives(GL_LINE_LOOP, batch.line_loops, max_line_loop_vertices_, view, projection);
-    draw_line_primitives(GL_LINES, batch.lines, max_line_vertices_, view, projection);
+    line_.draw(batch.line_trails, GL_LINE_STRIP, max_line_trail_vertices_, view, projection);
+    line_.draw(batch.line_loops, GL_LINE_LOOP, max_line_loop_vertices_, view, projection);
+    line_.draw(batch.lines, GL_LINES, max_line_vertices_, view, projection);
 }
 
 void GlRenderer::upload_texture(const std::string& path, const TextureImage& image) {

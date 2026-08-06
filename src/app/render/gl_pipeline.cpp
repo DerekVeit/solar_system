@@ -113,6 +113,30 @@ void StreamPipeline::cache_uniforms() {
 
 void StreamPipeline::destroy() { destroy_program(); }
 
+void StreamPipeline::draw(std::span<const LinePrimitive> primitives, unsigned int mode,
+                          std::size_t max_vertices, const glm::mat4& view,
+                          const glm::mat4& projection) {
+    if (program == 0 || vao == 0 || vbo == 0) {
+        return;
+    }
+
+    set_camera_uniforms(view, projection);
+    glBindVertexArray(vao);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+    for (const LinePrimitive& primitive : primitives) {
+        const std::size_t count =
+            primitive.vertices.size() < max_vertices ? primitive.vertices.size() : max_vertices;
+        if (count < 2) {
+            continue;
+        }
+
+        glBufferSubData(GL_ARRAY_BUFFER, 0, static_cast<GLsizeiptr>(count * sizeof(LineVertex)),
+                        primitive.vertices.data());
+        glDrawArrays(mode, 0, static_cast<GLsizei>(count));
+    }
+}
+
 void GlMeshProgram::destroy_mesh_and_program() {
     destroy_program();
     if (ebo != 0) {

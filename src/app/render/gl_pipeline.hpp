@@ -24,6 +24,8 @@ struct StreamPipeline : GlProgram {
     void create(int capacity);
     void cache_uniforms();
     void destroy();
+    void draw(std::span<const LinePrimitive> primitives, unsigned int mode,
+              std::size_t max_vertices, const glm::mat4& view, const glm::mat4& projection);
 };
 
 struct GlMeshProgram : GlProgram {
