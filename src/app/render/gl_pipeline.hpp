@@ -58,6 +58,9 @@ struct RingPipeline : GlMeshProgram {
     void cache_uniforms();
     void upload_mesh(const MeshData& mesh);
     void destroy();
+    void draw(std::span<const RingInstance> rings,
+              std::unordered_map<std::string, unsigned int>& textures, const glm::mat4& view,
+              const glm::mat4& projection);
 };
 
 } // namespace solar::app

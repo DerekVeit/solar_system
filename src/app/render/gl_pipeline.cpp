@@ -296,6 +296,77 @@ void RingPipeline::upload_mesh(const MeshData& mesh) {
     prepare_vertex_array_attribs(mesh.stride, {floats(3), floats(1)});
 }
 
+void RingPipeline::draw(std::span<const RingInstance> rings,
+                        std::unordered_map<std::string, unsigned int>& textures,
+                        const glm::mat4& view, const glm::mat4& projection) {
+    if (program == 0 || vao == 0 || index_count <= 0) {
+        return;
+    }
+    if (rings.empty()) {
+        return;
+    }
+
+    set_camera_uniforms(view, projection);
+    glBindVertexArray(vao);
+
+    const GLboolean was_blend = glIsEnabled(GL_BLEND);
+    const GLboolean was_cull = glIsEnabled(GL_CULL_FACE);
+    GLboolean depth_mask = GL_TRUE;
+    glGetBooleanv(GL_DEPTH_WRITEMASK, &depth_mask);
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glDepthMask(GL_FALSE);
+    glDisable(GL_CULL_FACE);
+
+    for (const RingInstance& ring : rings) {
+        if (ring.outer_radius_km <= 0.0f) {
+            continue;
+        }
+
+        const glm::mat4 T =
+            glm::translate(glm::mat4{1.0f}, glm::vec3{ring.x_km, ring.y_km, ring.z_km});
+        const glm::mat4 R = glm::mat4(ring.rotation);
+        const float s = ring.outer_radius_km;
+        const glm::mat4 S = glm::scale(glm::mat4{1.0f}, glm::vec3{s, s, s});
+        const glm::mat4 model = T * R * S;
+
+        if (model_loc >= 0) {
+            glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));
+        }
+        if (light_dir_loc >= 0) {
+            glUniform3fv(light_dir_loc, 1, glm::value_ptr(ring.light_dir));
+        }
+
+        const bool using_map = !ring.map.empty() && textures.contains(ring.map) && map_loc >= 0;
+        if (using_map) {
+            glUniform1i(use_map_loc, 1);
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, textures[ring.map]);
+            glUniform1i(map_loc, 0);
+        } else if (use_map_loc >= 0) {
+            glUniform1i(use_map_loc, 0);
+        }
+
+        if (inner_fraction_loc >= 0) {
+            glUniform1f(inner_fraction_loc,
+                        static_cast<float>(ring.inner_radius_km / ring.outer_radius_km));
+        }
+
+        glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, nullptr);
+    }
+
+    glDepthMask(depth_mask);
+    if (!was_blend) {
+        glDisable(GL_BLEND);
+    }
+    if (was_cull) {
+        glEnable(GL_CULL_FACE);
+    } else {
+        glDisable(GL_CULL_FACE);
+    }
+}
+
 void RingPipeline::destroy() {
     destroy_mesh_and_program();
     light_dir_loc = -1;

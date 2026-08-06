@@ -58,77 +58,6 @@ bool GlRenderer::init(const RenderCapacity& capacity) {
     }
 }
 
-void GlRenderer::draw_rings(std::span<const RingInstance> rings, const glm::mat4& view,
-                            const glm::mat4& projection) {
-    if (ring_.program == 0 || ring_.vao == 0 || ring_.index_count <= 0) {
-        return;
-    }
-    if (rings.empty()) {
-        return;
-    }
-
-    ring_.set_camera_uniforms(view, projection);
-    glBindVertexArray(ring_.vao);
-
-    const GLboolean was_blend = glIsEnabled(GL_BLEND);
-    const GLboolean was_cull = glIsEnabled(GL_CULL_FACE);
-    GLboolean depth_mask = GL_TRUE;
-    glGetBooleanv(GL_DEPTH_WRITEMASK, &depth_mask);
-
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glDepthMask(GL_FALSE);
-    glDisable(GL_CULL_FACE);
-
-    for (const RingInstance& ring : rings) {
-        if (ring.outer_radius_km <= 0.0f) {
-            continue;
-        }
-
-        const glm::mat4 T =
-            glm::translate(glm::mat4{1.0f}, glm::vec3{ring.x_km, ring.y_km, ring.z_km});
-        const glm::mat4 R = glm::mat4(ring.rotation);
-        const float s = ring.outer_radius_km;
-        const glm::mat4 S = glm::scale(glm::mat4{1.0f}, glm::vec3{s, s, s});
-        const glm::mat4 model = T * R * S;
-
-        if (ring_.model_loc >= 0) {
-            glUniformMatrix4fv(ring_.model_loc, 1, GL_FALSE, glm::value_ptr(model));
-        }
-        if (ring_.light_dir_loc >= 0) {
-            glUniform3fv(ring_.light_dir_loc, 1, glm::value_ptr(ring.light_dir));
-        }
-
-        const bool using_map =
-            !ring.map.empty() && textures_.contains(ring.map) && ring_.map_loc >= 0;
-        if (using_map) {
-            glUniform1i(ring_.use_map_loc, 1);
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, textures_[ring.map]);
-            glUniform1i(ring_.map_loc, 0);
-        } else if (ring_.use_map_loc >= 0) {
-            glUniform1i(ring_.use_map_loc, 0);
-        }
-
-        if (ring_.inner_fraction_loc >= 0) {
-            glUniform1f(ring_.inner_fraction_loc,
-                        static_cast<float>(ring.inner_radius_km / ring.outer_radius_km));
-        }
-
-        glDrawElements(GL_TRIANGLES, ring_.index_count, GL_UNSIGNED_INT, nullptr);
-    }
-
-    glDepthMask(depth_mask);
-    if (!was_blend) {
-        glDisable(GL_BLEND);
-    }
-    if (was_cull) {
-        glEnable(GL_CULL_FACE);
-    } else {
-        glDisable(GL_CULL_FACE);
-    }
-}
-
 void GlRenderer::draw_line_primitives(unsigned int mode, std::span<const LinePrimitive> primitives,
                                       std::size_t max_vertices, const glm::mat4& view,
                                       const glm::mat4& projection) {
@@ -155,7 +84,7 @@ void GlRenderer::draw_line_primitives(unsigned int mode, std::span<const LinePri
 
 void GlRenderer::draw(const DrawBatch& batch, const glm::mat4& view, const glm::mat4& projection) {
     sphere_.draw(batch.spheres, max_spheres_, textures_, view, projection);
-    draw_rings(batch.rings, view, projection);
+    ring_.draw(batch.rings, textures_, view, projection);
     draw_line_primitives(GL_LINE_STRIP, batch.line_trails, max_line_trail_vertices_, view,
                          projection);
     draw_line_primitives(GL_LINE_LOOP, batch.line_loops, max_line_loop_vertices_, view, projection);
