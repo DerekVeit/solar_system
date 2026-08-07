@@ -36,10 +36,7 @@ class GlRenderer final : public IRenderer {
     RingPipeline ring_{};
     StreamPipeline line_{};
 
-    std::size_t max_spheres_{0};
-    std::size_t max_line_vertices_{0};
-    std::size_t max_line_trail_vertices_{0};
-    std::size_t max_line_loop_vertices_{0};
+    RenderCapacity capacity_{};
     std::unordered_map<std::string, unsigned int> textures_;
 };
 

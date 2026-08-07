@@ -8,8 +8,6 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/vec3.hpp>
 
-#include <cstddef>
-
 namespace solar::app {
 
 GlRenderer::~GlRenderer() { destroy(); }
@@ -18,10 +16,7 @@ void GlRenderer::destroy() {
     sphere_.destroy();
     ring_.destroy();
     line_.destroy();
-    max_spheres_ = 0;
-    max_line_vertices_ = 0;
-    max_line_trail_vertices_ = 0;
-    max_line_loop_vertices_ = 0;
+    capacity_ = {};
     for (auto item : textures_) {
         glDeleteTextures(1, &item.second);
     }
@@ -29,27 +24,21 @@ void GlRenderer::destroy() {
 }
 
 bool GlRenderer::init(const RenderCapacity& capacity) {
+    destroy();
+
+    capacity_ = capacity;
     if (capacity.max_spheres == 0) {
         return false;
     }
 
-    destroy();
-
     try {
         sphere_.create();
         ring_.create();
-
-        const std::size_t line_buffer_capacity = capacity.max_line_vertices +
-                                                 capacity.max_line_trail_vertices +
-                                                 capacity.max_line_loop_vertices;
-        line_.create(line_buffer_capacity);
+        line_.create(capacity.max_line_vertices + capacity.max_line_trail_vertices +
+                     capacity.max_line_loop_vertices);
 
         glBindVertexArray(0);
 
-        max_spheres_ = capacity.max_spheres;
-        max_line_vertices_ = capacity.max_line_vertices;
-        max_line_trail_vertices_ = capacity.max_line_trail_vertices;
-        max_line_loop_vertices_ = capacity.max_line_loop_vertices;
         return true;
     } catch (const std::exception& e) {
         solar::app::log("GlRenderer::init failed: {}", e.what());
@@ -59,11 +48,12 @@ bool GlRenderer::init(const RenderCapacity& capacity) {
 }
 
 void GlRenderer::draw(const DrawBatch& batch, const glm::mat4& view, const glm::mat4& projection) {
-    sphere_.draw(batch.spheres, max_spheres_, textures_, view, projection);
+    sphere_.draw(batch.spheres, capacity_.max_spheres, textures_, view, projection);
     ring_.draw(batch.rings, textures_, view, projection);
-    line_.draw(batch.line_trails, GL_LINE_STRIP, max_line_trail_vertices_, view, projection);
-    line_.draw(batch.line_loops, GL_LINE_LOOP, max_line_loop_vertices_, view, projection);
-    line_.draw(batch.lines, GL_LINES, max_line_vertices_, view, projection);
+    line_.draw(batch.line_trails, GL_LINE_STRIP, capacity_.max_line_trail_vertices, view,
+               projection);
+    line_.draw(batch.line_loops, GL_LINE_LOOP, capacity_.max_line_loop_vertices, view, projection);
+    line_.draw(batch.lines, GL_LINES, capacity_.max_line_vertices, view, projection);
 }
 
 void GlRenderer::upload_texture(const std::string& path, const TextureImage& image) {
