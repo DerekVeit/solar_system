@@ -76,15 +76,16 @@ struct EpochOffsetRotation {
 };
 
 TEST_CASE("body_orientation_matrix with synthetic body", "[body_orientation]") {
-    const EpochOffsetRotation test_case = GENERATE(EpochOffsetRotation{"t0 + 0", 0.0, {1, 0, 0}},
-                                                   EpochOffsetRotation{"t0 + P/4", 0.25, {0, 1, 0}},
-                                                   EpochOffsetRotation{"t0 + P/2", 0.5, {-1, 0, 0}},
-                                                   EpochOffsetRotation{"t0 + P", 1.0, {1, 0, 0}});
+    constexpr double ecl = 23.44 * solar::core::kDegToRad;
+    const EpochOffsetRotation test_case =
+        GENERATE(EpochOffsetRotation{"t0 + 0", 0.0, {1, 0, 0}},
+                 EpochOffsetRotation{"t0 + P/4", 0.25, {0, std::cos(ecl), -std::sin(ecl)}},
+                 EpochOffsetRotation{"t0 + P/2", 0.5, {-1, 0, 0}},
+                 EpochOffsetRotation{"t0 + P", 1.0, {1, 0, 0}});
     INFO(test_case.label);
 
     solar::core::BodyDefinition body{};
-    body.obliquity_deg = 0.0;
-    body.pole = {.ra_deg = 0.0, .dec_deg = 90.0};
+    body.pole = {.ra_deg = -90.0, .dec_deg = 90.0};
     const double t0 = solar::core::kJ2000Jd;
     // One full turn per day: Ẇ = 360°/day.
     body.rotation = {.W0_deg = 0.0, .W_dot_deg_per_day = 360.0, .epoch = {t0}};
