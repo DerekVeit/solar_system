@@ -14,13 +14,10 @@ double modulo(double a, double b) { return !b ? a : a - b * floor(a / b); }
 } // namespace
 
 [[nodiscard]] double rotation_deg_at_epoch(const BodyDefinition& body, Epoch epoch) {
+    // W(t) = W0 + Ẇ * d  (IAU WGCCRE); d = days from rotation.epoch.
     const BodyRotation rotation = body.rotation;
-    if (!rotation.period_s) {
-        return rotation.prime_meridian_deg_at_epoch;
-    }
-    const Duration elapsed{(epoch.jd - rotation.epoch.jd) * kSecondsPerDay};
-    const double rotations = elapsed.count() / rotation.period_s;
-    return modulo((rotation.prime_meridian_deg_at_epoch + 360 * rotations), 360.0);
+    const double days = epoch.jd - rotation.epoch.jd;
+    return modulo(rotation.W0_deg + rotation.W_dot_deg_per_day * days, 360.0);
 }
 
 [[nodiscard]] glm::dmat3 body_orientation_matrix(const BodyDefinition& body, Epoch epoch) {

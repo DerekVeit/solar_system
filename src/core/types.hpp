@@ -89,9 +89,18 @@ struct StateVector {
     }
 };
 
+/// North pole direction in ICRF / J2000 equatorial coordinates (IAU WGCCRE style).
+/// α = right ascension, δ = declination (degrees).
+struct BodyPole {
+    double ra_deg{};
+    double dec_deg{90.0};
+};
+
+/// Prime-meridian angle W(t) = W0_deg + W_dot_deg_per_day * (jd - epoch.jd) (degrees).
+/// Values follow IAU WGCCRE-style reporting (epoch usually J2000).
 struct BodyRotation {
-    double period_s{};
-    double prime_meridian_deg_at_epoch{};
+    double W0_deg{};
+    double W_dot_deg_per_day{};
     Epoch epoch{};
 };
 

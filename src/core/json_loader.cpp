@@ -14,14 +14,25 @@ namespace {
 
 double degrees_to_radians(double degrees) { return degrees * kDegToRad; }
 
+BodyPole parse_pole(const nlohmann::json& json) {
+    if (!json.contains("pole")) {
+        return BodyPole{};
+    }
+    const auto& pole = json.at("pole");
+    return BodyPole{
+        .ra_deg = pole.at("ra_deg").get<double>(),
+        .dec_deg = pole.at("dec_deg").get<double>(),
+    };
+}
+
 BodyRotation parse_rotation(const nlohmann::json& json) {
     if (!json.contains("rotation")) {
         return BodyRotation{};
     }
     const auto& rotation = json.at("rotation");
     return BodyRotation{
-        .period_s = rotation.at("period_s").get<double>(),
-        .prime_meridian_deg_at_epoch = rotation.at("prime_meridian_deg_at_epoch").get<double>(),
+        .W0_deg = rotation.at("W0_deg").get<double>(),
+        .W_dot_deg_per_day = rotation.at("W_dot_deg_per_day").get<double>(),
         .epoch = Epoch{rotation.at("epoch_jd").get<double>()},
     };
 }
@@ -57,6 +68,7 @@ std::vector<BodyDefinition> load_bodies(const std::filesystem::path& path) {
             .gravitational_parameter_km3_s2 = entry.at("mu_km3_s2").get<double>(),
             .radius_km = entry.at("radius_km").get<double>(),
             .obliquity_deg = entry.at("obliquity_deg").get<float>(),
+            .pole = parse_pole(entry),
             .rotation = parse_rotation(entry),
             .elements = parse_elements(entry),
         });

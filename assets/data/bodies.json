@@ -4,7 +4,16 @@
       "name": "Sun",
       "mu_km3_s2": 132712440041.93938,
       "radius_km": 695700.0,
-      "obliquity_deg": 0.0,
+      "obliquity_deg": 7.25,
+      "pole": {
+        "ra_deg": 286.13,
+        "dec_deg": 63.87
+      },
+      "rotation": {
+        "W0_deg": 84.176,
+        "W_dot_deg_per_day": 14.1844,
+        "epoch_jd": 2451545.0
+      },
       "kepler": {
         "a_km": 0.0,
         "e": 0.0,
@@ -19,7 +28,16 @@
       "name": "Mercury",
       "mu_km3_s2": 22031.86855,
       "radius_km": 2439.4,
-      "obliquity_deg": 0.0,
+      "obliquity_deg": 0.034,
+      "pole": {
+        "ra_deg": 281.0103,
+        "dec_deg": 61.4155
+      },
+      "rotation": {
+        "W0_deg": 329.5988,
+        "W_dot_deg_per_day": 6.1385025,
+        "epoch_jd": 2451545.0
+      },
       "kepler": {
         "a_km": 57909068.29452708,
         "e": 0.2056302933705567,
@@ -32,9 +50,18 @@
     },
     {
       "name": "Venus",
-      "mu_km3_s2": 324858.592000,
+      "mu_km3_s2": 324858.592,
       "radius_km": 6051.8,
-      "obliquity_deg": 0.0,
+      "obliquity_deg": 177.36,
+      "pole": {
+        "ra_deg": 272.76,
+        "dec_deg": 67.16
+      },
+      "rotation": {
+        "W0_deg": 160.2,
+        "W_dot_deg_per_day": -1.4813688,
+        "epoch_jd": 2451545.0
+      },
       "kepler": {
         "a_km": 108208925.5131937,
         "e": 0.00677323,
@@ -50,9 +77,13 @@
       "mu_km3_s2": 398600.4418,
       "radius_km": 6378.137,
       "obliquity_deg": 23.44,
+      "pole": {
+        "ra_deg": 0.0,
+        "dec_deg": 90.0
+      },
       "rotation": {
-        "period_s": 86164.0905,
-        "prime_meridian_deg_at_epoch": 280.47,
+        "W0_deg": 190.147,
+        "W_dot_deg_per_day": 360.9856235,
         "epoch_jd": 2451545.0
       },
       "kepler": {
@@ -61,7 +92,7 @@
         "i_deg": 0.00005,
         "Omega_deg": -11.26064,
         "omega_deg": 114.20783,
-        "M0_deg": 358.61790,
+        "M0_deg": 358.6179,
         "epoch_jd": 2451545.0
       }
     },
@@ -69,26 +100,44 @@
       "name": "Mars",
       "mu_km3_s2": 42828.375816,
       "radius_km": 3396.19,
-      "obliquity_deg": 0.0,
+      "obliquity_deg": 25.19,
+      "pole": {
+        "ra_deg": 317.68143,
+        "dec_deg": 52.8865
+      },
+      "rotation": {
+        "W0_deg": 176.63,
+        "W_dot_deg_per_day": 350.89198226,
+        "epoch_jd": 2451545.0
+      },
       "kepler": {
         "a_km": 227939200.0,
         "e": 0.0934,
         "i_deg": 1.85061,
         "Omega_deg": 49.57854,
-        "omega_deg": 286.46230,
-        "M0_deg": 18.60210,
+        "omega_deg": 286.4623,
+        "M0_deg": 18.6021,
         "epoch_jd": 2451545.0
       }
     },
     {
       "name": "Jupiter",
-      "mu_km3_s2": 126712764.100000,
+      "mu_km3_s2": 126712764.1,
       "radius_km": 71492.0,
-      "obliquity_deg": 0.0,
+      "obliquity_deg": 3.13,
+      "pole": {
+        "ra_deg": 268.056595,
+        "dec_deg": 64.495303
+      },
+      "rotation": {
+        "W0_deg": 284.95,
+        "W_dot_deg_per_day": 870.536,
+        "epoch_jd": 2451545.0
+      },
       "kepler": {
         "a_km": 778412026.7751428,
         "e": 0.04839266,
-        "i_deg": 1.30530,
+        "i_deg": 1.3053,
         "Omega_deg": 100.55615,
         "omega_deg": 14.75385,
         "M0_deg": 279.09438,
@@ -100,6 +149,15 @@
       "mu_km3_s2": 37931206.234,
       "radius_km": 58232.0,
       "obliquity_deg": 26.73,
+      "pole": {
+        "ra_deg": 40.589,
+        "dec_deg": 83.537
+      },
+      "rotation": {
+        "W0_deg": 38.9,
+        "W_dot_deg_per_day": 810.7939024,
+        "epoch_jd": 2451545.0
+      },
       "kepler": {
         "a_km": 1433449366.276614,
         "e": 0.05572339465748773,
@@ -114,7 +172,16 @@
       "name": "Uranus",
       "mu_km3_s2": 5793950.6103,
       "radius_km": 25362.0,
-      "obliquity_deg": 0.0,
+      "obliquity_deg": 97.77,
+      "pole": {
+        "ra_deg": 257.311,
+        "dec_deg": -15.175
+      },
+      "rotation": {
+        "W0_deg": 203.81,
+        "W_dot_deg_per_day": -501.1600928,
+        "epoch_jd": 2451545.0
+      },
       "kepler": {
         "a_km": 2876679778.878009,
         "e": 0.04440552558427553,
@@ -129,7 +196,16 @@
       "name": "Neptune",
       "mu_km3_s2": 6835099.97,
       "radius_km": 24624.0,
-      "obliquity_deg": 0.0,
+      "obliquity_deg": 28.32,
+      "pole": {
+        "ra_deg": 299.36,
+        "dec_deg": 43.46
+      },
+      "rotation": {
+        "W0_deg": 253.18,
+        "W_dot_deg_per_day": 536.3128492,
+        "epoch_jd": 2451545.0
+      },
       "kepler": {
         "a_km": 4503440391.917468,
         "e": 0.01121514293584095,
@@ -144,7 +220,16 @@
       "name": "Pluto",
       "mu_km3_s2": 869.326,
       "radius_km": 1188.3,
-      "obliquity_deg": 0.0,
+      "obliquity_deg": 122.53,
+      "pole": {
+        "ra_deg": 132.993,
+        "dec_deg": -6.163
+      },
+      "rotation": {
+        "W0_deg": 302.695,
+        "W_dot_deg_per_day": 56.3625225,
+        "epoch_jd": 2451545.0
+      },
       "kepler": {
         "a_km": 5873861272.09796,
         "e": 0.2446745123195729,

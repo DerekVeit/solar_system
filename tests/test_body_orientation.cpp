@@ -12,6 +12,7 @@
 #include <glm/ext/quaternion_geometric.hpp>
 #include <glm/ext/vector_double3.hpp>
 
+#include <cmath>
 #include <string>
 
 namespace {
@@ -26,38 +27,46 @@ solar::core::BodyDefinition get_body(std::string body_name) {
     return *body;
 }
 
+[[nodiscard]] double sidereal_period_days(const solar::core::BodyRotation& rotation) {
+    REQUIRE(std::abs(rotation.W_dot_deg_per_day) > 0.0);
+    return 360.0 / std::abs(rotation.W_dot_deg_per_day);
+}
+
 } // namespace
 
-TEST_CASE("rotation_deg_at_epoch: zero rotation ", "[body_orientation]") {
+TEST_CASE("load_bodies provides IAU-style pole and W for Earth", "[body_orientation][json]") {
     const solar::core::BodyDefinition body = get_body("Earth");
-    const solar::core::Epoch epoch{solar::core::kJ2000Jd};
+    CHECK(body.pole.ra_deg == Approx(0.0));
+    CHECK(body.pole.dec_deg == Approx(90.0));
+    CHECK(body.rotation.W0_deg == Approx(190.147));
+    CHECK(body.rotation.W_dot_deg_per_day == Approx(360.9856235));
+    CHECK(body.rotation.epoch.jd == Approx(solar::core::kJ2000Jd));
+}
 
-    double angle = solar::core::rotation_deg_at_epoch(body, epoch);
+TEST_CASE("rotation_deg_at_epoch: at rotation epoch equals W0", "[body_orientation]") {
+    const solar::core::BodyDefinition body = get_body("Earth");
+    const solar::core::Epoch epoch{body.rotation.epoch.jd};
 
-    double expected_angle = body.rotation.prime_meridian_deg_at_epoch;
-    CHECK(angle == Approx(expected_angle).margin(1e-5));
+    const double angle = solar::core::rotation_deg_at_epoch(body, epoch);
+    CHECK(angle == Approx(body.rotation.W0_deg).margin(1e-5));
 }
 
 TEST_CASE("rotation_deg_at_epoch: Earth approx. 1 rotation in a solar day", "[body_orientation]") {
     const solar::core::BodyDefinition body = get_body("Earth");
-    const double solar_day = 1.0;
-    const solar::core::Epoch epoch{solar::core::kJ2000Jd + solar_day};
+    const solar::core::Epoch epoch{body.rotation.epoch.jd + 1.0};
 
-    double angle = solar::core::rotation_deg_at_epoch(body, epoch);
-
-    double expected_angle = body.rotation.prime_meridian_deg_at_epoch;
-    CHECK(angle == Approx(expected_angle).margin(2.0));
+    const double angle = solar::core::rotation_deg_at_epoch(body, epoch);
+    // W advances ~360.986°/day; after one civil day, residual ~1° past W0.
+    CHECK(angle == Approx(body.rotation.W0_deg).margin(2.0));
 }
 
 TEST_CASE("rotation_deg_at_epoch: Earth 1 rotation in a sidereal day", "[body_orientation]") {
     const solar::core::BodyDefinition body = get_body("Earth");
-    const double sidereal_day = body.rotation.period_s / solar::core::kSecondsPerDay;
-    const solar::core::Epoch epoch{solar::core::kJ2000Jd + sidereal_day};
+    const double sidereal_day = sidereal_period_days(body.rotation);
+    const solar::core::Epoch epoch{body.rotation.epoch.jd + sidereal_day};
 
-    double angle = solar::core::rotation_deg_at_epoch(body, epoch);
-
-    double expected_angle = body.rotation.prime_meridian_deg_at_epoch;
-    CHECK(angle == Approx(expected_angle).margin(1e-5));
+    const double angle = solar::core::rotation_deg_at_epoch(body, epoch);
+    CHECK(angle == Approx(body.rotation.W0_deg).margin(1e-5));
 }
 
 struct EpochOffsetRotation {
@@ -75,9 +84,10 @@ TEST_CASE("body_orientation_matrix with synthetic body", "[body_orientation]") {
 
     solar::core::BodyDefinition body{};
     body.obliquity_deg = 0.0;
+    body.pole = {.ra_deg = 0.0, .dec_deg = 90.0};
     const double t0 = solar::core::kJ2000Jd;
-    body.rotation = {
-        .period_s = solar::core::kSecondsPerDay, .prime_meridian_deg_at_epoch = 0.0, .epoch = {t0}};
+    // One full turn per day: Ẇ = 360°/day.
+    body.rotation = {.W0_deg = 0.0, .W_dot_deg_per_day = 360.0, .epoch = {t0}};
 
     const glm::dmat3 matrix = solar::core::body_orientation_matrix(body, {t0 + test_case.offset});
 
@@ -105,7 +115,7 @@ TEST_CASE("body_orientation_matrix result tilts Earth Z 23.44°", "[body_orienta
 TEST_CASE("body_orientation_matrix result rotates Earth once in a sidereal day",
           "[body_orientation]") {
     const solar::core::BodyDefinition body = get_body("Earth");
-    const double sidereal_day = body.rotation.period_s / solar::core::kSecondsPerDay;
+    const double sidereal_day = sidereal_period_days(body.rotation);
     const solar::core::Epoch epoch_0{solar::core::kJ2000Jd};
     const solar::core::Epoch epoch_1{solar::core::kJ2000Jd + sidereal_day};
     const solar::core::Epoch epoch_2{solar::core::kJ2000Jd + sidereal_day / 4};

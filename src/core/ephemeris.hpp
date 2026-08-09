@@ -12,7 +12,9 @@ struct BodyDefinition {
     std::string name{};
     double gravitational_parameter_km3_s2{};
     double radius_km{};
+    /// Temporary ecliptic tilt used by body_orientation_matrix until pole-based R is implemented.
     float obliquity_deg{};
+    BodyPole pole{};
     BodyRotation rotation{};
     KeplerianElements elements{};
 };
