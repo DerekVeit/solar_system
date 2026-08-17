@@ -25,7 +25,12 @@ class EphemerisProvider {
   public:
     virtual ~EphemerisProvider() = default;
 
+    /// Heliocentric (draw-frame) state: Kepler relative to the primary, plus the
+    /// primary's own state. The Sun (or any body with a <= 0) is at the origin.
     [[nodiscard]] virtual StateVector state(const std::string& body_name, Epoch epoch) const = 0;
+    /// Kepler state relative to the primary (Sun if primary is empty).
+    [[nodiscard]] virtual StateVector relative_state(const std::string& body_name,
+                                                     Epoch epoch) const = 0;
     [[nodiscard]] virtual double rotation_deg(const std::string& body_name, Epoch epoch) const = 0;
     [[nodiscard]] virtual const std::vector<BodyDefinition>& bodies() const = 0;
 };
@@ -36,5 +41,12 @@ using EphemerisProviderPtr = std::unique_ptr<EphemerisProvider>;
                                               const std::string& name);
 
 [[nodiscard]] double central_gravitational_parameter(const EphemerisProvider& ephemeris);
+
+/// The body this one orbits: named primary, or the Sun if primary is empty.
+[[nodiscard]] const BodyDefinition* primary_body(const EphemerisProvider& ephemeris,
+                                                 const BodyDefinition& body);
+
+/// Gravitational parameter of the attracting center for this body's Kepler orbit.
+[[nodiscard]] double orbital_mu(const EphemerisProvider& ephemeris, const BodyDefinition& body);
 
 } // namespace solar::core

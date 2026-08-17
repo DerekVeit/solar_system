@@ -34,7 +34,7 @@ using GravitationalParameter = double;
 [[nodiscard]] double mean_anomaly_at_epoch(GravitationalParameter mu,
                                            const KeplerianElements& elements, Epoch epoch);
 
-/// Heliocentric state from osculating Keplerian elements at the given epoch.
+/// Osculating Keplerian state relative to the attracting center at the given epoch.
 [[nodiscard]] StateVector state_from_kepler(GravitationalParameter mu,
                                             const KeplerianElements& elements, Epoch epoch);
 
