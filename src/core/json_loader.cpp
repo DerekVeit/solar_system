@@ -65,6 +65,7 @@ std::vector<BodyDefinition> load_bodies(const std::filesystem::path& path) {
     for (const auto& entry : root.at("bodies")) {
         bodies.push_back(BodyDefinition{
             .name = entry.at("name").get<std::string>(),
+            .primary = entry.value("primary", std::string{}),
             .gravitational_parameter_km3_s2 = entry.at("mu_km3_s2").get<double>(),
             .radius_km = entry.at("radius_km").get<double>(),
             .obliquity_deg = entry.at("obliquity_deg").get<float>(),
