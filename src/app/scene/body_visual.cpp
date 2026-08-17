@@ -59,6 +59,9 @@ void append_orbit_loop(const sim::SolarSystem& simulation, const core::BodyDefin
     }
 
     const core::Epoch epoch_now = simulation.clock().epoch();
+    const core::Displacement primary_now =
+        body.primary.empty() ? core::Displacement{}
+                             : simulation.ephemeris().state(body.primary, epoch_now).position;
     loop.vertices.reserve(BodyVisual::kOrbitSamples);
 
     for (std::size_t sample = 0; sample < BodyVisual::kOrbitSamples; ++sample) {
@@ -67,8 +70,9 @@ void append_orbit_loop(const sim::SolarSystem& simulation, const core::BodyDefin
         const double elapsed_seconds = period_seconds * fraction;
         const core::Epoch sample_epoch{epoch_now.jd -
                                        (period_seconds - elapsed_seconds) / core::kSecondsPerDay};
-        const core::Displacement position =
-            simulation.ephemeris().state(body.name, sample_epoch).position;
+        const core::Displacement relative =
+            simulation.ephemeris().relative_state(body.name, sample_epoch).position;
+        const core::Displacement position{primary_now.km + relative.km};
         loop.vertices.push_back(to_line_vertex(position, BodyVisual::kOrbitTrailColor, view));
     }
 }
@@ -155,7 +159,7 @@ void BodyVisual::append_draw(const sim::SolarSystem& simulation, const ViewFrame
         return;
     }
 
-    const double mu = core::central_gravitational_parameter(simulation.ephemeris());
+    const double mu = core::orbital_mu(simulation.ephemeris(), *body);
     if (mu <= 0.0) {
         return;
     }
