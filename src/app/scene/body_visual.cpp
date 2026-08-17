@@ -51,8 +51,14 @@ namespace {
                         light_dir};
 }
 
+[[nodiscard]] core::Displacement offset_from_primary(const core::Displacement& primary,
+                                                     const core::Displacement& relative,
+                                                     double orbit_factor) {
+    return {primary.km + orbit_factor * relative.km};
+}
+
 void append_orbit_loop(const sim::SolarSystem& simulation, const core::BodyDefinition& body,
-                       double mu, const ViewFrame& view, LinePrimitive& loop) {
+                       double mu, double orbit_factor, const ViewFrame& view, LinePrimitive& loop) {
     const double period_seconds = core::orbital_period_seconds(mu, body.elements);
     if (period_seconds <= 0.0) {
         return;
@@ -72,13 +78,15 @@ void append_orbit_loop(const sim::SolarSystem& simulation, const core::BodyDefin
                                        (period_seconds - elapsed_seconds) / core::kSecondsPerDay};
         const core::Displacement relative =
             simulation.ephemeris().relative_state(body.name, sample_epoch).position;
-        const core::Displacement position{primary_now.km + relative.km};
+        const core::Displacement position =
+            offset_from_primary(primary_now, relative, orbit_factor);
         loop.vertices.push_back(to_line_vertex(position, BodyVisual::kOrbitTrailColor, view));
     }
 }
 
 void append_tail(const sim::SolarSystem& simulation, const core::BodyDefinition& body, double mu,
-                 const ViewFrame& view, double tail_duration_seconds, LinePrimitive& trail) {
+                 double orbit_factor, const ViewFrame& view, double tail_duration_seconds,
+                 LinePrimitive& trail) {
     if (tail_duration_seconds <= 0.0 || BodyVisual::kTailSamples < 2) {
         return;
     }
@@ -100,8 +108,13 @@ void append_tail(const sim::SolarSystem& simulation, const core::BodyDefinition&
             core::normalize_angle(mean_anomaly_now - tail_mean_anomaly_span * fraction);
         const core::Epoch sample_epoch =
             core::epoch_before_mean_anomaly(mu, body.elements, epoch_now, target_mean_anomaly);
-        const core::Displacement position =
-            simulation.ephemeris().state(body.name, sample_epoch).position;
+        const core::Displacement relative =
+            simulation.ephemeris().relative_state(body.name, sample_epoch).position;
+        const core::Displacement primary =
+            body.primary.empty()
+                ? core::Displacement{}
+                : simulation.ephemeris().state(body.primary, sample_epoch).position;
+        const core::Displacement position = offset_from_primary(primary, relative, orbit_factor);
         Color tail_color = BodyVisual::kTailColor;
         tail_color.a = BodyVisual::kTailColor.a * static_cast<float>(1.0 - fraction);
         trail.vertices.push_back(to_line_vertex(position, tail_color, view));
@@ -110,14 +123,34 @@ void append_tail(const sim::SolarSystem& simulation, const core::BodyDefinition&
 
 } // namespace
 
-BodyVisual::BodyVisual(const core::BodyDefinition& body, BodyVisualSpec spec)
+BodyVisual::BodyVisual(const core::BodyDefinition& body, BodyVisualSpec spec,
+                       float orbit_display_size_factor)
     : name_(body.name)
+    , primary_(body.primary)
     , surface_(spec.surface)
     , rings_(spec.rings)
     , radius_km_(body.radius_km)
     , tail_duration_seconds_(spec.tail_duration_days * core::kSecondsPerDay)
     , display_size_factor_(spec.display_size_factor)
+    , orbit_display_size_factor_(orbit_display_size_factor)
     , draws_orbit_trails_(body.elements.semi_major_axis_km > 0.0) {}
+
+core::Displacement BodyVisual::drawn_position(const sim::SolarSystem& simulation,
+                                              bool body_scaling) const {
+    return drawn_position(simulation, body_scaling, simulation.clock().epoch());
+}
+
+core::Displacement BodyVisual::drawn_position(const sim::SolarSystem& simulation, bool body_scaling,
+                                              core::Epoch epoch) const {
+    const double factor =
+        (!body_scaling || primary_.empty()) ? 1.0 : static_cast<double>(orbit_display_size_factor_);
+    const core::Displacement relative =
+        simulation.ephemeris().relative_state(name_, epoch).position;
+    const core::Displacement primary = primary_.empty()
+                                           ? core::Displacement{}
+                                           : simulation.ephemeris().state(primary_, epoch).position;
+    return offset_from_primary(primary, relative, factor);
+}
 
 float BodyVisual::drawn_radius_km(const ViewFrame& view) const {
     const float size_factor = view.body_scaling ? display_size_factor_ : 1.0f;
@@ -128,11 +161,12 @@ float BodyVisual::drawn_radius_km(const ViewFrame& view) const {
 void BodyVisual::append_draw(const sim::SolarSystem& simulation, const ViewFrame& view,
                              DrawBatch& batch, bool show_graticules) const {
     const float radius_km = drawn_radius_km(view);
-    const core::Displacement position = simulation.state(name_).position;
+    const core::Displacement physical = simulation.state(name_).position;
+    const core::Displacement position = drawn_position(simulation, view.body_scaling);
     glm::vec3 light_dir{0.0f, 0.0f, 1.0f};
     if (surface_.emission < 1.0f) {
         const core::Displacement sun_position = simulation.state("Sun").position;
-        const glm::dvec3 delta = sun_position.km - position.km;
+        const glm::dvec3 delta = sun_position.km - physical.km;
         const double len2 = glm::dot(delta, delta);
         if (len2 > 0.0) {
             light_dir = glm::vec3(glm::normalize(delta));
@@ -164,14 +198,18 @@ void BodyVisual::append_draw(const sim::SolarSystem& simulation, const ViewFrame
         return;
     }
 
+    const double orbit_factor = view.body_scaling && !body->primary.empty()
+                                    ? static_cast<double>(orbit_display_size_factor_)
+                                    : 1.0;
+
     LinePrimitive orbit_loop;
-    append_orbit_loop(simulation, *body, mu, view, orbit_loop);
+    append_orbit_loop(simulation, *body, mu, orbit_factor, view, orbit_loop);
     if (!orbit_loop.vertices.empty()) {
         batch.line_loops.push_back(std::move(orbit_loop));
     }
 
     LinePrimitive tail_trail;
-    append_tail(simulation, *body, mu, view, tail_duration_seconds_, tail_trail);
+    append_tail(simulation, *body, mu, orbit_factor, view, tail_duration_seconds_, tail_trail);
     if (!tail_trail.vertices.empty()) {
         batch.line_trails.push_back(std::move(tail_trail));
     }

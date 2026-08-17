@@ -37,6 +37,9 @@ struct BodyVisualSpec {
     std::vector<RingSpec> rings{};
     double tail_duration_days{};
     float display_size_factor{};
+    /// Stretch applied to this body's satellites (primary → moon vectors) when
+    /// body scaling is on. Ignored on the satellites themselves.
+    float moon_orbit_display_size_factor{1.0f};
     bool visible{};
 };
 

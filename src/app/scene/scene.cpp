@@ -224,7 +224,10 @@ void Scene::update_camera_from_follow(const sim::SolarSystem& simulation) {
         return;
     }
 
-    const core::Displacement position = simulation.state(*followed_body_).position;
+    core::Displacement position = simulation.state(*followed_body_).position;
+    if (const auto visual = find_body_visual(bodies_, *followed_body_)) {
+        position = visual->drawn_position(simulation, body_scaling_);
+    }
     camera_.set_target_au(position.km.x / core::kAuKm + follow_offset_x_au_,
                           position.km.y / core::kAuKm + follow_offset_y_au_,
                           position.km.z / core::kAuKm + follow_offset_z_au_);

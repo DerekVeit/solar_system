@@ -132,6 +132,10 @@ void apply_spec_partial(const nlohmann::json& json, BodyVisualSpec& spec,
     if (json.contains("display_size_factor")) {
         spec.display_size_factor = json.at("display_size_factor").get<float>();
     }
+    if (json.contains("moon_orbit_display_size_factor")) {
+        spec.moon_orbit_display_size_factor =
+            json.at("moon_orbit_display_size_factor").get<float>();
+    }
     if (json.contains("visible")) {
         spec.visible = json.at("visible").get<bool>();
     }

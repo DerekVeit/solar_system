@@ -22,13 +22,21 @@ class BodyVisual {
     static constexpr Color kOrbitTrailColor{0.45f, 0.45f, 0.45f, 0.35f};
     static constexpr Color kTailColor{0.55f, 0.65f, 0.85f, 0.55f};
 
-    BodyVisual(const core::BodyDefinition& body, BodyVisualSpec spec);
+    BodyVisual(const core::BodyDefinition& body, BodyVisualSpec spec,
+               float orbit_display_size_factor = 1.0f);
 
     [[nodiscard]] const std::string& name() const { return name_; }
     [[nodiscard]] bool draws_orbit_trails() const { return draws_orbit_trails_; }
     [[nodiscard]] float display_size_km(bool scaling) const {
         return (scaling ? display_size_factor_ : 1.0f) * radius_km_;
     }
+
+    /// Physical heliocentric position, with the primary→body vector scaled when
+    /// body scaling is on and this body has a primary.
+    [[nodiscard]] core::Displacement drawn_position(const sim::SolarSystem& simulation,
+                                                    bool body_scaling) const;
+    [[nodiscard]] core::Displacement drawn_position(const sim::SolarSystem& simulation,
+                                                    bool body_scaling, core::Epoch epoch) const;
 
     void append_draw(const sim::SolarSystem& simulation, const ViewFrame& view, DrawBatch& batch,
                      bool show_graticules) const;
@@ -40,11 +48,13 @@ class BodyVisual {
     [[nodiscard]] float drawn_radius_km(const ViewFrame& view) const;
 
     std::string name_;
+    std::string primary_;
     BodySurface surface_{};
     std::vector<RingSpec> rings_{};
     double radius_km_{0.0};
     double tail_duration_seconds_{0.0};
     float display_size_factor_{1.0f};
+    float orbit_display_size_factor_{1.0f};
     bool draws_orbit_trails_{false};
 };
 
