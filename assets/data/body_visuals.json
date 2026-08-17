@@ -56,7 +56,18 @@
           "specular": "textures/2k_earth_specular_map.tif"
         }
       },
-      "tail_duration_days": 45.0
+      "tail_duration_days": 45.0,
+      "moon_orbit_display_size_factor": 15.0
+    },
+    {
+      "name": "Moon",
+      "surface": {
+        "color": [0.75, 0.75, 0.72, 1.0],
+        "textures": {
+          "diffuse": "textures/2k_moon.jpg"
+        }
+      },
+      "tail_duration_days": 5.0
     },
     {
       "name": "Mars",

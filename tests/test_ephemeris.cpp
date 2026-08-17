@@ -84,6 +84,23 @@ TEST_CASE("state composes satellite Kepler onto the primary", "[ephemeris]") {
     CHECK(moon.position.km.z == Approx(earth.position.km.z + relative.position.km.z).margin(1e-6));
 }
 
+TEST_CASE("Moon relative state matches Horizons geocentric J2000", "[ephemeris][horizons]") {
+    const auto bodies = solar::core::load_bodies("assets/data/bodies.json");
+    const solar::core::KeplerEphemeris ephemeris{bodies};
+    const solar::core::Epoch epoch{solar::core::kJ2000Jd};
+
+    const solar::core::StateVector relative = ephemeris.relative_state("Moon", epoch);
+    // NASA/JPL Horizons DE441, Earth-centered, ecliptic J2000, 2451545.0 TDB.
+    CHECK(relative.position.km.x == Approx(-291608.3841877129).margin(1.0));
+    CHECK(relative.position.km.y == Approx(-274979.7416731504).margin(1.0));
+    CHECK(relative.position.km.z == Approx(36271.19662699287).margin(1.0));
+
+    const solar::core::StateVector moon = ephemeris.state("Moon", epoch);
+    const solar::core::StateVector earth = ephemeris.state("Earth", epoch);
+    CHECK(glm::length(moon.position.km - earth.position.km) ==
+          Approx(relative.position.length()).margin(1e-6));
+}
+
 TEST_CASE("KeplerEphemeris rejects an unknown or cyclic primary", "[ephemeris]") {
     CHECK_THROWS_AS(solar::core::KeplerEphemeris{{make_body("Moon", "Earth", 1.0, 4.0e5)}},
                     std::invalid_argument);

@@ -53,12 +53,12 @@ All maps below are **2K** equirectangular textures (2048×1024) unless noted.
 | `2k_saturn_ring_alpha.png` | Saturn rings (RGBA strip, not 2:1 globe) |
 | `2k_uranus.jpg` | Uranus |
 | `2k_neptune.jpg` | Neptune |
+| `2k_moon.jpg` | Moon |
 
 ### Extra maps (not used by the catalog yet)
 
 | File | Description |
 |------|-------------|
-| `2k_moon.jpg` | Moon |
 | `2k_stars.jpg` | Starfield |
 | `2k_stars_milky_way.jpg` | Starfield with Milky Way |
 | `2k_ceres_fictional.jpg` | Ceres (artist / fictional surface) |

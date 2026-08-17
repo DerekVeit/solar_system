@@ -9,5 +9,7 @@ TEST_CASE("moon_orbit_display_size_factor defaults to 1", "[body_visual][json]")
     const auto config = solar::app::load_body_visual_config("assets/data/body_visuals.json");
     CHECK(config.defaults.moon_orbit_display_size_factor == Approx(1.0f));
     REQUIRE(config.by_name.contains("Earth"));
-    CHECK(config.by_name.at("Earth").moon_orbit_display_size_factor == Approx(1.0f));
+    CHECK(config.by_name.at("Earth").moon_orbit_display_size_factor == Approx(15.0f));
+    REQUIRE(config.by_name.contains("Moon"));
+    CHECK(config.by_name.at("Moon").moon_orbit_display_size_factor == Approx(1.0f));
 }

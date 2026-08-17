@@ -167,6 +167,10 @@ void key_callback(GLFWwindow* glfw_window, int key, int /*scancode*/, int action
             log("toggled graticules: now {}", showing);
             break;
         }
+        case GLFW_KEY_M:
+            scene->set_follow_target(*simulation, "Moon");
+            log("following Moon");
+            break;
         default:
             if (key >= GLFW_KEY_0 && key <= GLFW_KEY_9) {
                 const std::size_t index = static_cast<std::size_t>(key - GLFW_KEY_0);

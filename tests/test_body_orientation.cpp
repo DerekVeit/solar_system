@@ -34,6 +34,15 @@ solar::core::BodyDefinition get_body(std::string body_name) {
 
 } // namespace
 
+TEST_CASE("load_bodies provides IAU-style pole and W for Moon", "[body_orientation][json]") {
+    const solar::core::BodyDefinition body = get_body("Moon");
+    CHECK(body.pole.ra_deg == Approx(269.9949));
+    CHECK(body.pole.dec_deg == Approx(66.5392));
+    CHECK(body.rotation.W0_deg == Approx(38.3213));
+    CHECK(body.rotation.W_dot_deg_per_day == Approx(13.17635815));
+    CHECK(body.primary == "Earth");
+}
+
 TEST_CASE("load_bodies provides IAU-style pole and W for Earth", "[body_orientation][json]") {
     const solar::core::BodyDefinition body = get_body("Earth");
     CHECK(body.pole.ra_deg == Approx(0.0));
