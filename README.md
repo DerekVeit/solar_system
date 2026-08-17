@@ -6,12 +6,12 @@ with orbit trails, camera pan/zoom, and optional body follow.
 
 ## Features
 
-- **Keplerian ephemeris** — osculating elements for the Sun, eight planets, and
-  Pluto (J2000-era data in `assets/data/bodies.json`)
+- **Keplerian ephemeris** — osculating elements for the Sun, eight planets,
+  Pluto, and the Moon (J2000-era data in `assets/data/bodies.json`)
 - **Simulation clock** — paused, real-time, or accelerated time scales
 - **Ecliptic view** — point sprites for bodies, grey orbit loops, fading motion
   tails
-- **Camera** — pan, zoom, Home reset, and follow a body (`0`–`9`)
+- **Camera** — pan, zoom, Home reset, and follow a body (`0`–`9`, `M` for the Moon)
 - **Presentation config** — surface shading (color, ambient, emission), tail
   length, size scaling, and visibility in `assets/data/body_visuals.json`
 
@@ -72,15 +72,16 @@ at the current wall-clock epoch.
 | **Home** | Clear follow, center view on the Sun |
 | **End** | Reset camera orientation (keep target) |
 | **`** | Clear follow, but keep current view |
-| **0**–**9** | Follow Sun through Pluto (catalog order) |
+| **0**–**9** | Follow Sun through Pluto |
+| **M** | Follow the Moon |
 | **B** / **Shift+B** | Body size scaling off / on |
 
 ## Data
 
 | File | Role |
 |------|------|
-| `assets/data/bodies.json` | Physical/orbital definitions (mu, radius, Kepler elements) |
-| `assets/data/body_visuals.json` | Defaults + per-body surface, tails, size, visibility |
+| `assets/data/bodies.json` | Physical/orbital definitions (mu, radius, Kepler elements, optional `primary`) |
+| `assets/data/body_visuals.json` | Defaults + per-body surface, tails, size, visibility, moon orbit scale |
 
 ## Layout
 

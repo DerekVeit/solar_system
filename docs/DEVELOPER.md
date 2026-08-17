@@ -76,22 +76,29 @@ helpers used for orbit sampling and motion tails
 
 ### Ephemeris interface (`ephemeris.hpp` / `ephemeris.cpp`)
 
-- `BodyDefinition` — name, mu, radius, elements
-- `EphemerisProvider` — `state(name, epoch)` and `bodies()`
-- `find_body`, `central_gravitational_parameter` (Sun’s mu)
+- `BodyDefinition` — name, optional `primary` (empty = Sun), mu, radius, elements
+- `EphemerisProvider` — `state(name, epoch)` (heliocentric), `relative_state`
+  (Kepler about the primary), `bodies()`
+- `find_body`, `primary_body`, `orbital_mu` (primary’s mu),
+  `central_gravitational_parameter` (Sun’s mu)
 
 ### Kepler ephemeris (`kepler_ephemeris.*`)
 
-Concrete provider: for the Sun (or any body with `a_km <= 0`) returns a zero
-state; otherwise `state_from_kepler` with the central mu.
+Concrete provider: Kepler about the primary (`orbital_mu`), then compose
+`state = state(primary) + relative`. The Sun (or any body with `a_km <= 0`)
+is at the origin. The constructor rejects unknown, self, or cyclic primaries.
 
 ### JSON loader (`json_loader.*`)
 
 Loads `assets/data/bodies.json` into `std::vector<BodyDefinition>`.
+Optional `"primary"` names the attracting body; omit it for heliocentric
+orbits. Satellite `kepler` blocks use the same inertial (ecliptic) frame as
+the planets, with the focus at the primary — not the primary’s equator.
 
 **When changing orbits or adding bodies:** update `bodies.json` and tests that
-assert catalog contents; keep Sun first with a valid mu (required by the
-Kepler ephemeris).
+assert catalog contents; keep Sun first with a valid mu (required by
+heliocentric Kepler). **When adding a moon:** set `"primary"` to the planet
+name and give planetocentric ecliptic elements.
 
 ---
 
@@ -135,8 +142,8 @@ alpha blending enable for trails.
 ### Input (`input.*`, `follow_targets.hpp`)
 
 GLFW key callback via `AppContext` (window / simulation / scene pointers).
-Follow targets `0`–`9` are a fixed name table aligned with `bodies.json` order;
-validation happens in `Scene::set_follow_target`.
+Follow targets `0`–`9` are a fixed name table (Sun through Pluto); **M**
+follows the Moon. Validation happens in `Scene::set_follow_target`.
 
 ### Context (`context.hpp`)
 
@@ -158,7 +165,9 @@ Owns:
 
 Each `render` call:
 
-1. If following, set camera look-at from body position (km → AU) + offset
+1. If following, set camera look-at from the body’s **drawn** position
+   (km → AU) + offset. Drawn position matches `BodyVisual` (scaled satellite
+   orbits when body scaling is on).
 2. Build `ViewFrame` (camera snapshot, framebuffer height, scaling)
 3. Each `BodyVisual::append_draw` fills a `DrawBatch`
 4. `renderer_->draw(batch, view, projection)`
@@ -175,18 +184,26 @@ do not store view state.
 ### BodyVisual (`body_visual.*`)
 
 One drawable body: name, `BodySurface` (color / ambient / emission), radius,
-tail duration, display size factor, and whether orbit decorations are enabled
+tail duration, display size factor, optional satellite-orbit factor inherited
+from the primary, and whether orbit decorations are enabled
 (`draws_orbit_trails_`, set from `semi_major_axis_km > 0` in the constructor).
 
 `append_draw`:
 
-1. Sample `simulation.state(name)`, build a lit sphere instance (view offset
-   applied here — same path for Sun and planets). Non-emissive bodies get a
-   light direction toward the Sun.
-2. If orbital trails: grey closed orbit loop + fading tail line/points
+1. Sample physical `simulation.state(name)` for lighting (direction to the
+   Sun). Draw the sphere at `drawn_position`: for a moon, that is
+   `state(primary) + f * (state(moon) − state(primary))`, where `f` is the
+   primary’s `moon_orbit_display_size_factor` when body scaling is on
+   (otherwise `f = 1`).
+2. If orbital trails: grey closed orbit loop around the **frozen** primary
+   (so a lunar ellipse stays closed) + fading tail along the composed path.
+   Both use `orbital_mu` and the same `f`.
 
 Drawn radius is derived from physical radius and optional
-`display_size_factor` (body size scaling can be toggled with `s` / `S`).
+`display_size_factor` (body size scaling can be toggled with `B` /
+`Shift+B`). Planet size factors and moon-orbit factors are independent: 500×
+Earth would swallow a 1:1 lunar orbit, so Earth uses a modest moon-orbit
+factor (~15) that clears the scaled Earth without reaching Venus or Mars.
 
 ### Catalog and presentation config
 
@@ -200,6 +217,9 @@ JSON shape:
 
 - **`defaults`** — fully required: nested `surface` (`color`, `ambient`,
   `emission`), plus `tail_duration_days`, `display_size_factor`, `visible`
+- **`moon_orbit_display_size_factor`** — optional on a **primary** (default
+  1). Applied to every satellite of that body when scaling is on; moons do
+  not set this on themselves.
 - **`bodies`** — optional per-name rows; each field (including nested
   `surface` keys) merges onto defaults. Catalog bodies without a row use
   defaults as-is.
@@ -238,8 +258,8 @@ possible.
 
 | Path | Contents |
 |------|----------|
-| `assets/data/bodies.json` | Name, mu, radius, Kepler elements (Sun-outward order) |
-| `assets/data/body_visuals.json` | Defaults + per-body surface, tail days, size factor, visible |
+| `assets/data/bodies.json` | Name, optional primary, mu, radius, Kepler elements |
+| `assets/data/body_visuals.json` | Defaults + per-body surface, tail days, size factor, moon orbit scale, visible |
 
 Mismatch warnings (visual entry with no catalog body, or catalog body with no
 visual entry — the latter uses defaults) are logged from
@@ -272,12 +292,15 @@ those are exercised by running the app.
 
 1. **Camera moves in the world.** Arrows move the view center (or follow
    offset). Objects appear to move the opposite way. Follow is
-   `body position + offset` each frame.
+   `drawn position + offset` each frame.
 2. **Names are the IDs.** Bodies are identified by string name across JSON,
    ephemeris, visuals, and follow targets.
 3. **Sun is not a special draw path.** It is a body with `a_km == 0`, zero
    state from the ephemeris, and `draws_orbit_trails == false`.
-4. **2D now, 3D-aware layout.** Positions are 3D km vectors; the view uses the
+4. **`state()` is heliocentric; drawing may stretch satellite orbits.**
+   Physics stays in the ephemeris. Presentation (`f` on the primary→moon
+   vector) lives in `BodyVisual`. Follow uses the drawn position.
+5. **2D now, 3D-aware layout.** Positions are 3D km vectors; the view uses the
    ecliptic plane (`x`, `y`) and a 2D center. Prefer world-space camera state
    over screen-space hacks when extending.
 
@@ -291,6 +314,10 @@ those are exercised by running the app.
 4. `src/sim/solar_system.cpp` + `src/core/kepler_ephemeris.cpp` — where state comes from  
 5. `src/app/input.cpp` — how keys reach scene / clock  
 
-For a **new body:** add to `bodies.json` and `body_visuals.json`, extend
+For a **new planet:** add to `bodies.json` and `body_visuals.json`, extend
 `kFollowTargets` if it should be key-selectable, rebuild (assets copy
 automatically).
+
+For a **new moon:** same files, plus `"primary"` on the moon and
+`moon_orbit_display_size_factor` on the planet if the scaled primary would
+swallow a 1:1 orbit. Do not put the orbit factor on `bodies.json`.
