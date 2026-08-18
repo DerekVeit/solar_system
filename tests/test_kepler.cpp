@@ -161,3 +161,25 @@ TEST_CASE("epoch_before_mean_anomaly recovers target mean anomaly", "[kepler]") 
 
     CHECK(recovered == Approx(target_mean_anomaly).margin(1e-10));
 }
+
+TEST_CASE("epoch_before_mean_anomaly steps back at most one period", "[kepler]") {
+    const solar::core::KeplerianElements elements{
+        .semi_major_axis_km = solar::core::kAuKm,
+        .eccentricity = 0.0,
+        .inclination_rad = 0.0,
+        .longitude_ascending_node_rad = 0.0,
+        .argument_periapsis_rad = 0.0,
+        .mean_anomaly_at_epoch_rad = 0.0,
+        .epoch = solar::core::Epoch{solar::core::kJ2000Jd},
+    };
+    const double period_days =
+        solar::core::orbital_period_seconds(kSunMu, elements) / solar::core::kSecondsPerDay;
+    const solar::core::Epoch reference{solar::core::kJ2000Jd + 10.0 * period_days};
+    const double mean_now = solar::core::mean_anomaly_at_epoch(kSunMu, elements, reference);
+    const solar::core::Epoch earlier =
+        solar::core::epoch_before_mean_anomaly(kSunMu, elements, reference, mean_now);
+
+    // Same mean anomaly unwraps to "now", not many periods ago.
+    CHECK(earlier.jd == Approx(reference.jd).margin(1e-9));
+    CHECK(reference.jd - earlier.jd < period_days);
+}

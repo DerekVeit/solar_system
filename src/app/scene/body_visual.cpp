@@ -84,30 +84,24 @@ void append_orbit_loop(const sim::SolarSystem& simulation, const core::BodyDefin
     }
 }
 
-void append_tail(const sim::SolarSystem& simulation, const core::BodyDefinition& body, double mu,
+void append_tail(const sim::SolarSystem& simulation, const core::BodyDefinition& body,
                  double orbit_factor, const ViewFrame& view, double tail_duration_seconds,
                  LinePrimitive& trail) {
     if (tail_duration_seconds <= 0.0 || BodyVisual::kTailSamples < 2) {
         return;
     }
 
+    // Sample uniformly in time. Mean-anomaly stepping (via epoch_before_mean_anomaly)
+    // wraps to one orbital period, so a Moon tail longer than ~27 days would fold
+    // back onto the last revolution instead of tracing the heliocentric path.
     const core::Epoch epoch_now = simulation.clock().epoch();
-    const double mean_anomaly_now = core::mean_anomaly_at_epoch(mu, body.elements, epoch_now);
-    const double mean_motion_value = core::mean_motion(mu, body.elements);
-    if (mean_motion_value <= 0.0) {
-        return;
-    }
-
-    const double tail_mean_anomaly_span = mean_motion_value * tail_duration_seconds;
     trail.vertices.reserve(BodyVisual::kTailSamples);
 
     for (std::size_t sample = 0; sample < BodyVisual::kTailSamples; ++sample) {
         const double fraction =
             static_cast<double>(sample) / static_cast<double>(BodyVisual::kTailSamples - 1);
-        const double target_mean_anomaly =
-            core::normalize_angle(mean_anomaly_now - tail_mean_anomaly_span * fraction);
-        const core::Epoch sample_epoch =
-            core::epoch_before_mean_anomaly(mu, body.elements, epoch_now, target_mean_anomaly);
+        const core::Epoch sample_epoch{epoch_now.jd -
+                                       tail_duration_seconds * fraction / core::kSecondsPerDay};
         const core::Displacement relative =
             simulation.ephemeris().relative_state(body.name, sample_epoch).position;
         const core::Displacement primary =
@@ -209,7 +203,7 @@ void BodyVisual::append_draw(const sim::SolarSystem& simulation, const ViewFrame
     }
 
     LinePrimitive tail_trail;
-    append_tail(simulation, *body, mu, orbit_factor, view, tail_duration_seconds_, tail_trail);
+    append_tail(simulation, *body, orbit_factor, view, tail_duration_seconds_, tail_trail);
     if (!tail_trail.vertices.empty()) {
         batch.line_trails.push_back(std::move(tail_trail));
     }

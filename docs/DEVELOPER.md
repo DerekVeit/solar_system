@@ -71,8 +71,9 @@ AU, day length, angle conversions, J2000 JD, etc.
 ### Kepler (`kepler.hpp` / `kepler.cpp`)
 
 Mean motion, period, Kepler equation solver, state from elements at an epoch,
-helpers used for orbit sampling and motion tails
-(`epoch_before_mean_anomaly`, `mean_anomaly_at_epoch`, …).
+helpers used for orbit sampling (`epoch_before_mean_anomaly`,
+`mean_anomaly_at_epoch`, …). Motion tails sample uniformly in time so a
+duration longer than one period (e.g. the Moon) still traces the real path.
 
 ### Ephemeris interface (`ephemeris.hpp` / `ephemeris.cpp`)
 
