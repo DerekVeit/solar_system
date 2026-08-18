@@ -18,6 +18,9 @@ struct BodyDefinition {
     float obliquity_deg{};
     BodyPole pole{};
     BodyRotation rotation{};
+    /// If true, Ẇ is the Keplerian mean motion of this orbit (same μ and a), so
+    /// the prime meridian stays locked to the primary. IAU W0 is still used.
+    bool tidally_locked{false};
     KeplerianElements elements{};
 };
 

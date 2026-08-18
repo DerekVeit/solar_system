@@ -3,6 +3,7 @@
 
 #include "core/constants.hpp"
 #include "core/ephemeris.hpp"
+#include "core/kepler.hpp"
 #include "core/kepler_ephemeris.hpp"
 #include "core/types.hpp"
 
@@ -41,6 +42,7 @@ TEST_CASE("load_bodies provides IAU-style pole and W for Moon", "[body_orientati
     CHECK(body.rotation.W0_deg == Approx(38.3213));
     CHECK(body.rotation.W_dot_deg_per_day == Approx(13.17635815));
     CHECK(body.primary == "Earth");
+    CHECK(body.tidally_locked);
 }
 
 TEST_CASE("load_bodies provides IAU-style pole and W for Earth", "[body_orientation][json]") {
@@ -120,6 +122,34 @@ TEST_CASE("body_orientation_matrix result tilts Earth Z 23.44°", "[body_orienta
 
     const double cos_tilt = glm::dot(point_after, glm::dvec3{0.0, 0.0, 1.0});
     CHECK(cos_tilt == Approx(std::cos(23.44 * solar::core::kDegToRad)).margin(1e-5));
+}
+
+TEST_CASE("Moon prime meridian stays phased with the Kepler orbit", "[body_orientation]") {
+    const auto bodies = solar::core::load_bodies("assets/data/bodies.json");
+    const solar::core::KeplerEphemeris ephemeris{bodies};
+    const solar::core::BodyDefinition moon = get_body("Moon");
+    const double mu = solar::core::orbital_mu(ephemeris, moon);
+
+    const auto facing_deg = [&](solar::core::Epoch epoch) {
+        const glm::dvec3 to_earth =
+            -glm::normalize(ephemeris.relative_state("Moon", epoch).position.km);
+        const glm::dmat3 R = solar::core::body_orientation_matrix(moon, epoch, mu);
+        const glm::dvec3 x_axis = glm::normalize(R * glm::dvec3{1.0, 0.0, 0.0});
+        return std::acos(glm::clamp(glm::dot(x_axis, to_earth), -1.0, 1.0)) *
+               solar::core::kRadToDeg;
+    };
+
+    const solar::core::Epoch j2000{solar::core::kJ2000Jd};
+    const double period_days =
+        solar::core::orbital_period_seconds(mu, moon.elements) / solar::core::kSecondsPerDay;
+    const solar::core::Epoch after_period{solar::core::kJ2000Jd + period_days};
+    const solar::core::Epoch now{2460910.0}; // 2026-08-17
+
+    const double at_epoch = facing_deg(j2000);
+    CHECK(at_epoch == Approx(7.2).margin(1.0));
+    CHECK(facing_deg(after_period) == Approx(at_epoch).margin(0.05));
+    // Optical libration only — not the tens of degrees from IAU Ẇ vs osculating n.
+    CHECK(facing_deg(now) == Approx(at_epoch).margin(12.0));
 }
 
 TEST_CASE("body_orientation_matrix result rotates Earth once in a sidereal day",

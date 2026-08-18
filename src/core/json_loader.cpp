@@ -71,6 +71,7 @@ std::vector<BodyDefinition> load_bodies(const std::filesystem::path& path) {
             .obliquity_deg = entry.at("obliquity_deg").get<float>(),
             .pole = parse_pole(entry),
             .rotation = parse_rotation(entry),
+            .tidally_locked = entry.value("tidally_locked", false),
             .elements = parse_elements(entry),
         });
     }

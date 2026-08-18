@@ -111,6 +111,7 @@
         "W_dot_deg_per_day": 13.17635815,
         "epoch_jd": 2451545.0
       },
+      "tidally_locked": true,
       "kepler": {
         "a_km": 381874.5248499886,
         "e": 0.06314721685094304,

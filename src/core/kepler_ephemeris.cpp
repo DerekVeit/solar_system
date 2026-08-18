@@ -101,7 +101,7 @@ double KeplerEphemeris::rotation_deg(const std::string& body_name, Epoch epoch) 
     if (body == nullptr) {
         throw std::invalid_argument("unknown body: " + body_name);
     }
-    return rotation_deg_at_epoch(*body, epoch);
+    return rotation_deg_at_epoch(*body, epoch, orbital_mu(*this, *body));
 }
 
 } // namespace solar::core

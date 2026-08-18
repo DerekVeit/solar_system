@@ -98,7 +98,9 @@ the planets, with the focus at the primary — not the primary’s equator.
 **When changing orbits or adding bodies:** update `bodies.json` and tests that
 assert catalog contents; keep Sun first with a valid mu (required by
 heliocentric Kepler). **When adding a moon:** set `"primary"` to the planet
-name and give planetocentric ecliptic elements.
+name and give planetocentric ecliptic elements. Tidally locked satellites
+need `"tidally_locked": true` so Ẇ uses the same Keplerian mean motion as
+the orbit (IAU mean Ẇ will drift against an osculating ellipse).
 
 ---
 
@@ -320,4 +322,5 @@ automatically).
 
 For a **new moon:** same files, plus `"primary"` on the moon and
 `moon_orbit_display_size_factor` on the planet if the scaled primary would
-swallow a 1:1 orbit. Do not put the orbit factor on `bodies.json`.
+swallow a 1:1 orbit. Do not put the orbit factor on `bodies.json`. Set
+`tidally_locked` if the prime meridian should stay facing the planet.

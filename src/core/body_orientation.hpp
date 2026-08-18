@@ -7,11 +7,14 @@
 
 namespace solar::core {
 
-/// Prime-meridian angle W(t) in degrees (IAU-style W0 + Ẇ·d), wrapped to [0, 360).
-[[nodiscard]] double rotation_deg_at_epoch(const BodyDefinition& body, Epoch epoch);
+/// Prime-meridian angle W(t) in degrees, wrapped to [0, 360).
+/// IAU W0 + Ẇ·d, except tidally locked bodies use Keplerian mean motion
+/// (from orbital_mu and a) as Ẇ so spin stays phased with the orbit.
+[[nodiscard]] double rotation_deg_at_epoch(const BodyDefinition& body, Epoch epoch,
+                                           double orbital_mu = 0.0);
 
-/// Body-fixed → draw-frame rotation. Currently uses obliquity_deg + W(t) only;
-/// BodyPole (α₀, δ₀) is loaded for Option B but not applied here yet.
-[[nodiscard]] glm::dmat3 body_orientation_matrix(const BodyDefinition& body, Epoch epoch);
+/// Body-fixed → ecliptic draw-frame rotation from IAU (α₀, δ₀, W).
+[[nodiscard]] glm::dmat3 body_orientation_matrix(const BodyDefinition& body, Epoch epoch,
+                                                 double orbital_mu = 0.0);
 
 } // namespace solar::core

@@ -17,7 +17,7 @@ glm::dmat3 SolarSystem::orientation(const std::string& body_name) const {
     if (body == nullptr) {
         throw std::invalid_argument("unknown body: " + body_name);
     }
-    return body_orientation_matrix(*body, clock_.epoch());
+    return body_orientation_matrix(*body, clock_.epoch(), orbital_mu(*ephemeris_, *body));
 }
 
 double SolarSystem::rotation_deg(const std::string& body_name) const {
