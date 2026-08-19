@@ -85,6 +85,28 @@ TEST_CASE("state composes satellite Kepler onto the primary", "[ephemeris]") {
     CHECK(moon.position.km.z == Approx(earth.position.km.z + relative.position.km.z).margin(1e-6));
 }
 
+TEST_CASE("bundled catalog satellites are ordered inner to outer", "[ephemeris][json]") {
+    const auto bodies = solar::core::load_bodies("assets/data/bodies.json");
+    const solar::core::KeplerEphemeris ephemeris{bodies};
+
+    const auto* sun = solar::core::find_body(ephemeris, "Sun");
+    const auto* jupiter = solar::core::find_body(ephemeris, "Jupiter");
+    const auto* mercury = solar::core::find_body(ephemeris, "Mercury");
+    REQUIRE(sun != nullptr);
+    REQUIRE(jupiter != nullptr);
+    REQUIRE(mercury != nullptr);
+
+    CHECK(solar::core::innermost_satellite(ephemeris, *sun)->name == "Mercury");
+    CHECK(solar::core::innermost_satellite(ephemeris, *jupiter)->name == "Io");
+    CHECK(solar::core::innermost_satellite(ephemeris, *mercury) == nullptr);
+
+    const auto jovian = solar::core::bodies_orbiting(ephemeris, "Jupiter");
+    REQUIRE(jovian.size() == 4);
+    CHECK(jovian[0]->name == "Io");
+    CHECK(jovian[3]->name == "Callisto");
+    CHECK(solar::core::sibling_by_offset(ephemeris, *jovian[0], 1)->name == "Europa");
+}
+
 TEST_CASE("Moon relative state matches Horizons geocentric J2000", "[ephemeris][horizons]") {
     const auto bodies = solar::core::load_bodies("assets/data/bodies.json");
     const solar::core::KeplerEphemeris ephemeris{bodies};

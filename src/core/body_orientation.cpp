@@ -29,6 +29,9 @@ glm::dmat3 rotate_z(double angle_deg) {
     double w_dot = rotation.W_dot_deg_per_day;
     if (body.tidally_locked && orbital_mu > 0.0) {
         w_dot = mean_motion(orbital_mu, body.elements) * kSecondsPerDay * kRadToDeg;
+        if (rotation.W_dot_deg_per_day < 0.0) {
+            w_dot = -w_dot;
+        }
     }
     return modulo(rotation.W0_deg + w_dot * days, 360.0);
 }
