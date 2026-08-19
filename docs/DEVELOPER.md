@@ -82,6 +82,8 @@ duration longer than one period (e.g. the Moon) still traces the real path.
   (Kepler about the primary), `bodies()`
 - `find_body`, `primary_body`, `orbital_mu` (primary’s mu),
   `central_gravitational_parameter` (Sun’s mu)
+- `bodies_orbiting`, `innermost_satellite`, `sibling_by_offset` — catalog
+  families sorted by semi-major axis (empty/`Sun` = heliocentric set)
 
 ### Kepler ephemeris (`kepler_ephemeris.*`)
 
@@ -101,7 +103,9 @@ assert catalog contents; keep Sun first with a valid mu (required by
 heliocentric Kepler). **When adding a moon:** set `"primary"` to the planet
 name and give planetocentric ecliptic elements. Tidally locked satellites
 need `"tidally_locked": true` so Ẇ uses the same Keplerian mean motion as
-the orbit (IAU mean Ẇ will drift against an osculating ellipse).
+the orbit (IAU mean Ẇ will drift against an osculating ellipse). The sign
+of the catalog Ẇ is kept so retrograde moons (Miranda, Triton, …) stay
+locked in the right sense.
 
 ---
 
@@ -145,8 +149,11 @@ alpha blending enable for trails.
 ### Input (`input.*`, `follow_targets.hpp`)
 
 GLFW key callback via `AppContext` (window / simulation / scene pointers).
-Follow targets `0`–`9` are a fixed name table (Sun through Pluto); **M**
-follows the Moon. Validation happens in `Scene::set_follow_target`.
+Follow targets `0`–`9` are a fixed name table (Sun through Pluto). **M**
+follows the innermost satellite of the current body (Mercury from the Sun,
+Io from Jupiter). **`,`** / **`.`** cycle siblings — bodies that share a
+primary, sorted by semi-major axis (`bodies_orbiting`). Validation happens
+in `Scene::set_follow_target`.
 
 ### Context (`context.hpp`)
 
@@ -261,7 +268,7 @@ possible.
 
 | Path | Contents |
 |------|----------|
-| `assets/data/bodies.json` | Name, optional primary, mu, radius, Kepler elements |
+| `assets/data/bodies.json` | Name, optional primary, mu, radius, Kepler elements, moons |
 | `assets/data/body_visuals.json` | Defaults + per-body surface, tail days, size factor, moon orbit scale, visible |
 
 Mismatch warnings (visual entry with no catalog body, or catalog body with no
@@ -319,9 +326,11 @@ those are exercised by running the app.
 
 For a **new planet:** add to `bodies.json` and `body_visuals.json`, extend
 `kFollowTargets` if it should be key-selectable, rebuild (assets copy
-automatically).
+automatically). **`,`** / **`.`** will pick it up from `bodies_orbiting`.
 
 For a **new moon:** same files, plus `"primary"` on the moon and
 `moon_orbit_display_size_factor` on the planet if the scaled primary would
 swallow a 1:1 orbit. Do not put the orbit factor on `bodies.json`. Set
 `tidally_locked` if the prime meridian should stay facing the planet.
+Major moons use `tail_duration_days` 0 so heliocentric tails do not clutter
+the solar-system view; grey orbit loops remain.

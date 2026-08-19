@@ -7,11 +7,11 @@ with orbit trails, camera pan/zoom, and optional body follow.
 ## Features
 
 - **Keplerian ephemeris** — osculating elements for the Sun, eight planets,
-  Pluto, and the Moon (J2000-era data in `assets/data/bodies.json`)
+  Pluto, and major moons (J2000-era data in `assets/data/bodies.json`)
 - **Simulation clock** — paused, real-time, or accelerated time scales
 - **Ecliptic view** — point sprites for bodies, grey orbit loops, fading motion
   tails
-- **Camera** — pan, zoom, Home reset, and follow a body (`0`–`9`, `M` for the Moon)
+- **Camera** — pan, zoom, Home reset, and follow a body (`0`–`9`, `M` / `,` / `.`)
 - **Presentation config** — surface shading (color, ambient, emission), tail
   length, size scaling, and visibility in `assets/data/body_visuals.json`
 
@@ -73,7 +73,8 @@ at the current wall-clock epoch.
 | **End** | Reset camera orientation (keep target) |
 | **`** | Clear follow, but keep current view |
 | **0**–**9** | Follow Sun through Pluto |
-| **M** | Follow the Moon |
+| **M** | Follow the innermost satellite of the current body |
+| **,** / **.** | Previous / next sibling (same primary; planets when following a planet) |
 | **B** / **Shift+B** | Body size scaling off / on |
 
 ## Data
