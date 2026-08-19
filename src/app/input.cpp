@@ -167,10 +167,47 @@ void key_callback(GLFWwindow* glfw_window, int key, int /*scancode*/, int action
             log("toggled graticules: now {}", showing);
             break;
         }
-        case GLFW_KEY_M:
-            scene->set_follow_target(*simulation, "Moon");
-            log("following Moon");
+        case GLFW_KEY_M: {
+            const auto current = scene->followed_body();
+            if (!current) {
+                log("M: not following a body");
+                break;
+            }
+            const core::BodyDefinition* body = core::find_body(simulation->ephemeris(), *current);
+            if (body == nullptr) {
+                break;
+            }
+            const core::BodyDefinition* inner =
+                core::innermost_satellite(simulation->ephemeris(), *body);
+            if (inner == nullptr) {
+                log("M: {} has no satellites", *current);
+                break;
+            }
+            scene->set_follow_target(*simulation, inner->name);
+            log("following {}", inner->name);
             break;
+        }
+        case GLFW_KEY_COMMA:
+        case GLFW_KEY_PERIOD: {
+            const auto current = scene->followed_body();
+            if (!current) {
+                log("not following a body");
+                break;
+            }
+            const core::BodyDefinition* body = core::find_body(simulation->ephemeris(), *current);
+            if (body == nullptr) {
+                break;
+            }
+            const int offset = (key == GLFW_KEY_PERIOD) ? 1 : -1;
+            const core::BodyDefinition* next =
+                core::sibling_by_offset(simulation->ephemeris(), *body, offset);
+            if (next == nullptr) {
+                break;
+            }
+            scene->set_follow_target(*simulation, next->name);
+            log("following {}", next->name);
+            break;
+        }
         default:
             if (key >= GLFW_KEY_0 && key <= GLFW_KEY_9) {
                 const std::size_t index = static_cast<std::size_t>(key - GLFW_KEY_0);

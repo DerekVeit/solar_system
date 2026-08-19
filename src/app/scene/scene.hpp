@@ -41,6 +41,8 @@ class Scene {
     void set_follow_target(const sim::SolarSystem& simulation,
                            std::optional<std::string> body_name);
 
+    [[nodiscard]] const std::optional<std::string>& followed_body() const { return followed_body_; }
+
     std::optional<std::string> release_from_follow();
 
     void add_yaw(float delta_rad);
