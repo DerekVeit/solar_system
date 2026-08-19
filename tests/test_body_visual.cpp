@@ -12,4 +12,7 @@ TEST_CASE("moon_orbit_display_size_factor defaults to 1", "[body_visual][json]")
     CHECK(config.by_name.at("Earth").moon_orbit_display_size_factor == Approx(15.0f));
     REQUIRE(config.by_name.contains("Moon"));
     CHECK(config.by_name.at("Moon").moon_orbit_display_size_factor == Approx(1.0f));
+    CHECK(config.by_name.at("Moon").tail_duration_days == Approx(0.0));
+    CHECK(config.by_name.at("Jupiter").moon_orbit_display_size_factor == Approx(90.0f));
+    CHECK(config.by_name.at("Io").tail_duration_days == Approx(0.0));
 }

@@ -67,7 +67,7 @@
           "diffuse": "textures/2k_moon.jpg"
         }
       },
-      "tail_duration_days": 5.0
+      "tail_duration_days": 0.0
     },
     {
       "name": "Mars",
@@ -77,7 +77,22 @@
           "diffuse": "textures/2k_mars.jpg"
         }
       },
-      "tail_duration_days": 60.0
+      "tail_duration_days": 60.0,
+      "moon_orbit_display_size_factor": 190.0
+    },
+    {
+      "name": "Phobos",
+      "surface": {
+        "color": [0.62, 0.52, 0.45, 1.0]
+      },
+      "tail_duration_days": 0.0
+    },
+    {
+      "name": "Deimos",
+      "surface": {
+        "color": [0.55, 0.48, 0.42, 1.0]
+      },
+      "tail_duration_days": 0.0
     },
     {
       "name": "Jupiter",
@@ -87,7 +102,36 @@
           "diffuse": "textures/2k_jupiter.jpg"
         }
       },
-      "tail_duration_days": 120.0
+      "tail_duration_days": 120.0,
+      "moon_orbit_display_size_factor": 90.0
+    },
+    {
+      "name": "Io",
+      "surface": {
+        "color": [0.95, 0.82, 0.35, 1.0]
+      },
+      "tail_duration_days": 0.0
+    },
+    {
+      "name": "Europa",
+      "surface": {
+        "color": [0.85, 0.82, 0.75, 1.0]
+      },
+      "tail_duration_days": 0.0
+    },
+    {
+      "name": "Ganymede",
+      "surface": {
+        "color": [0.70, 0.62, 0.52, 1.0]
+      },
+      "tail_duration_days": 0.0
+    },
+    {
+      "name": "Callisto",
+      "surface": {
+        "color": [0.45, 0.40, 0.36, 1.0]
+      },
+      "tail_duration_days": 0.0
     },
     {
       "name": "Saturn",
@@ -104,7 +148,57 @@
           "outer_radius_km": 140300.0
         }
       ],
-      "tail_duration_days": 180.0
+      "tail_duration_days": 180.0,
+      "moon_orbit_display_size_factor": 165.0
+    },
+    {
+      "name": "Mimas",
+      "surface": {
+        "color": [0.78, 0.76, 0.74, 1.0]
+      },
+      "tail_duration_days": 0.0
+    },
+    {
+      "name": "Enceladus",
+      "surface": {
+        "color": [0.92, 0.94, 0.96, 1.0]
+      },
+      "tail_duration_days": 0.0
+    },
+    {
+      "name": "Tethys",
+      "surface": {
+        "color": [0.82, 0.82, 0.80, 1.0]
+      },
+      "tail_duration_days": 0.0
+    },
+    {
+      "name": "Dione",
+      "surface": {
+        "color": [0.76, 0.76, 0.74, 1.0]
+      },
+      "tail_duration_days": 0.0
+    },
+    {
+      "name": "Rhea",
+      "surface": {
+        "color": [0.80, 0.78, 0.75, 1.0]
+      },
+      "tail_duration_days": 0.0
+    },
+    {
+      "name": "Titan",
+      "surface": {
+        "color": [0.90, 0.62, 0.28, 1.0]
+      },
+      "tail_duration_days": 0.0
+    },
+    {
+      "name": "Iapetus",
+      "surface": {
+        "color": [0.55, 0.48, 0.40, 1.0]
+      },
+      "tail_duration_days": 0.0
     },
     {
       "name": "Uranus",
@@ -114,7 +208,43 @@
           "diffuse": "textures/2k_uranus.jpg"
         }
       },
-      "tail_duration_days": 240.0
+      "tail_duration_days": 240.0,
+      "moon_orbit_display_size_factor": 105.0
+    },
+    {
+      "name": "Miranda",
+      "surface": {
+        "color": [0.70, 0.70, 0.68, 1.0]
+      },
+      "tail_duration_days": 0.0
+    },
+    {
+      "name": "Ariel",
+      "surface": {
+        "color": [0.78, 0.76, 0.74, 1.0]
+      },
+      "tail_duration_days": 0.0
+    },
+    {
+      "name": "Umbriel",
+      "surface": {
+        "color": [0.42, 0.42, 0.44, 1.0]
+      },
+      "tail_duration_days": 0.0
+    },
+    {
+      "name": "Titania",
+      "surface": {
+        "color": [0.68, 0.64, 0.62, 1.0]
+      },
+      "tail_duration_days": 0.0
+    },
+    {
+      "name": "Oberon",
+      "surface": {
+        "color": [0.58, 0.52, 0.48, 1.0]
+      },
+      "tail_duration_days": 0.0
     },
     {
       "name": "Neptune",
@@ -124,14 +254,30 @@
           "diffuse": "textures/2k_neptune.jpg"
         }
       },
-      "tail_duration_days": 300.0
+      "tail_duration_days": 300.0,
+      "moon_orbit_display_size_factor": 40.0
+    },
+    {
+      "name": "Triton",
+      "surface": {
+        "color": [0.72, 0.68, 0.70, 1.0]
+      },
+      "tail_duration_days": 0.0
     },
     {
       "name": "Pluto",
       "surface": {
         "color": [0.8, 0.7, 0.6, 1.0]
       },
-      "tail_duration_days": 360.0
+      "tail_duration_days": 360.0,
+      "moon_orbit_display_size_factor": 50.0
+    },
+    {
+      "name": "Charon",
+      "surface": {
+        "color": [0.62, 0.58, 0.56, 1.0]
+      },
+      "tail_duration_days": 0.0
     }
   ]
 }
