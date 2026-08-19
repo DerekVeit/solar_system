@@ -7,6 +7,7 @@
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <stdexcept>
+#include <string>
 #include <vector>
 
 using Catch::Approx;
@@ -99,6 +100,56 @@ TEST_CASE("Moon relative state matches Horizons geocentric J2000", "[ephemeris][
     const solar::core::StateVector earth = ephemeris.state("Earth", epoch);
     CHECK(glm::length(moon.position.km - earth.position.km) ==
           Approx(relative.position.length()).margin(1e-6));
+}
+
+TEST_CASE("bodies_orbiting lists satellites by increasing semi-major axis", "[ephemeris]") {
+    const solar::core::KeplerEphemeris ephemeris{{
+        make_body("Sun", "", 1.0e11, 0.0),
+        make_body("Earth", "", 4.0e5, 1.0e8),
+        make_body("Mars", "", 4.0e4, 2.0e8),
+        make_body("Deimos", "Mars", 1.0, 2.4e4),
+        make_body("Phobos", "Mars", 1.0, 9.4e3),
+    }};
+
+    const auto heliocentric = solar::core::bodies_orbiting(ephemeris, "Sun");
+    REQUIRE(heliocentric.size() == 3);
+    CHECK(heliocentric[0]->name == "Sun");
+    CHECK(heliocentric[1]->name == "Earth");
+    CHECK(heliocentric[2]->name == "Mars");
+
+    const auto martian = solar::core::bodies_orbiting(ephemeris, "Mars");
+    REQUIRE(martian.size() == 2);
+    CHECK(martian[0]->name == "Phobos");
+    CHECK(martian[1]->name == "Deimos");
+    CHECK(solar::core::bodies_orbiting(ephemeris, "").size() == 3);
+}
+
+TEST_CASE("innermost_satellite and sibling_by_offset walk a family", "[ephemeris]") {
+    const solar::core::KeplerEphemeris ephemeris{{
+        make_body("Sun", "", 1.0e11, 0.0),
+        make_body("Earth", "", 4.0e5, 1.0e8),
+        make_body("Mars", "", 4.0e4, 2.0e8),
+        make_body("Deimos", "Mars", 1.0, 2.4e4),
+        make_body("Phobos", "Mars", 1.0, 9.4e3),
+    }};
+    const auto* sun = solar::core::find_body(ephemeris, "Sun");
+    const auto* earth = solar::core::find_body(ephemeris, "Earth");
+    const auto* mars = solar::core::find_body(ephemeris, "Mars");
+    const auto* phobos = solar::core::find_body(ephemeris, "Phobos");
+    REQUIRE(sun != nullptr);
+    REQUIRE(earth != nullptr);
+    REQUIRE(mars != nullptr);
+    REQUIRE(phobos != nullptr);
+
+    CHECK(solar::core::innermost_satellite(ephemeris, *sun)->name == "Earth");
+    CHECK(solar::core::innermost_satellite(ephemeris, *mars)->name == "Phobos");
+    CHECK(solar::core::innermost_satellite(ephemeris, *earth) == nullptr);
+    CHECK(solar::core::innermost_satellite(ephemeris, *phobos) == nullptr);
+
+    CHECK(solar::core::sibling_by_offset(ephemeris, *earth, 1)->name == "Mars");
+    CHECK(solar::core::sibling_by_offset(ephemeris, *mars, 1)->name == "Sun");
+    CHECK(solar::core::sibling_by_offset(ephemeris, *phobos, 1)->name == "Deimos");
+    CHECK(solar::core::sibling_by_offset(ephemeris, *phobos, -1)->name == "Deimos");
 }
 
 TEST_CASE("KeplerEphemeris rejects an unknown or cyclic primary", "[ephemeris]") {

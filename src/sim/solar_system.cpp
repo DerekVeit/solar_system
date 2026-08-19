@@ -24,4 +24,12 @@ double SolarSystem::rotation_deg(const std::string& body_name) const {
     return ephemeris_->rotation_deg(body_name, clock_.epoch());
 }
 
+std::vector<std::string> SolarSystem::bodies_orbiting(const std::string& primary_name) const {
+    std::vector<std::string> names;
+    for (const core::BodyDefinition* body : core::bodies_orbiting(*ephemeris_, primary_name)) {
+        names.push_back(body->name);
+    }
+    return names;
+}
+
 } // namespace solar::sim

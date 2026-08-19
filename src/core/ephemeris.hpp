@@ -4,6 +4,7 @@
 
 #include <memory>
 #include <string>
+#include <string_view>
 #include <vector>
 
 namespace solar::core {
@@ -51,5 +52,18 @@ using EphemerisProviderPtr = std::unique_ptr<EphemerisProvider>;
 
 /// Gravitational parameter of the attracting center for this body's Kepler orbit.
 [[nodiscard]] double orbital_mu(const EphemerisProvider& ephemeris, const BodyDefinition& body);
+
+/// Bodies that orbit `primary_name`, sorted by semi-major axis.
+/// Empty or "Sun" selects heliocentric bodies (empty primary), including the Sun.
+[[nodiscard]] std::vector<const BodyDefinition*> bodies_orbiting(const EphemerisProvider& ephemeris,
+                                                                 std::string_view primary_name);
+
+/// Innermost satellite of `body` (smallest a > 0 that orbits it). Null if none.
+[[nodiscard]] const BodyDefinition* innermost_satellite(const EphemerisProvider& ephemeris,
+                                                        const BodyDefinition& body);
+
+/// Sibling in the same orbital family, wrapping. Offset +1 is the next-farther body.
+[[nodiscard]] const BodyDefinition* sibling_by_offset(const EphemerisProvider& ephemeris,
+                                                      const BodyDefinition& body, int offset);
 
 } // namespace solar::core
