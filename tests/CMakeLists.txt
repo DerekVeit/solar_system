@@ -1,6 +1,7 @@
 add_executable(solar_system_tests
     test_body_orientation.cpp
     test_body_visual.cpp
+    test_body_visual_geometry.cpp
     test_color.cpp
     test_ephemeris.cpp
     test_horizons.cpp
@@ -12,6 +13,7 @@ add_executable(solar_system_tests
 target_sources(solar_system_tests
     PRIVATE
         ${CMAKE_SOURCE_DIR}/src/app/color.cpp
+        ${CMAKE_SOURCE_DIR}/src/app/scene/body_visual_geometry.cpp
         ${CMAKE_SOURCE_DIR}/src/app/scene/body_visual_loader.cpp
 )
 
