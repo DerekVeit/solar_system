@@ -61,7 +61,7 @@ at the current wall-clock epoch.
 | **Esc** | Quit |
 | **Space** | Pause time |
 | **R** | Real-time scale |
-| **A** | Accelerated time scale |
+| **T** | Accelerated time scale |
 | **-** / **+** (or numpad) | Halve / double acceleration |
 | **Page Up** / **Page Down** | Zoom in / out |
 | **Arrow keys** | Pan camera (or offset while following) |
