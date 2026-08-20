@@ -198,7 +198,10 @@ tail duration, display size factor, optional satellite-orbit factor inherited
 from the primary, and whether orbit decorations are enabled
 (`draws_orbit_trails_`, set from `semi_major_axis_km > 0` in the constructor).
 
-`append_draw`:
+Km-space sampling lives in `body_visual_geometry.*` (no OpenGL): drawn
+position, closed loop around a frozen primary, and a tail sampled uniformly
+in time. `append_draw` maps those km samples into camera-relative
+`DrawBatch` vertices.
 
 1. Sample physical `simulation.state(name)` for lighting (direction to the
    Sun). Draw the sphere at `drawn_position`: for a moon, that is
@@ -207,7 +210,7 @@ from the primary, and whether orbit decorations are enabled
    (otherwise `f = 1`).
 2. If orbital trails: grey closed orbit loop around the **frozen** primary
    (so a lunar ellipse stays closed) + fading tail along the composed path.
-   Both use `orbital_mu` and the same `f`.
+   Both use the same `f`.
 
 Drawn radius is derived from physical radius and optional
 `display_size_factor` (body size scaling can be toggled with `B` /
@@ -235,8 +238,8 @@ JSON shape:
   defaults as-is.
 
 **When changing how a body looks:** prefer `body_visuals.json`. **When changing
-physics:** `bodies.json` / core. **When changing draw logic for all bodies:**
-`body_visual.cpp`.
+physics:** `bodies.json` / core. **When changing where bodies are drawn:**
+`body_visual_geometry.cpp`. **When changing GPU batching:** `body_visual.cpp`.
 
 ---
 
