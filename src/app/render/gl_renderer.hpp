@@ -20,7 +20,10 @@ class GlRenderer final : public IRenderer {
 
     bool init(const RenderCapacity& capacity) override;
     void draw(const DrawBatch& batch, const glm::mat4& view, const glm::mat4& projection) override;
-    void upload_texture(const std::string& path, const TextureImage& image) override;
+    void upload_texture(const std::string& path, const TextureImage& image,
+                        TextureFilter filter = TextureFilter::mipmapped) override;
+    void set_sky(const std::string& texture_path, const glm::mat3& tex_from_ecliptic,
+                 float brightness) override;
 
   private:
     void destroy();
@@ -35,6 +38,7 @@ class GlRenderer final : public IRenderer {
     SpherePipeline sphere_{};
     RingPipeline ring_{};
     StreamPipeline line_{};
+    SkyPipeline sky_{};
 
     RenderCapacity capacity_{};
     std::unordered_map<std::string, unsigned int> textures_;

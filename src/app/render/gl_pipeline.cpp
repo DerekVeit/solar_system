@@ -5,7 +5,9 @@
 #include "app/render/types.hpp"
 
 #include <glad/gl.h>
+#include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/matrix.hpp>
 
 #include <filesystem>
 #include <stdexcept>
@@ -397,6 +399,90 @@ void RingPipeline::destroy() {
     map_loc = -1;
     use_map_loc = -1;
     inner_fraction_loc = -1;
+}
+
+void SkyPipeline::create() {
+    link_program_from_files(program, "sky.vert", "sky.frag");
+    cache_uniforms();
+    glGenVertexArrays(1, &vao);
+}
+
+void SkyPipeline::cache_uniforms() {
+    cache_uniform(program, inv_projection_loc, "u_inv_projection");
+    cache_uniform(program, world_from_view_loc, "u_world_from_view");
+    cache_uniform(program, tex_from_ecliptic_loc, "u_tex_from_ecliptic");
+    cache_uniform(program, stars_loc, "u_stars");
+    cache_uniform(program, brightness_loc, "u_brightness");
+}
+
+void SkyPipeline::destroy() {
+    destroy_program();
+    inv_projection_loc = -1;
+    world_from_view_loc = -1;
+    tex_from_ecliptic_loc = -1;
+    stars_loc = -1;
+    brightness_loc = -1;
+    texture_path.clear();
+    tex_from_ecliptic = glm::mat3{1.0f};
+    brightness = 1.0f;
+}
+
+void SkyPipeline::set_sky(const std::string& path, const glm::mat3& tex_from_ecliptic_matrix,
+                          float brightness_scale) {
+    texture_path = path;
+    tex_from_ecliptic = tex_from_ecliptic_matrix;
+    brightness = brightness_scale;
+}
+
+void SkyPipeline::draw(std::unordered_map<std::string, unsigned int>& textures,
+                       const glm::mat4& view, const glm::mat4& projection) {
+    if (program == 0 || vao == 0 || texture_path.empty() || !textures.contains(texture_path)) {
+        return;
+    }
+
+    const GLboolean was_depth = glIsEnabled(GL_DEPTH_TEST);
+    const GLboolean was_blend = glIsEnabled(GL_BLEND);
+    GLboolean depth_mask = GL_TRUE;
+    glGetBooleanv(GL_DEPTH_WRITEMASK, &depth_mask);
+
+    glDisable(GL_DEPTH_TEST);
+    glDepthMask(GL_FALSE);
+    glDisable(GL_BLEND);
+
+    glUseProgram(program);
+    glBindVertexArray(vao);
+
+    if (inv_projection_loc >= 0) {
+        const glm::mat4 inv_projection = glm::inverse(projection);
+        glUniformMatrix4fv(inv_projection_loc, 1, GL_FALSE, glm::value_ptr(inv_projection));
+    }
+    if (world_from_view_loc >= 0) {
+        const glm::mat3 world_from_view = glm::transpose(glm::mat3(view));
+        glUniformMatrix3fv(world_from_view_loc, 1, GL_FALSE, glm::value_ptr(world_from_view));
+    }
+    if (tex_from_ecliptic_loc >= 0) {
+        glUniformMatrix3fv(tex_from_ecliptic_loc, 1, GL_FALSE, glm::value_ptr(tex_from_ecliptic));
+    }
+    if (brightness_loc >= 0) {
+        glUniform1f(brightness_loc, brightness);
+    }
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, textures[texture_path]);
+    if (stars_loc >= 0) {
+        glUniform1i(stars_loc, 0);
+    }
+
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+
+    glBindVertexArray(0);
+    glDepthMask(depth_mask);
+    if (was_depth) {
+        glEnable(GL_DEPTH_TEST);
+    }
+    if (was_blend) {
+        glEnable(GL_BLEND);
+    }
 }
 
 } // namespace solar::app

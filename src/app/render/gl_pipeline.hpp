@@ -4,9 +4,12 @@
 #include "app/render/types.hpp"
 
 #include <glad/gl.h>
+#include <glm/ext/matrix_float3x3.hpp>
 #include <glm/ext/matrix_float4x4.hpp>
 
 #include <span>
+#include <string>
+#include <unordered_map>
 
 namespace solar::app {
 
@@ -62,6 +65,26 @@ struct RingPipeline : GlMeshProgram {
     void destroy();
     void draw(std::span<const RingInstance> rings,
               std::unordered_map<std::string, unsigned int>& textures, const glm::mat4& view,
+              const glm::mat4& projection);
+};
+
+struct SkyPipeline : GlProgram {
+    int inv_projection_loc{-1};
+    int world_from_view_loc{-1};
+    int tex_from_ecliptic_loc{-1};
+    int stars_loc{-1};
+    int brightness_loc{-1};
+
+    std::string texture_path{};
+    glm::mat3 tex_from_ecliptic{1.0f};
+    float brightness{1.0f};
+
+    void create();
+    void cache_uniforms();
+    void destroy();
+    void set_sky(const std::string& path, const glm::mat3& tex_from_ecliptic_matrix,
+                 float brightness_scale);
+    void draw(std::unordered_map<std::string, unsigned int>& textures, const glm::mat4& view,
               const glm::mat4& projection);
 };
 

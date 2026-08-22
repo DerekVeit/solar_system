@@ -4,6 +4,7 @@ add_library(solar_core STATIC
     core/kepler.cpp
     core/kepler_ephemeris.cpp
     core/json_loader.cpp
+    core/sky_orientation.cpp
     sim/clock.cpp
     sim/solar_system.cpp
 )
@@ -49,6 +50,7 @@ add_executable(solar_system
     app/scene/body_visual_loader.cpp
     app/scene/camera.cpp
     app/scene/scene.cpp
+    app/scene/sky_loader.cpp
     app/scene/texture.cpp
     app/window.cpp
 )

@@ -7,6 +7,7 @@
 #include "app/logging.hpp"
 #include "app/render/gl_renderer.hpp"
 #include "app/scene/body_visual_catalog.hpp"
+#include "app/scene/sky_loader.hpp"
 #include "app/window.hpp"
 #include "core/constants.hpp"
 #include "core/json_loader.hpp"
@@ -36,6 +37,7 @@ AppObjects make_app() {
     auto renderer = std::make_unique<GlRenderer>();
     Scene scene(std::move(renderer));
     populate_scene(scene, bodies, asset_path("data/body_visuals.json"));
+    scene.set_sky(load_sky_config(asset_path("data/sky.json")));
 
     AppObjects app{
         Window{{.title = "Solar System", .fullscreen = false}},

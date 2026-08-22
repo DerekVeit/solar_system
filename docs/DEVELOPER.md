@@ -10,9 +10,9 @@ main → make_app / run_loop
          │
          ├─ Window (GLFW) + input callbacks
          ├─ SolarSystem (clock + EphemerisProvider)
-         └─ Scene (BodyVisuals + camera + IRenderer)
+         └─ Scene (BodyVisuals + sky + camera + IRenderer)
                     │
-                    └─ each frame: ViewFrame → BodyVisual::append_draw → DrawBatch → GlRenderer
+                    └─ each frame: sky pass → ViewFrame → BodyVisual::append_draw → DrawBatch → GlRenderer
 ```
 
 Three layers keep physics, presentation, and windowing separate:
@@ -39,9 +39,9 @@ src/
     input.*       # key bindings
     follow_targets.hpp  # digit → body name for camera follow
     context.hpp   # pointers shared with GLFW callbacks
-    scene/        # camera + body visuals + draw batching
+    scene/        # camera + body visuals + sky + draw batching
     render/       # IRenderer, GlRenderer, GPU types
-assets/data/      # bodies.json, body_visuals.json
+assets/data/      # bodies.json, body_visuals.json, sky.json
 tests/            # Catch2 tests against solar_core (+ some app types)
 ```
 
@@ -107,6 +107,13 @@ the orbit (IAU mean Ẇ will drift against an osculating ellipse). The sign
 of the catalog Ẇ is kept so retrograde moons (Miranda, Triton, …) stay
 locked in the right sense.
 
+### Sky orientation (`sky_orientation.*`)
+
+Galactic-from-equatorial and `tex_from_ecliptic`: sample directions for the
+star map. The SSS equirectangular maps are galactic-style (Milky Way along
+the texture equator); `longitude_offset_deg` in `sky.json` lines up the
+packed bulge.
+
 ---
 
 ## Simulation (`src/sim/`)
@@ -137,7 +144,7 @@ computed:** ephemeris / Kepler, not the clock.
 ### Entry (`main.cpp`, `run.*`)
 
 1. `make_app()` — load bodies, build ephemeris + clock, populate scene from
-   visuals JSON, create window, register keys, `scene.init()`
+   visuals JSON, load `sky.json`, create window, register keys, `scene.init()`
 2. `run_loop()` — advance clock, clear, `scene.render(...)`, swap, poll
 3. `log_shutdown_report()` — sample positions / epoch on exit
 
@@ -257,8 +264,10 @@ count and trail/orbit sample counts in `Scene::init`.
 
 ### GlRenderer (`gl_renderer.*`, `gl_shader.*`)
 
-OpenGL 4.6: batched points (circular discard in fragment shader) and line
-strips/loops. World → NDC is already done in `BodyVisual`; the renderer only
+OpenGL 4.6: directional starfield (fullscreen triangle, no sky mesh), then
+spheres, rings, and line strips/loops. The sky samples an equirectangular map
+from the view ray after `tex_from_ecliptic` (galactic frame + longitude
+offset). World → NDC for bodies is already done in `BodyVisual`; the renderer
 uploads and draws.
 
 **When adding 3D later:** extend `ViewFrame` / projection in scene visuals first;
@@ -273,6 +282,7 @@ possible.
 |------|----------|
 | `assets/data/bodies.json` | Name, optional primary, mu, radius, Kepler elements, moons |
 | `assets/data/body_visuals.json` | Defaults + per-body surface, tail days, size factor, moon orbit scale, visible |
+| `assets/data/sky.json` | Star map path, galactic longitude offset, brightness |
 
 Mismatch warnings (visual entry with no catalog body, or catalog body with no
 visual entry — the latter uses defaults) are logged from

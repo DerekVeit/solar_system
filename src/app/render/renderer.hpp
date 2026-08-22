@@ -3,9 +3,12 @@
 #include "app/render/types.hpp"
 #include "app/scene/texture.hpp"
 
+#include <glm/mat3x3.hpp>
 #include <glm/mat4x4.hpp>
 
 namespace solar::app {
+
+enum class TextureFilter { mipmapped, linear };
 
 /// Backend-agnostic draw API for the solar system view.
 class IRenderer {
@@ -18,7 +21,11 @@ class IRenderer {
     virtual void draw(const DrawBatch& batch, const glm::mat4& view,
                       const glm::mat4& projection) = 0;
 
-    virtual void upload_texture(const std::string& path, const TextureImage& image) = 0;
+    virtual void upload_texture(const std::string& path, const TextureImage& image,
+                                TextureFilter filter = TextureFilter::mipmapped) = 0;
+
+    virtual void set_sky(const std::string& texture_path, const glm::mat3& tex_from_ecliptic,
+                         float brightness) = 0;
 };
 
 } // namespace solar::app

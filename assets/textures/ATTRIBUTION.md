@@ -55,12 +55,17 @@ All maps below are **2K** equirectangular textures (2048×1024) unless noted.
 | `2k_neptune.jpg` | Neptune |
 | `2k_moon.jpg` | Moon |
 
+### Sky
+
+| File | Description |
+|------|-------------|
+| `extra/2k_stars.jpg` | Starfield (directional background; see `assets/data/sky.json`) |
+| `extra/2k_stars_milky_way.jpg` | Starfield with Milky Way (same packing; useful for lining up longitude) |
+
 ### Extra maps (not used by the catalog yet)
 
 | File | Description |
 |------|-------------|
-| `2k_stars.jpg` | Starfield |
-| `2k_stars_milky_way.jpg` | Starfield with Milky Way |
 | `2k_ceres_fictional.jpg` | Ceres (artist / fictional surface) |
 | `2k_haumea_fictional.jpg` | Haumea (artist / fictional surface) |
 | `2k_makemake_fictional.jpg` | Makemake (artist / fictional surface) |

@@ -5,8 +5,10 @@
 #include "app/scene/texture.hpp"
 #include "core/constants.hpp"
 #include "core/ephemeris.hpp"
+#include "core/sky_orientation.hpp"
 
 #include <cmath>
+#include <glm/mat3x3.hpp>
 #include <glm/vec3.hpp>
 #include <optional>
 #include <span>
@@ -43,6 +45,8 @@ Scene::Scene(std::unique_ptr<IRenderer> renderer)
 
 void Scene::add_body(BodyVisual body) { bodies_.push_back(std::move(body)); }
 
+void Scene::set_sky(SkySpec spec) { sky_ = std::move(spec); }
+
 bool Scene::init() {
     if (renderer_ == nullptr) {
         return false;
@@ -71,6 +75,18 @@ bool Scene::init() {
             renderer_->upload_texture(path, image);
         } else {
             log("failed to get valid image from path {}", path);
+        }
+    }
+
+    if (sky_.visible && !sky_.texture.empty()) {
+        TextureImage image = image_from_path(sky_.texture);
+        if (image.valid()) {
+            renderer_->upload_texture(sky_.texture, image, TextureFilter::linear);
+            const glm::mat3 rotation =
+                glm::mat3(core::tex_from_ecliptic(sky_.longitude_offset_deg));
+            renderer_->set_sky(sky_.texture, rotation, sky_.brightness);
+        } else {
+            log("failed to get valid sky image from path {}", sky_.texture);
         }
     }
     return true;
