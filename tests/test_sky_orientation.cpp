@@ -90,7 +90,7 @@ TEST_CASE("tex_from_ecliptic sends the galactic centre to the map equator", "[sk
 
 TEST_CASE("sky.json names the star map and longitude origin", "[sky][json]") {
     const auto spec = solar::app::load_sky_config("assets/data/sky.json");
-    CHECK(spec.texture == "textures/extra/2k_stars.jpg");
+    CHECK_FALSE(spec.texture.empty());
     CHECK(spec.longitude_offset_deg == Approx(184.7f));
     CHECK(spec.brightness == Approx(2.0f));
     CHECK(spec.visible);

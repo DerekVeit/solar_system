@@ -2,11 +2,13 @@
 
 #include "app/logging.hpp"
 #include "app/scene/body_visual.hpp"
+#include "app/scene/star_markers.hpp"
 #include "app/scene/texture.hpp"
 #include "core/constants.hpp"
 #include "core/ephemeris.hpp"
 #include "core/sky_orientation.hpp"
 
+#include <algorithm>
 #include <cmath>
 #include <glm/mat3x3.hpp>
 #include <glm/vec3.hpp>
@@ -47,6 +49,8 @@ void Scene::add_body(BodyVisual body) { bodies_.push_back(std::move(body)); }
 
 void Scene::set_sky(SkySpec spec) { sky_ = std::move(spec); }
 
+void Scene::set_star_catalog(StarCatalog catalog) { star_catalog_ = std::move(catalog); }
+
 bool Scene::init() {
     if (renderer_ == nullptr) {
         return false;
@@ -59,11 +63,13 @@ bool Scene::init() {
         }
     }
 
+    const std::size_t star_loop_vertices = star_catalog_.visible ? StarCatalog::kMarkerSamples : 0;
     const RenderCapacity capacity{
         .max_spheres = bodies_.size(),
         .max_line_vertices = 0,
         .max_line_trail_vertices = trail_bodies * BodyVisual::kTailSamples,
-        .max_line_loop_vertices = trail_bodies * BodyVisual::kOrbitSamples,
+        .max_line_loop_vertices =
+            std::max(trail_bodies * BodyVisual::kOrbitSamples, star_loop_vertices),
     };
     if (!renderer_->init(capacity)) {
         return false;
@@ -102,7 +108,7 @@ void Scene::render(const sim::SolarSystem& simulation, float aspect_ratio, int f
 
     DrawBatch batch;
     batch.spheres.reserve(bodies_.size());
-    batch.line_loops.reserve(bodies_.size());
+    batch.line_loops.reserve(bodies_.size() + star_catalog_.stars.size());
     batch.line_trails.reserve(bodies_.size());
 
     const ViewFrame view{
@@ -114,6 +120,9 @@ void Scene::render(const sim::SolarSystem& simulation, float aspect_ratio, int f
     for (const BodyVisual& body : bodies_) {
         body.append_draw(simulation, view, batch, graticules_);
     }
+    const double marker_distance_km =
+        static_cast<double>(Camera::kFarAu) * StarCatalog::kDistanceFarFraction * core::kAuKm;
+    append_star_markers(star_catalog_, marker_distance_km, batch);
     renderer_->draw(batch, camera_.view_matrix(), camera_.projection_matrix());
 }
 

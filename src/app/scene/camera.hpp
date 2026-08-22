@@ -25,6 +25,7 @@ class Camera {
     static constexpr float kZoomFactor = 1.02f;
     static constexpr float kPanFraction = 0.005;
     static constexpr float kFov = 45.0f; // field of view, degrees
+    static constexpr float kFarAu = 150.0f;
 
     // Absolute orientations: look at the target from this celestial direction (ecliptic frame).
     // North/south: ±Z. East/west: ±X with +Z up (pitch 0).

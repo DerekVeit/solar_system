@@ -1,0 +1,12 @@
+{
+  "visible": true,
+  "marker_radius_deg": 0.35,
+  "color": [1.0, 0.85, 0.35, 0.9],
+  "stars": [
+    {"name": "Dubhe", "ra_deg": 165.9320, "dec_deg": 61.7510},
+    {"name": "Polaris", "ra_deg": 37.9546, "dec_deg": 89.2641},
+    {"name": "Sirius", "ra_deg": 101.2872, "dec_deg": -16.7161},
+    {"name": "Vega", "ra_deg": 279.2347, "dec_deg": 38.7837},
+    {"name": "Galactic centre", "ra_deg": 266.4051, "dec_deg": -28.9362}
+  ]
+}

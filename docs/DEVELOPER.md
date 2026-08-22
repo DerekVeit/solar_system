@@ -41,7 +41,7 @@ src/
     context.hpp   # pointers shared with GLFW callbacks
     scene/        # camera + body visuals + sky + draw batching
     render/       # IRenderer, GlRenderer, GPU types
-assets/data/      # bodies.json, body_visuals.json, sky.json
+assets/data/      # bodies.json, body_visuals.json, sky.json, stars.json
 tests/            # Catch2 tests against solar_core (+ some app types)
 ```
 
@@ -112,7 +112,8 @@ locked in the right sense.
 Galactic-from-equatorial and `tex_from_ecliptic`: sample directions for the
 star map. The SSS equirectangular maps are galactic-style (Milky Way along
 the texture equator); `longitude_offset_deg` in `sky.json` lines up the
-packed bulge.
+packed bulge. Named-star reticles (`stars.json`) use `ecliptic_direction` and
+`directional_circle` so a marker sits on the same view ray as the sky.
 
 ---
 
@@ -144,7 +145,8 @@ computed:** ephemeris / Kepler, not the clock.
 ### Entry (`main.cpp`, `run.*`)
 
 1. `make_app()` — load bodies, build ephemeris + clock, populate scene from
-   visuals JSON, load `sky.json`, create window, register keys, `scene.init()`
+   visuals JSON, load `sky.json` and `stars.json`, create window, register keys,
+   `scene.init()`
 2. `run_loop()` — advance clock, clear, `scene.render(...)`, swap, poll
 3. `log_shutdown_report()` — sample positions / epoch on exit
 
@@ -283,6 +285,7 @@ possible.
 | `assets/data/bodies.json` | Name, optional primary, mu, radius, Kepler elements, moons |
 | `assets/data/body_visuals.json` | Defaults + per-body surface, tail days, size factor, moon orbit scale, visible |
 | `assets/data/sky.json` | Star map path, galactic longitude offset, brightness |
+| `assets/data/stars.json` | Named J2000 RA/Dec markers drawn as angular line-loop reticles |
 
 Mismatch warnings (visual entry with no catalog body, or catalog body with no
 visual entry — the latter uses defaults) are logged from

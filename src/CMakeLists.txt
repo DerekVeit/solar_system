@@ -51,6 +51,8 @@ add_executable(solar_system
     app/scene/camera.cpp
     app/scene/scene.cpp
     app/scene/sky_loader.cpp
+    app/scene/star_catalog_loader.cpp
+    app/scene/star_markers.cpp
     app/scene/texture.cpp
     app/window.cpp
 )

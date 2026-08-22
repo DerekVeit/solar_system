@@ -156,7 +156,7 @@ glm::mat4 Camera::projection_matrix() const {
     if (radius_au_ < 1.0f) {
         near_km = 0.1f * radius_au_ * au_km;
     }
-    const float far_km = 150.0f * au_km;
+    const float far_km = kFarAu * au_km;
     const float fov = glm::radians(kFov);
     return glm::perspective(fov, aspect_ratio_, near_km, far_km);
 }

@@ -8,6 +8,7 @@ add_executable(solar_system_tests
     test_kepler.cpp
     test_json_loader.cpp
     test_sky_orientation.cpp
+    test_star_markers.cpp
     test_types.cpp
 )
 
@@ -17,6 +18,7 @@ target_sources(solar_system_tests
         ${CMAKE_SOURCE_DIR}/src/app/scene/body_visual_geometry.cpp
         ${CMAKE_SOURCE_DIR}/src/app/scene/body_visual_loader.cpp
         ${CMAKE_SOURCE_DIR}/src/app/scene/sky_loader.cpp
+        ${CMAKE_SOURCE_DIR}/src/app/scene/star_catalog_loader.cpp
 )
 
 target_link_libraries(solar_system_tests
