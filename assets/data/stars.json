@@ -4,6 +4,12 @@
   "color": [1.0, 0.85, 0.35, 0.9],
   "stars": [
     {"name": "Dubhe", "ra_deg": 165.9320, "dec_deg": 61.7510},
+    {"name": "Merak", "ra_deg": 165.4603, "dec_deg": 56.3824},
+    {"name": "Phecda", "ra_deg": 178.4572, "dec_deg": 53.6947},
+    {"name": "Megrez", "ra_deg": 183.8565, "dec_deg": 57.0326},
+    {"name": "Alioth", "ra_deg": 193.5068, "dec_deg": 55.9598},
+    {"name": "Mizar", "ra_deg": 200.9814, "dec_deg": 54.9254},
+    {"name": "Alkaid", "ra_deg": 206.8852, "dec_deg": 49.3133},
     {"name": "Polaris", "ra_deg": 37.9546, "dec_deg": 89.2641},
     {"name": "Sirius", "ra_deg": 101.2872, "dec_deg": -16.7161},
     {"name": "Vega", "ra_deg": 279.2347, "dec_deg": 38.7837},

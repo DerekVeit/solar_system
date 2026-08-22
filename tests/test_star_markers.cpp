@@ -7,6 +7,8 @@
 #include <glm/geometric.hpp>
 
 #include <cmath>
+#include <set>
+#include <string>
 
 using Catch::Approx;
 
@@ -24,6 +26,14 @@ TEST_CASE("stars.json includes Dubhe at J2000 RA/Dec", "[stars][json]") {
     REQUIRE(dubhe != nullptr);
     CHECK(dubhe->ra_deg == Approx(165.9320).margin(1e-4));
     CHECK(dubhe->dec_deg == Approx(61.7510).margin(1e-4));
+
+    std::set<std::string> names;
+    for (const solar::app::Star& star : catalog.stars) {
+        names.insert(star.name);
+    }
+    for (const char* name : {"Dubhe", "Merak", "Phecda", "Megrez", "Alioth", "Mizar", "Alkaid"}) {
+        CHECK(names.contains(name));
+    }
 }
 
 TEST_CASE("ecliptic_direction is a unit vector in the draw frame", "[stars]") {
