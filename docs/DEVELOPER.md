@@ -110,10 +110,11 @@ locked in the right sense.
 ### Sky orientation (`sky_orientation.*`)
 
 Galactic-from-equatorial and `tex_from_ecliptic`: sample directions for the
-star map. The SSS equirectangular maps are galactic-style (Milky Way along
-the texture equator); `longitude_offset_deg` in `sky.json` lines up the
-packed bulge. Named-star reticles (`stars.json`) use `ecliptic_direction` and
-`directional_circle` so a marker sits on the same view ray as the sky.
+star map. The SSS equirectangular maps are galactic (Milky Way along the
+texture equator) with the galactic centre at u = 0.5 and the north galactic
+pole at v = 1 — IAU galactic followed by Ry(180°). Named-star reticles
+(`stars.json`) use `ecliptic_direction` and `directional_circle` so a marker
+sits on the same view ray as the sky.
 
 ---
 

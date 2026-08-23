@@ -17,6 +17,10 @@ glm::dmat3 rotate_x(double angle_deg) {
     return glm::rotate(glm::dmat4{1.0}, angle_deg * kDegToRad, {1, 0, 0});
 }
 
+glm::dmat3 rotate_y(double angle_deg) {
+    return glm::rotate(glm::dmat4{1.0}, angle_deg * kDegToRad, {0, 1, 0});
+}
+
 glm::dmat3 rotate_z(double angle_deg) {
     return glm::rotate(glm::dmat4{1.0}, angle_deg * kDegToRad, {0, 0, 1});
 }
@@ -55,7 +59,11 @@ glm::dvec2 equirectangular_uv(const glm::dvec3& dir) {
 }
 
 glm::dmat3 tex_from_ecliptic(double longitude_offset_deg) {
-    return rotate_z(longitude_offset_deg) * galactic_from_equatorial() *
+    // Ry(180°) sends the galactic centre to −X (u = 0.5) and the NGP to −Z
+    // (v = 1), matching the SSS JPEG packing. The Milky Way stays on the
+    // texture equator either way, which is why a pole/longitude flip is easy
+    // to miss if you only check the band.
+    return rotate_z(longitude_offset_deg) * rotate_y(180.0) * galactic_from_equatorial() *
            rotate_x(kMeanObliquityDeg);
 }
 

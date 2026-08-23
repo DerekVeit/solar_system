@@ -62,36 +62,39 @@ TEST_CASE("ecliptic_from_equatorial tilts by the mean obliquity", "[sky]") {
     CHECK(equinox.z == Approx(0.0).margin(1e-12));
 }
 
-TEST_CASE("tex_from_ecliptic sends the galactic centre to the map equator", "[sky]") {
+TEST_CASE("tex_from_ecliptic matches Solar System Scope galactic packing", "[sky]") {
     const glm::dvec3 gc_eq = solar::core::equatorial_direction(solar::core::kGalacticCenterRaDeg,
                                                                solar::core::kGalacticCenterDecDeg);
     const glm::dvec3 gc_ecl = solar::core::ecliptic_from_equatorial(gc_eq);
 
+    // SSS maps put the galactic centre at u = 0.5 (−X), not u = 0 (+X).
     const glm::dvec3 dir0 = solar::core::tex_from_ecliptic(0.0) * gc_ecl;
-    CHECK(dir0.x == Approx(1.0).margin(1e-4));
+    CHECK(dir0.x == Approx(-1.0).margin(1e-4));
     CHECK(dir0.y == Approx(0.0).margin(1e-4));
     CHECK(dir0.z == Approx(0.0).margin(1e-4));
-    CHECK(solar::core::equirectangular_uv(dir0).y == Approx(0.5).margin(1e-3));
-
-    // SSS 2k star maps pack the bulge near u = 1050/2048.
-    constexpr double kOffsetDeg = 184.7;
-    const glm::dvec3 dir = solar::core::tex_from_ecliptic(kOffsetDeg) * gc_ecl;
-    const glm::dvec2 uv = solar::core::equirectangular_uv(dir);
-    CHECK(uv.x == Approx(184.7 / 360.0).margin(1e-4));
-    CHECK(uv.y == Approx(0.5).margin(1e-3));
+    const glm::dvec2 gc_uv = solar::core::equirectangular_uv(dir0);
+    CHECK(gc_uv.x == Approx(0.5).margin(1e-4));
+    CHECK(gc_uv.y == Approx(0.5).margin(1e-3));
 
     const glm::dvec3 ngp_ecl =
         solar::core::ecliptic_from_equatorial(solar::core::equatorial_direction(
             solar::core::kNorthGalacticPoleRaDeg, solar::core::kNorthGalacticPoleDecDeg));
     const glm::dvec2 pole_uv =
-        solar::core::equirectangular_uv(solar::core::tex_from_ecliptic(kOffsetDeg) * ngp_ecl);
-    CHECK(pole_uv.y == Approx(0.0).margin(1e-4));
+        solar::core::equirectangular_uv(solar::core::tex_from_ecliptic(0.0) * ngp_ecl);
+    CHECK(pole_uv.y == Approx(1.0).margin(1e-4));
+
+    // Dubhe (and the other named stars) sit on real bright pixels only in this frame.
+    const glm::dvec3 dubhe_ecl = solar::core::ecliptic_direction(165.9320, 61.7510);
+    const glm::dvec2 dubhe_uv =
+        solar::core::equirectangular_uv(solar::core::tex_from_ecliptic(0.0) * dubhe_ecl);
+    CHECK(dubhe_uv.x == Approx(0.103198).margin(1e-4));
+    CHECK(dubhe_uv.y == Approx(0.783381).margin(1e-4));
 }
 
 TEST_CASE("sky.json names the star map and longitude origin", "[sky][json]") {
     const auto spec = solar::app::load_sky_config("assets/data/sky.json");
     CHECK_FALSE(spec.texture.empty());
-    CHECK(spec.longitude_offset_deg == Approx(184.7f));
+    CHECK(spec.longitude_offset_deg == Approx(0.0f));
     CHECK(spec.brightness == Approx(2.0f));
     CHECK(spec.visible);
 }

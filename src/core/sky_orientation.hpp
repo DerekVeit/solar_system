@@ -31,8 +31,10 @@ inline constexpr double kMeanObliquityDeg = 23.44;
 /// u = 0 on +X, increasing toward +Y; v = 0 at +Z (same as the globe mesh).
 [[nodiscard]] glm::dvec2 equirectangular_uv(const glm::dvec3& dir);
 
-/// Texture-frame from ecliptic J2000. `longitude_offset_deg` is a rotation about
-/// galactic +Z so the map's u = 0 matches the packed prime meridian.
+/// Texture-frame from ecliptic J2000 for the Solar System Scope star maps.
+/// Those JPEGs are galactic equirectangular with the centre at u = 0.5 and the
+/// north galactic pole at the bottom (v = 1): IAU galactic, then Ry(180°).
+/// `longitude_offset_deg` is an extra rotation about the map's +Z.
 [[nodiscard]] glm::dmat3 tex_from_ecliptic(double longitude_offset_deg);
 
 /// Ecliptic J2000 unit vector at ICRS right ascension / declination.
