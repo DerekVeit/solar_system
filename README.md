@@ -76,6 +76,7 @@ at the current wall-clock epoch.
 | **M** | Follow the innermost satellite of the current body |
 | **,** / **.** | Previous / next sibling (same primary; planets when following a planet) |
 | **B** / **Shift+B** | Body size scaling off / on |
+| **C** / **X** | Star reticles on / off |
 
 ## Data
 

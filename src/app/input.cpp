@@ -96,6 +96,14 @@ void key_callback(GLFWwindow* glfw_window, int key, int /*scancode*/, int action
             scene->body_scaling(enabled);
             log("body scaling {}", enabled ? "on" : "off");
         } break;
+        case GLFW_KEY_C:
+            scene->set_star_markers_visible(true);
+            log("star reticles on");
+            break;
+        case GLFW_KEY_X:
+            scene->set_star_markers_visible(false);
+            log("star reticles off");
+            break;
         case GLFW_KEY_W:
             scene->add_pitch(-Camera::kYawPitchStepRad);
             break;

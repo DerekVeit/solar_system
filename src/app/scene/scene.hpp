@@ -32,6 +32,7 @@ class Scene {
     void set_view_half_extent_au(float half_extent_au);
 
     void body_scaling(bool enabled);
+    void set_star_markers_visible(bool visible);
     bool toggle_graticules() {
         graticules_ = !graticules_;
         return graticules_;

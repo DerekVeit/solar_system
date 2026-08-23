@@ -63,7 +63,9 @@ bool Scene::init() {
         }
     }
 
-    const std::size_t star_loop_vertices = star_catalog_.visible ? StarCatalog::kMarkerSamples : 0;
+    // Always reserve a star-marker loop so C can show them even if they start hidden.
+    const std::size_t star_loop_vertices =
+        star_catalog_.stars.empty() ? 0 : StarCatalog::kMarkerSamples;
     const RenderCapacity capacity{
         .max_spheres = bodies_.size(),
         .max_line_vertices = 0,
@@ -131,6 +133,8 @@ void Scene::set_view_half_extent_au(float half_extent_au) {
 }
 
 void Scene::body_scaling(bool enabled) { body_scaling_ = enabled; }
+
+void Scene::set_star_markers_visible(bool visible) { star_catalog_.visible = visible; }
 
 void Scene::pan_view_fraction(float delta_x_fraction, float delta_y_fraction) {
     const float delta_x_au = delta_x_fraction * camera_.view_width_au();
