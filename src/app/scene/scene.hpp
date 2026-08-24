@@ -4,6 +4,7 @@
 #include "app/scene/body_visual.hpp"
 #include "app/scene/camera.hpp"
 #include "app/scene/sky_config.hpp"
+#include "app/scene/sky_figure.hpp"
 #include "app/scene/star_catalog.hpp"
 #include "sim/solar_system.hpp"
 
@@ -21,6 +22,7 @@ class Scene {
     void add_body(BodyVisual body);
     void set_sky(SkySpec spec);
     void set_star_catalog(StarCatalog catalog);
+    void set_sky_figures(SkyFigureCatalog catalog);
 
     bool init();
 
@@ -70,6 +72,7 @@ class Scene {
     std::vector<BodyVisual> bodies_;
     SkySpec sky_{};
     StarCatalog star_catalog_{};
+    SkyFigureCatalog sky_figures_{};
     Camera camera_;
     bool body_scaling_{true};
     bool graticules_{true};

@@ -18,6 +18,7 @@ target_sources(solar_system_tests
         ${CMAKE_SOURCE_DIR}/src/app/color.cpp
         ${CMAKE_SOURCE_DIR}/src/app/scene/body_visual_geometry.cpp
         ${CMAKE_SOURCE_DIR}/src/app/scene/body_visual_loader.cpp
+        ${CMAKE_SOURCE_DIR}/src/app/scene/sky_figure_lines.cpp
         ${CMAKE_SOURCE_DIR}/src/app/scene/sky_figure_loader.cpp
         ${CMAKE_SOURCE_DIR}/src/app/scene/sky_loader.cpp
         ${CMAKE_SOURCE_DIR}/src/app/scene/star_catalog_loader.cpp

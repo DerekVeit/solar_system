@@ -7,6 +7,8 @@
 
 #include <algorithm>
 #include <cmath>
+#include <optional>
+#include <utility>
 #include <vector>
 
 namespace solar::core {
@@ -97,6 +99,31 @@ std::vector<glm::dvec3> directional_circle(const glm::dvec3& dir, double distanc
         points.push_back(distance * (n * cos_a + spoke * sin_a));
     }
     return points;
+}
+
+std::optional<std::pair<glm::dvec3, glm::dvec3>>
+inset_great_circle(const glm::dvec3& from, const glm::dvec3& to, double gap_rad) {
+    const double from_len2 = glm::dot(from, from);
+    const double to_len2 = glm::dot(to, to);
+    if (from_len2 <= 0.0 || to_len2 <= 0.0 || gap_rad < 0.0) {
+        return std::nullopt;
+    }
+
+    const glm::dvec3 a = from / std::sqrt(from_len2);
+    const glm::dvec3 b = to / std::sqrt(to_len2);
+    const double cos_sep = std::clamp(glm::dot(a, b), -1.0, 1.0);
+    const double sep = std::acos(cos_sep);
+    if (sep <= 2.0 * gap_rad || sep < 1e-12) {
+        return std::nullopt;
+    }
+
+    const double sin_sep = std::sin(sep);
+    const auto slerp = [&](double t) {
+        const double theta = t * sep;
+        return (std::sin(sep - theta) / sin_sep) * a + (std::sin(theta) / sin_sep) * b;
+    };
+    const double t_gap = gap_rad / sep;
+    return std::pair{glm::normalize(slerp(t_gap)), glm::normalize(slerp(1.0 - t_gap))};
 }
 
 } // namespace solar::core

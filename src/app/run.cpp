@@ -7,6 +7,7 @@
 #include "app/logging.hpp"
 #include "app/render/gl_renderer.hpp"
 #include "app/scene/body_visual_catalog.hpp"
+#include "app/scene/sky_figure_loader.hpp"
 #include "app/scene/sky_loader.hpp"
 #include "app/scene/star_catalog_loader.hpp"
 #include "app/window.hpp"
@@ -39,7 +40,9 @@ AppObjects make_app() {
     Scene scene(std::move(renderer));
     populate_scene(scene, bodies, asset_path("data/body_visuals.json"));
     scene.set_sky(load_sky_config(asset_path("data/sky.json")));
-    scene.set_star_catalog(load_star_catalog(asset_path("data/stars.json")));
+    auto stars = load_star_catalog(asset_path("data/stars.json"));
+    scene.set_sky_figures(load_sky_figures(asset_path("data/constellations.json"), stars));
+    scene.set_star_catalog(std::move(stars));
 
     AppObjects app{
         Window{{.title = "Solar System", .fullscreen = false}},

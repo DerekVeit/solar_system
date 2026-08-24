@@ -5,6 +5,8 @@
 #include <glm/ext/vector_double3.hpp>
 
 #include <cstddef>
+#include <optional>
+#include <utility>
 #include <vector>
 
 namespace solar::core {
@@ -45,5 +47,10 @@ inline constexpr double kMeanObliquityDeg = 23.44;
 [[nodiscard]] std::vector<glm::dvec3> directional_circle(const glm::dvec3& dir, double distance,
                                                          double angular_radius_rad,
                                                          std::size_t sample_count);
+
+/// Unit endpoints of the great-circle from `from` to `to`, shortened by `gap_rad`
+/// at each end. Empty if the vectors are degenerate or the separation is too small.
+[[nodiscard]] std::optional<std::pair<glm::dvec3, glm::dvec3>>
+inset_great_circle(const glm::dvec3& from, const glm::dvec3& to, double gap_rad);
 
 } // namespace solar::core

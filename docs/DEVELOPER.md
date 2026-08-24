@@ -41,7 +41,7 @@ src/
     context.hpp   # pointers shared with GLFW callbacks
     scene/        # camera + body visuals + sky + draw batching
     render/       # IRenderer, GlRenderer, GPU types
-assets/data/      # bodies.json, body_visuals.json, sky.json, stars.json
+assets/data/      # bodies.json, body_visuals.json, sky.json, stars.json, constellations.json
 tests/            # Catch2 tests against solar_core (+ some app types)
 ```
 
@@ -146,8 +146,8 @@ computed:** ephemeris / Kepler, not the clock.
 ### Entry (`main.cpp`, `run.*`)
 
 1. `make_app()` — load bodies, build ephemeris + clock, populate scene from
-   visuals JSON, load `sky.json` and `stars.json`, create window, register keys,
-   `scene.init()`
+   visuals JSON, load `sky.json`, `stars.json`, and `constellations.json`,
+   create window, register keys, `scene.init()`
 2. `run_loop()` — advance clock, clear, `scene.render(...)`, swap, poll
 3. `log_shutdown_report()` — sample positions / epoch on exit
 
@@ -182,6 +182,7 @@ Owns:
 - `Camera` (look-at target, orbit angles, radius / framing)
 - Body-scaling flag
 - Optional follow body name + pan offset while following
+- Named-star catalog and constellation / asterism stick figures
 
 Each `render` call:
 
@@ -286,7 +287,8 @@ possible.
 | `assets/data/bodies.json` | Name, optional primary, mu, radius, Kepler elements, moons |
 | `assets/data/body_visuals.json` | Defaults + per-body surface, tail days, size factor, moon orbit scale, visible |
 | `assets/data/sky.json` | Star map path, galactic longitude offset, brightness |
-| `assets/data/stars.json` | Named J2000 RA/Dec markers drawn as angular line-loop reticles |
+| `assets/data/stars.json` | HIP-keyed J2000 RA/Dec stars; optional names draw reticles and labels |
+| `assets/data/constellations.json` | Stick figures (constellation or asterism) as HIP polylines |
 
 Mismatch warnings (visual entry with no catalog body, or catalog body with no
 visual entry — the latter uses defaults) are logged from

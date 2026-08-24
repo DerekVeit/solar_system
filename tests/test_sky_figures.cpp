@@ -1,9 +1,17 @@
+#include "app/render/types.hpp"
+#include "app/scene/sky_figure_lines.hpp"
 #include "app/scene/sky_figure_loader.hpp"
 #include "app/scene/star_catalog_loader.hpp"
+#include "core/constants.hpp"
+#include "core/sky_orientation.hpp"
 
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
 
+#include <glm/geometric.hpp>
+
+#include <algorithm>
+#include <cmath>
 #include <filesystem>
 #include <fstream>
 #include <stdexcept>
@@ -50,4 +58,46 @@ TEST_CASE("sky figure loader rejects an unknown HIP", "[sky][figures]") {
         "solar_unknown_hip_figures.json",
         R"({"figures":[{"id":"x","name":"X","kind":"asterism","polylines":[[54061,1]]}]})");
     CHECK_THROWS_AS(solar::app::load_sky_figures(path, stars), std::runtime_error);
+}
+
+TEST_CASE("append_sky_figures draws inset segments without reticles", "[sky][figures]") {
+    const auto stars = solar::app::load_star_catalog("assets/data/stars.json");
+    auto figures = solar::app::load_sky_figures("assets/data/constellations.json", stars);
+    constexpr double kDistance = 1000.0;
+
+    solar::app::DrawBatch hidden;
+    figures.visible = false;
+    solar::app::append_sky_figures(figures, stars, kDistance, hidden);
+    CHECK(hidden.lines.empty());
+    CHECK(hidden.line_loops.empty());
+
+    figures.visible = true;
+    solar::app::DrawBatch batch;
+    solar::app::append_sky_figures(figures, stars, kDistance, batch);
+    REQUIRE(batch.lines.size() == 1);
+    CHECK(batch.line_loops.empty());
+    CHECK(batch.lines[0].vertices.size() == 14);
+    CHECK(solar::app::sky_figure_line_vertex_capacity(figures) == 14);
+
+    const double gap_rad = figures.line_gap_deg * solar::core::kDegToRad;
+    for (const auto& vertex : batch.lines[0].vertices) {
+        const glm::dvec3 point{vertex.x_km, vertex.y_km, vertex.z_km};
+        CHECK(glm::length(point) == Approx(kDistance).margin(1e-3));
+        CHECK(vertex.color == figures.color);
+
+        bool near_a_star = false;
+        for (const solar::app::Star& star : stars.stars) {
+            if (star.hip == 0) {
+                continue;
+            }
+            const glm::dvec3 dir = solar::core::ecliptic_direction(star.ra_deg, star.dec_deg);
+            const double angle =
+                std::acos(std::clamp(glm::dot(glm::normalize(point), dir), -1.0, 1.0));
+            if (std::abs(angle - gap_rad) < 1e-4) {
+                near_a_star = true;
+                break;
+            }
+        }
+        CHECK(near_a_star);
+    }
 }

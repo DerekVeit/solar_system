@@ -99,6 +99,24 @@ TEST_CASE("sky.json names the star map and longitude origin", "[sky][json]") {
     CHECK(spec.visible);
 }
 
+TEST_CASE("inset_great_circle shortens a segment at both ends", "[sky]") {
+    const glm::dvec3 from{1.0, 0.0, 0.0};
+    const glm::dvec3 to{0.0, 1.0, 0.0};
+    constexpr double kGap = 10.0 * solar::core::kDegToRad;
+    const auto inset = solar::core::inset_great_circle(from, to, kGap);
+    REQUIRE(inset.has_value());
+    CHECK(glm::length(inset->first) == Approx(1.0).margin(1e-12));
+    CHECK(glm::length(inset->second) == Approx(1.0).margin(1e-12));
+    CHECK(glm::dot(inset->first, from) == Approx(std::cos(kGap)).margin(1e-12));
+    CHECK(glm::dot(inset->second, to) == Approx(std::cos(kGap)).margin(1e-12));
+    CHECK(glm::dot(inset->first, inset->second) ==
+          Approx(std::cos(90.0 * solar::core::kDegToRad - 2.0 * kGap)).margin(1e-12));
+
+    CHECK_FALSE(solar::core::inset_great_circle(from, to, 50.0 * solar::core::kDegToRad));
+    CHECK_FALSE(solar::core::inset_great_circle(from, from, kGap));
+    CHECK_FALSE(solar::core::inset_great_circle({0.0, 0.0, 0.0}, to, kGap));
+}
+
 TEST_CASE("equirectangular_uv matches the globe mesh convention", "[sky]") {
     CHECK(solar::core::equirectangular_uv({1.0, 0.0, 0.0}).x == Approx(0.0).margin(1e-12));
     CHECK(solar::core::equirectangular_uv({1.0, 0.0, 0.0}).y == Approx(0.5).margin(1e-12));

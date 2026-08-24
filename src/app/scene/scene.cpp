@@ -2,6 +2,7 @@
 
 #include "app/logging.hpp"
 #include "app/scene/body_visual.hpp"
+#include "app/scene/sky_figure_lines.hpp"
 #include "app/scene/star_markers.hpp"
 #include "app/scene/texture.hpp"
 #include "core/constants.hpp"
@@ -52,6 +53,8 @@ void Scene::set_sky(SkySpec spec) { sky_ = std::move(spec); }
 
 void Scene::set_star_catalog(StarCatalog catalog) { star_catalog_ = std::move(catalog); }
 
+void Scene::set_sky_figures(SkyFigureCatalog catalog) { sky_figures_ = std::move(catalog); }
+
 bool Scene::init() {
     if (renderer_ == nullptr) {
         return false;
@@ -69,7 +72,8 @@ bool Scene::init() {
         star_catalog_.stars.empty() ? 0 : StarCatalog::kMarkerSamples;
     const RenderCapacity capacity{
         .max_spheres = bodies_.size(),
-        .max_line_vertices = star_marker_line_vertex_capacity(star_catalog_),
+        .max_line_vertices = std::max(star_marker_line_vertex_capacity(star_catalog_),
+                                      sky_figure_line_vertex_capacity(sky_figures_)),
         .max_line_trail_vertices = trail_bodies * BodyVisual::kTailSamples,
         .max_line_loop_vertices =
             std::max(trail_bodies * BodyVisual::kOrbitSamples, star_loop_vertices),
@@ -113,7 +117,7 @@ void Scene::render(const sim::SolarSystem& simulation, float aspect_ratio, int f
     batch.spheres.reserve(bodies_.size());
     batch.line_loops.reserve(bodies_.size() + star_catalog_.stars.size());
     batch.line_trails.reserve(bodies_.size());
-    batch.lines.reserve(star_catalog_.stars.size());
+    batch.lines.reserve(star_catalog_.stars.size() + sky_figures_.figures.size());
 
     const ViewFrame view{
         .camera = camera_,
@@ -130,6 +134,7 @@ void Scene::render(const sim::SolarSystem& simulation, float aspect_ratio, int f
     glm::vec3 view_up{};
     glm::vec3 view_forward{};
     camera_.view_basis(view_right, view_up, view_forward);
+    append_sky_figures(sky_figures_, star_catalog_, marker_distance_km, batch);
     append_star_markers(star_catalog_, marker_distance_km, glm::dvec3{view_right},
                         glm::dvec3{view_up}, batch);
     renderer_->draw(batch, camera_.view_matrix(), camera_.projection_matrix());
