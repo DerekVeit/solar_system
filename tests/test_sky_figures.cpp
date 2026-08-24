@@ -31,25 +31,44 @@ std::filesystem::path write_temp_json(const std::string& name, const std::string
 
 } // namespace
 
-TEST_CASE("constellations.json lists the Big Dipper as an asterism", "[sky][figures][json]") {
+TEST_CASE("constellations.json lists showpiece constellations and asterisms",
+          "[sky][figures][json]") {
     const auto stars = solar::app::load_star_catalog("assets/data/stars.json");
     const auto catalog = solar::app::load_sky_figures("assets/data/constellations.json", stars);
 
     REQUIRE(catalog.visible);
     CHECK(catalog.line_gap_deg == Approx(0.5f));
-    REQUIRE(catalog.figures.size() == 1);
 
-    const solar::app::SkyFigure& dipper = catalog.figures.front();
-    CHECK(dipper.id == "dipper");
-    CHECK(dipper.name == "Big Dipper");
-    CHECK(dipper.kind == solar::app::SkyFigureKind::asterism);
-    REQUIRE(dipper.polylines.size() == 2);
-    CHECK(dipper.polylines[0] ==
-          std::vector<int>({54061, 53910, 58001, 59774, 62956, 65378, 67301}));
-    CHECK(dipper.polylines[1] == std::vector<int>({54061, 59774}));
-    for (int hip : dipper.polylines[0]) {
-        CHECK(solar::app::star_by_hip(stars, hip) != nullptr);
+    int constellations = 0;
+    int asterisms = 0;
+    const solar::app::SkyFigure* dipper = nullptr;
+    const solar::app::SkyFigure* orion = nullptr;
+    for (const solar::app::SkyFigure& figure : catalog.figures) {
+        if (figure.kind == solar::app::SkyFigureKind::constellation) {
+            ++constellations;
+        } else if (figure.kind == solar::app::SkyFigureKind::asterism) {
+            ++asterisms;
+        }
+        if (figure.id == "dipper") {
+            dipper = &figure;
+        }
+        if (figure.id == "ori") {
+            orion = &figure;
+        }
     }
+    CHECK(constellations == 40);
+    CHECK(asterisms == 7);
+
+    REQUIRE(dipper != nullptr);
+    CHECK(dipper->name == "Big Dipper");
+    CHECK(dipper->kind == solar::app::SkyFigureKind::asterism);
+    REQUIRE(dipper->polylines.size() == 2);
+    CHECK(dipper->polylines[0] ==
+          std::vector<int>({54061, 53910, 58001, 59774, 62956, 65378, 67301}));
+    CHECK(dipper->polylines[1] == std::vector<int>({54061, 59774}));
+    REQUIRE(orion != nullptr);
+    CHECK(orion->kind == solar::app::SkyFigureKind::constellation);
+    CHECK_FALSE(orion->polylines.empty());
 }
 
 TEST_CASE("sky figure loader rejects an unknown HIP", "[sky][figures]") {
@@ -62,7 +81,15 @@ TEST_CASE("sky figure loader rejects an unknown HIP", "[sky][figures]") {
 
 TEST_CASE("append_sky_figures draws inset segments without reticles", "[sky][figures]") {
     const auto stars = solar::app::load_star_catalog("assets/data/stars.json");
-    auto figures = solar::app::load_sky_figures("assets/data/constellations.json", stars);
+    const auto bundled = solar::app::load_sky_figures("assets/data/constellations.json", stars);
+    solar::app::SkyFigureCatalog figures = bundled;
+    figures.figures.clear();
+    for (const solar::app::SkyFigure& figure : bundled.figures) {
+        if (figure.id == "dipper") {
+            figures.figures.push_back(figure);
+        }
+    }
+    REQUIRE(figures.figures.size() == 1);
     constexpr double kDistance = 1000.0;
 
     solar::app::DrawBatch hidden;
@@ -100,4 +127,9 @@ TEST_CASE("append_sky_figures draws inset segments without reticles", "[sky][fig
         }
         CHECK(near_a_star);
     }
+
+    solar::app::DrawBatch all;
+    solar::app::append_sky_figures(bundled, stars, kDistance, all);
+    CHECK(all.line_loops.empty());
+    CHECK(all.lines.size() == bundled.figures.size());
 }

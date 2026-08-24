@@ -288,7 +288,7 @@ possible.
 | `assets/data/body_visuals.json` | Defaults + per-body surface, tail days, size factor, moon orbit scale, visible |
 | `assets/data/sky.json` | Star map path, galactic longitude offset, brightness |
 | `assets/data/stars.json` | HIP-keyed J2000 RA/Dec stars; optional names draw reticles and labels |
-| `assets/data/constellations.json` | Stick figures (constellation or asterism) as HIP polylines |
+| `assets/data/constellations.json` | 40 IAU showpiece constellations plus 7 asterisms as HIP polylines |
 
 Mismatch warnings (visual entry with no catalog body, or catalog body with no
 visual entry — the latter uses defaults) are logged from
