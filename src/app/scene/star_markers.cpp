@@ -88,6 +88,9 @@ void append_star_markers(const StarCatalog& catalog, double distance_km,
     }
 
     for (const Star& star : catalog.stars) {
+        if (star.name.empty()) {
+            continue;
+        }
         const double radius_deg =
             star.marker_radius_deg > 0.0f ? star.marker_radius_deg : catalog.marker_radius_deg;
         const double radius_rad = radius_deg * core::kDegToRad;

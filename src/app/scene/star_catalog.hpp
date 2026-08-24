@@ -9,6 +9,9 @@
 namespace solar::app {
 
 struct Star {
+    /// Hipparcos identifier; 0 if this is not a HIP star (e.g. Galactic centre).
+    int hip{0};
+    /// Empty means no reticle or label; figure vertices often have only `hip`.
     std::string name{};
     double ra_deg{};
     double dec_deg{};
@@ -27,5 +30,17 @@ struct StarCatalog {
     float marker_radius_deg{0.35f};
     bool visible{true};
 };
+
+[[nodiscard]] inline const Star* star_by_hip(const StarCatalog& catalog, int hip) {
+    if (hip <= 0) {
+        return nullptr;
+    }
+    for (const Star& star : catalog.stars) {
+        if (star.hip == hip) {
+            return &star;
+        }
+    }
+    return nullptr;
+}
 
 } // namespace solar::app

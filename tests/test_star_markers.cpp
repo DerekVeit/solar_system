@@ -29,8 +29,21 @@ TEST_CASE("stars.json includes Dubhe at J2000 RA/Dec", "[stars][json]") {
         }
     }
     REQUIRE(dubhe != nullptr);
+    CHECK(dubhe->hip == 54061);
     CHECK(dubhe->ra_deg == Approx(165.9320).margin(1e-4));
     CHECK(dubhe->dec_deg == Approx(61.7510).margin(1e-4));
+    CHECK(solar::app::star_by_hip(catalog, 54061) == dubhe);
+    CHECK(solar::app::star_by_hip(catalog, 91262)->name == "Vega");
+    CHECK(solar::app::star_by_hip(catalog, 0) == nullptr);
+
+    const solar::app::Star* galactic_centre = nullptr;
+    for (const solar::app::Star& star : catalog.stars) {
+        if (star.name == "Galactic centre") {
+            galactic_centre = &star;
+        }
+    }
+    REQUIRE(galactic_centre != nullptr);
+    CHECK(galactic_centre->hip == 0);
 
     std::set<std::string> names;
     for (const solar::app::Star& star : catalog.stars) {
@@ -87,6 +100,17 @@ TEST_CASE("stroke font emits line pairs for letters and skips spaces", "[stars][
         CHECK(point.y <= solar::app::kStrokeFontCapHeight + 0.1);
         CHECK(point.z == Approx(0.0).margin(1e-12));
     }
+}
+
+TEST_CASE("unlabeled HIP stars do not get reticles or labels", "[stars]") {
+    solar::app::StarCatalog catalog{};
+    catalog.stars.push_back(solar::app::Star{.hip = 24436, .ra_deg = 78.6345, .dec_deg = -8.2016});
+
+    solar::app::DrawBatch batch;
+    solar::app::append_star_markers(catalog, 1000.0, {1.0, 0.0, 0.0}, {0.0, 0.0, 1.0}, batch);
+    CHECK(batch.line_loops.empty());
+    CHECK(batch.lines.empty());
+    CHECK(solar::app::star_by_hip(catalog, 24436) == &catalog.stars.front());
 }
 
 TEST_CASE("append_star_markers draws a reticle and a name label", "[stars]") {
