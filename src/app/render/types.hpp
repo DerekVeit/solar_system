@@ -3,7 +3,6 @@
 #include "app/color.hpp"
 #include "app/scene/body_visual_config.hpp"
 
-#include <glad/gl.h>
 #include <glm/ext/matrix_double3x3.hpp>
 #include <glm/vec3.hpp>
 

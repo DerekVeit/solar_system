@@ -10,6 +10,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <glm/ext/vector_double3.hpp>
 #include <glm/mat3x3.hpp>
 #include <glm/vec3.hpp>
 #include <optional>
@@ -68,7 +69,7 @@ bool Scene::init() {
         star_catalog_.stars.empty() ? 0 : StarCatalog::kMarkerSamples;
     const RenderCapacity capacity{
         .max_spheres = bodies_.size(),
-        .max_line_vertices = 0,
+        .max_line_vertices = star_marker_line_vertex_capacity(star_catalog_),
         .max_line_trail_vertices = trail_bodies * BodyVisual::kTailSamples,
         .max_line_loop_vertices =
             std::max(trail_bodies * BodyVisual::kOrbitSamples, star_loop_vertices),
@@ -112,6 +113,7 @@ void Scene::render(const sim::SolarSystem& simulation, float aspect_ratio, int f
     batch.spheres.reserve(bodies_.size());
     batch.line_loops.reserve(bodies_.size() + star_catalog_.stars.size());
     batch.line_trails.reserve(bodies_.size());
+    batch.lines.reserve(star_catalog_.stars.size());
 
     const ViewFrame view{
         .camera = camera_,
@@ -124,7 +126,12 @@ void Scene::render(const sim::SolarSystem& simulation, float aspect_ratio, int f
     }
     const double marker_distance_km =
         static_cast<double>(Camera::kFarAu) * StarCatalog::kDistanceFarFraction * core::kAuKm;
-    append_star_markers(star_catalog_, marker_distance_km, batch);
+    glm::vec3 view_right{};
+    glm::vec3 view_up{};
+    glm::vec3 view_forward{};
+    camera_.view_basis(view_right, view_up, view_forward);
+    append_star_markers(star_catalog_, marker_distance_km, glm::dvec3{view_right},
+                        glm::dvec3{view_up}, batch);
     renderer_->draw(batch, camera_.view_matrix(), camera_.projection_matrix());
 }
 

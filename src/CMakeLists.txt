@@ -53,6 +53,7 @@ add_executable(solar_system
     app/scene/sky_loader.cpp
     app/scene/star_catalog_loader.cpp
     app/scene/star_markers.cpp
+    app/scene/stroke_font.cpp
     app/scene/texture.cpp
     app/window.cpp
 )

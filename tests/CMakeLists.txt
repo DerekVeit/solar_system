@@ -19,6 +19,8 @@ target_sources(solar_system_tests
         ${CMAKE_SOURCE_DIR}/src/app/scene/body_visual_loader.cpp
         ${CMAKE_SOURCE_DIR}/src/app/scene/sky_loader.cpp
         ${CMAKE_SOURCE_DIR}/src/app/scene/star_catalog_loader.cpp
+        ${CMAKE_SOURCE_DIR}/src/app/scene/star_markers.cpp
+        ${CMAKE_SOURCE_DIR}/src/app/scene/stroke_font.cpp
 )
 
 target_link_libraries(solar_system_tests

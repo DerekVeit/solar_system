@@ -19,6 +19,8 @@ struct Star {
 struct StarCatalog {
     static constexpr std::size_t kMarkerSamples = 48;
     static constexpr float kDistanceFarFraction = 0.9f;
+    static constexpr float kLabelHeightDeg = 0.65f;
+    static constexpr float kLabelGapDeg = 0.18f;
 
     std::vector<Star> stars{};
     Color color{1.0f, 0.85f, 0.35f, 0.9f};
