@@ -1,0 +1,16 @@
+{
+  "visible": true,
+  "line_gap_deg": 0.5,
+  "color": [0.55, 0.65, 0.85, 0.32],
+  "figures": [
+    {
+      "id": "dipper",
+      "name": "Big Dipper",
+      "kind": "asterism",
+      "polylines": [
+        [54061, 53910, 58001, 59774, 62956, 65378, 67301],
+        [54061, 59774]
+      ]
+    }
+  ]
+}
