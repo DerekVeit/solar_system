@@ -4,6 +4,11 @@ C++20 interactive simulation of solar system geometry and motion. Bodies move
 on Keplerian orbits in the ecliptic plane and are drawn in a GLFW/OpenGL window
 with orbit trails, camera pan/zoom, and optional body follow.
 
+![Earth view](docs/Earth%20at%202026-08-30%2014-12-29.png)
+*Earth at 2026-08-30 14:12:29 PDT*
+
+[More images](docs)
+
 ## Features
 
 - **Keplerian ephemeris** — osculating elements for the Sun, eight planets,
