@@ -15,8 +15,6 @@ struct BodyDefinition {
     std::string primary{};
     double gravitational_parameter_km3_s2{};
     double radius_km{};
-    /// Temporary ecliptic tilt used by body_orientation_matrix until pole-based R is implemented.
-    float obliquity_deg{};
     BodyPole pole{};
     BodyRotation rotation{};
     /// If true, Ẇ is the Keplerian mean motion of this orbit (same μ and a), so

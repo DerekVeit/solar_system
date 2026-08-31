@@ -4,7 +4,6 @@
       "name": "Sun",
       "mu_km3_s2": 132712440041.93938,
       "radius_km": 695700.0,
-      "obliquity_deg": 7.25,
       "pole": {
         "ra_deg": 286.13,
         "dec_deg": 63.87
@@ -28,7 +27,6 @@
       "name": "Mercury",
       "mu_km3_s2": 22031.86855,
       "radius_km": 2439.4,
-      "obliquity_deg": 0.034,
       "pole": {
         "ra_deg": 281.0103,
         "dec_deg": 61.4155
@@ -52,7 +50,6 @@
       "name": "Venus",
       "mu_km3_s2": 324858.592,
       "radius_km": 6051.8,
-      "obliquity_deg": 177.36,
       "pole": {
         "ra_deg": 272.76,
         "dec_deg": 67.16
@@ -76,7 +73,6 @@
       "name": "Earth",
       "mu_km3_s2": 398600.4418,
       "radius_km": 6378.137,
-      "obliquity_deg": 23.44,
       "pole": {
         "ra_deg": 0.0,
         "dec_deg": 90.0
@@ -101,7 +97,6 @@
       "primary": "Earth",
       "mu_km3_s2": 4902.800066,
       "radius_km": 1737.4,
-      "obliquity_deg": 6.67,
       "pole": {
         "ra_deg": 269.9949,
         "dec_deg": 66.5392
@@ -126,7 +121,6 @@
       "name": "Mars",
       "mu_km3_s2": 42828.375816,
       "radius_km": 3396.19,
-      "obliquity_deg": 25.19,
       "pole": {
         "ra_deg": 317.68143,
         "dec_deg": 52.8865
@@ -151,7 +145,6 @@
       "primary": "Mars",
       "mu_km3_s2": 0.0007087,
       "radius_km": 11.27,
-      "obliquity_deg": 0.0,
       "pole": {
         "ra_deg": 317.68,
         "dec_deg": 52.89
@@ -177,7 +170,6 @@
       "primary": "Mars",
       "mu_km3_s2": 9.62e-05,
       "radius_km": 6.2,
-      "obliquity_deg": 0.0,
       "pole": {
         "ra_deg": 316.65,
         "dec_deg": 53.52
@@ -202,7 +194,6 @@
       "name": "Jupiter",
       "mu_km3_s2": 126712764.1,
       "radius_km": 71492.0,
-      "obliquity_deg": 3.13,
       "pole": {
         "ra_deg": 268.056595,
         "dec_deg": 64.495303
@@ -227,7 +218,6 @@
       "primary": "Jupiter",
       "mu_km3_s2": 5959.916,
       "radius_km": 1821.6,
-      "obliquity_deg": 0.05,
       "pole": {
         "ra_deg": 268.05,
         "dec_deg": 64.5
@@ -253,7 +243,6 @@
       "primary": "Jupiter",
       "mu_km3_s2": 3202.739,
       "radius_km": 1560.8,
-      "obliquity_deg": 0.47,
       "pole": {
         "ra_deg": 268.08,
         "dec_deg": 64.51
@@ -279,7 +268,6 @@
       "primary": "Jupiter",
       "mu_km3_s2": 9887.834,
       "radius_km": 2631.2,
-      "obliquity_deg": 0.2,
       "pole": {
         "ra_deg": 268.2,
         "dec_deg": 64.57
@@ -305,7 +293,6 @@
       "primary": "Jupiter",
       "mu_km3_s2": 7179.289,
       "radius_km": 2410.3,
-      "obliquity_deg": 0.19,
       "pole": {
         "ra_deg": 268.72,
         "dec_deg": 64.83
@@ -330,7 +317,6 @@
       "name": "Saturn",
       "mu_km3_s2": 37931206.234,
       "radius_km": 58232.0,
-      "obliquity_deg": 26.73,
       "pole": {
         "ra_deg": 40.589,
         "dec_deg": 83.537
@@ -355,7 +341,6 @@
       "primary": "Saturn",
       "mu_km3_s2": 2.5026,
       "radius_km": 198.2,
-      "obliquity_deg": 0.0,
       "pole": {
         "ra_deg": 40.66,
         "dec_deg": 83.52
@@ -381,7 +366,6 @@
       "primary": "Saturn",
       "mu_km3_s2": 7.2027,
       "radius_km": 252.1,
-      "obliquity_deg": 0.0,
       "pole": {
         "ra_deg": 40.66,
         "dec_deg": 83.52
@@ -407,7 +391,6 @@
       "primary": "Saturn",
       "mu_km3_s2": 41.21,
       "radius_km": 531.0,
-      "obliquity_deg": 0.0,
       "pole": {
         "ra_deg": 40.66,
         "dec_deg": 83.52
@@ -433,7 +416,6 @@
       "primary": "Saturn",
       "mu_km3_s2": 73.115,
       "radius_km": 561.4,
-      "obliquity_deg": 0.0,
       "pole": {
         "ra_deg": 40.66,
         "dec_deg": 83.52
@@ -459,7 +441,6 @@
       "primary": "Saturn",
       "mu_km3_s2": 153.94,
       "radius_km": 763.8,
-      "obliquity_deg": 0.0,
       "pole": {
         "ra_deg": 40.38,
         "dec_deg": 83.55
@@ -485,7 +466,6 @@
       "primary": "Saturn",
       "mu_km3_s2": 8978.14,
       "radius_km": 2574.73,
-      "obliquity_deg": 0.0,
       "pole": {
         "ra_deg": 39.4827,
         "dec_deg": 83.4279
@@ -511,7 +491,6 @@
       "primary": "Saturn",
       "mu_km3_s2": 120.51,
       "radius_km": 734.5,
-      "obliquity_deg": 0.0,
       "pole": {
         "ra_deg": 318.16,
         "dec_deg": 75.03
@@ -536,7 +515,6 @@
       "name": "Uranus",
       "mu_km3_s2": 5793950.6103,
       "radius_km": 25362.0,
-      "obliquity_deg": 97.77,
       "pole": {
         "ra_deg": 257.311,
         "dec_deg": -15.175
@@ -561,7 +539,6 @@
       "primary": "Uranus",
       "mu_km3_s2": 4.4,
       "radius_km": 235.8,
-      "obliquity_deg": 0.0,
       "pole": {
         "ra_deg": 257.43,
         "dec_deg": -15.08
@@ -587,7 +564,6 @@
       "primary": "Uranus",
       "mu_km3_s2": 86.4,
       "radius_km": 578.9,
-      "obliquity_deg": 0.0,
       "pole": {
         "ra_deg": 257.43,
         "dec_deg": -15.1
@@ -613,7 +589,6 @@
       "primary": "Uranus",
       "mu_km3_s2": 81.5,
       "radius_km": 584.7,
-      "obliquity_deg": 0.0,
       "pole": {
         "ra_deg": 257.43,
         "dec_deg": -15.1
@@ -639,7 +614,6 @@
       "primary": "Uranus",
       "mu_km3_s2": 228.2,
       "radius_km": 788.9,
-      "obliquity_deg": 0.0,
       "pole": {
         "ra_deg": 257.43,
         "dec_deg": -15.1
@@ -665,7 +639,6 @@
       "primary": "Uranus",
       "mu_km3_s2": 205.3,
       "radius_km": 761.4,
-      "obliquity_deg": 0.0,
       "pole": {
         "ra_deg": 257.43,
         "dec_deg": -15.1
@@ -690,7 +663,6 @@
       "name": "Neptune",
       "mu_km3_s2": 6835099.97,
       "radius_km": 24624.0,
-      "obliquity_deg": 28.32,
       "pole": {
         "ra_deg": 299.36,
         "dec_deg": 43.46
@@ -715,7 +687,6 @@
       "primary": "Neptune",
       "mu_km3_s2": 1427.6,
       "radius_km": 1353.4,
-      "obliquity_deg": 0.0,
       "pole": {
         "ra_deg": 299.36,
         "dec_deg": 41.17
@@ -740,7 +711,6 @@
       "name": "Pluto",
       "mu_km3_s2": 869.326,
       "radius_km": 1188.3,
-      "obliquity_deg": 122.53,
       "pole": {
         "ra_deg": 132.993,
         "dec_deg": -6.163
@@ -765,7 +735,6 @@
       "primary": "Pluto",
       "mu_km3_s2": 105.88,
       "radius_km": 606.0,
-      "obliquity_deg": 0.0,
       "pole": {
         "ra_deg": 132.993,
         "dec_deg": -6.163

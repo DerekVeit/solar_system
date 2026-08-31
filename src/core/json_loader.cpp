@@ -68,7 +68,6 @@ std::vector<BodyDefinition> load_bodies(const std::filesystem::path& path) {
             .primary = entry.value("primary", std::string{}),
             .gravitational_parameter_km3_s2 = entry.at("mu_km3_s2").get<double>(),
             .radius_km = entry.at("radius_km").get<double>(),
-            .obliquity_deg = entry.at("obliquity_deg").get<float>(),
             .pole = parse_pole(entry),
             .rotation = parse_rotation(entry),
             .tidally_locked = entry.value("tidally_locked", false),
